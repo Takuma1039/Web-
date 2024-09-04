@@ -24,11 +24,11 @@ class ItemRequest extends FormRequest
         if ($this->isMethod('get')) return [];
 
         return [
-            'name' => 'required',
-            'body' => 'required',
-            'address' => 'required',
-            'lat' => 'required',
-            'long' => 'required',
+            'spot.name' => 'required',
+            'spot.body' => 'required',
+            'spot.address' => 'required',
+            'spot.lat' => 'required',
+            'spot.long' => 'required',
             'files.*.photo' => 'image|mimes:jpeg,bmp,png',
         ];
     }

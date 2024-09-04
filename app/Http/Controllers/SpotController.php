@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests\ItemRequest;
 use App\Models\Spot;
+use App\Models\Spot_image;
+use Cloudinary;
 
 class SpotController extends Controller
 {
@@ -16,32 +18,35 @@ class SpotController extends Controller
         return view('Spot.index', $data);
     }
     
-    public function create(ItemRequest $request)
+    public function show(Spot $spot, Spot_image $spot_image)
     {
-        // POST
-        if ($request->isMethod('POST')) {
-            dd($request->all());
-            // 商品情報の保存
-            $item = Spot::create(['name'=> $request->name, 
-                                  'body'=> $request->body,
-                                  'address' => $request->address,
-                                  'lat' => $request->lat,
-                                  'long' => $request->long]);
-
-            // 商品画像の保存
-            foreach ($request->file('files') as $index=> $e) {
-                $ext = $e['photo']->guessExtension();
-                $filename = "{$request->name}_{$index}.{$ext}";
-                $path = $e['photo']->storeAs('image', $filename);
-                // photosメソッドにより、商品に紐付けられた画像を保存する
-                $item->spotimages()->create(['image_path'=> $path]);
-            }
-
-            return redirect('/')->with(['success'=> '保存しました！']);
+        //変数の中身の確認
+        $image_get = Spot_Image::where('spot_id', '=', $spot->id)->get();
+        return view("Spot.show")->with(['spot' => $spot,'spot_image' => $image_get]);
+    }
+    
+    public function create()
+    {
+        return view('Spot.create');  //create.blade.phpを表示
+    }
+    
+    public function store(ItemRequest $request, Spot_image $spot_image, Spot $spot)
+    {
+        $images = $request->file('image');
+        $input = $request['spot'];
+        $spot->fill($input)->save();
+        //dd($spot);
+        foreach($images as $image){
+            //cloudinaryへ画像を送信し、画像のURLを$image_urlに代入している
+            $image_url = Cloudinary::upload($image->getRealPath())->getSecurePath();
+            //dd($image_url);  //画像のURLを画面に表示
+            $spot_image = New Spot_image();
+            $spot_image->spot_id = $spot->id;
+            $spot_image->image_path = $image_url;
+            dd($spot_image);
+            $spot_image->save();
         }
-
-        // GET
-        return view('Spot.create');
+        return redirect('/spots/' . $spot->id);
     }
     
     public function favprote_spots()

@@ -37,8 +37,9 @@ Route::middleware('auth')->group(function () {
 
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
-    Route::get('/spots', [SpotController::class, 'index'])->name('spot');
-    Route::get('/create', [SpotController::class, 'create'])->name('create');
+    Route::get('/spots/create', [SpotController::class, 'create']);  //スポット作成フォーム
+    Route::get('/spots/{spot}', [SpotController::class, 'show'])->name('show'); //スポット詳細画面表示
+    Route::post('/spots', [SpotController::class, 'store'])->name('store'); //画像を含めたスポット投稿の保存機能
     Route::post('/spots/{spot}/favorite', [FavoriteController::class, 'store'])->name('favorite.store');
     Route::delete('/spots/{spot}/unfavorite', [FavoriteController::class, 'destroy'])->name('favorite.destroy');
     Route::get('/favorites', [SpotController::class, 'favorite_spots'])->name('favorites');
