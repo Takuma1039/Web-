@@ -12,7 +12,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(SpotSeeder::class);
+        $this->call([
+            SeasonSeeder::class,
+            MonthSeeder::class,
+            LocalSeeder::class,
+            SpotcategorySeeder::class
+        ]);
         // \App\Models\User::factory(10)->create();
 
         // \App\Models\User::factory()->create([

@@ -9,7 +9,7 @@
 @foreach ($spots as $spot)
 <body class="spot-item">
     <div class="spot-title">
-        <a href="{{ route('spot.show', $spot) }}">{{ $spot->title }}</a>
+        <a href="{{ route('Spot.show', $spot) }}">{{ $spot->title }}</a>
     </div>
     <div class="spot-info">
         {{ $spot->created_at }}｜{{ $spot->user->name }}

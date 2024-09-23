@@ -1,0 +1,16 @@
+/* いいね押下時の星の色 */
+.liked {
+    color: orangered;
+    transition: 0.2s;
+}
+.flexbox {
+    align-items: center;
+    display: flex;
+}
+.count-num {
+    font-size: 20px;
+    margin-left: 10px;
+}
+.fa-star {
+    font-size: 30px;
+}

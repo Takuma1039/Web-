@@ -6,6 +6,10 @@ use Illuminate\Http\Request;
 use App\Http\Requests\ItemRequest;
 use App\Models\Spot;
 use App\Models\Spot_image;
+use App\Models\SpotCategory;
+use App\Models\Season;
+use App\Models\Local;
+use App\Models\Month;
 use Cloudinary;
 
 class SpotController extends Controller
@@ -21,13 +25,14 @@ class SpotController extends Controller
     public function show(Spot $spot, Spot_image $spot_image)
     {
         //変数の中身の確認
+        //dd($spot);
         $image_get = Spot_Image::where('spot_id', '=', $spot->id)->get();
         return view("Spot.show")->with(['spot' => $spot,'spot_image' => $image_get]);
     }
     
-    public function create()
+    public function create(SpotCategory $spotcategory, Local $local, Season $season, Month $month)
     {
-        return view('Spot.create');  //create.blade.phpを表示
+        return view('Spot.create')->with(['spotcategories' => $spotcategory->get(), 'locals' => $local->get(), 'seasons' => $season->get(), 'months' => $month->get()]);  //create.blade.phpを表示
     }
     
     public function store(ItemRequest $request, Spot_image $spot_image, Spot $spot)
@@ -43,7 +48,6 @@ class SpotController extends Controller
             $spot_image = New Spot_image();
             $spot_image->spot_id = $spot->id;
             $spot_image->image_path = $image_url;
-            dd($spot_image);
             $spot_image->save();
         }
         return redirect('/spots/' . $spot->id);

@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Local extends Model
 {
     use HasFactory;
+    
+    public function spots()
+    {
+        return $this->hasMany(Spot::class);
+    }
 }

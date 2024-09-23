@@ -2,6 +2,29 @@
 <!-- フォーム -->
 <form action="/spots" method="POST" enctype="multipart/form-data">
     @csrf <!--他のサイトからのリクエスト送信などを許容しないため-->
+    <div class="spot_category">
+      <h2>Category</h2>
+        <select name="spot[spot_category_id]">
+          @foreach($spotcategories as $spotcategory)
+            <option value="{{ $spotcategory->id }}">{{ $spotcategory->name }}</option>
+          @endforeach
+        </select>
+        <select name="spot[local_id]">
+          @foreach($locals as $local)
+            <option value="{{ $local->id }}">{{ $local->name }}</option>
+          @endforeach
+        </select>
+        <select name="spot[season_id]">
+          @foreach($seasons as $season)
+            <option value="{{ $season->id }}">{{ $season->name }}</option>
+          @endforeach
+        </select>
+        <select name="spot[month_id]">
+          @foreach($months as $month)
+            <option value="{{ $month->id }}">{{ $month->name }}</option>
+          @endforeach
+        </select>
+    </div>
     <div class="name">
       <h2>Name</h2>
       <input type="text" name="spot[name]" placeholder="名前" value="{{ old('spot.name') }}"/>　
@@ -35,6 +58,6 @@
     <button type="submit" class="btn btn-success" value="store"> Upload </button>
 </form>
 <div class="footer">
-    <a href="/">戻る</a>
+    <a href="/dashboard">戻る</a>
 </div>
 </x-app-layout>
