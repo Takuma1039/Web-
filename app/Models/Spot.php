@@ -23,7 +23,7 @@ class Spot extends Model
     
     public function spotcategory() //1対多なのでspotcategory単数形
     {
-        return $this->belongsTo(SpotCategory::class);
+        return $this->belongsTo(SpotCategory::class, 'spot_category_id');
     }
     
     public function local()

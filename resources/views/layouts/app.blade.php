@@ -7,13 +7,15 @@
 
         <title>{{ config('app.name', 'Laravel') }}</title>
         
-        <!-- Fonts -->
+        <!-- Css -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        <!--star icon-->
         <script src="https://kit.fontawesome.com/77786c3cf3.js" crossorigin="anonymous"></script>
+        <!--slider-->
+        <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.1/dist/flowbite.min.js"></script>
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100">

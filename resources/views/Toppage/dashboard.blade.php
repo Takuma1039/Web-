@@ -1,34 +1,96 @@
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css" rel="stylesheet" />
-
 <x-app-layout>
-    <div class="flex bg-gray-100">
-      <div class="flex overflow-hidden">
+    <div class="mx-auto max-w-screen-2xl bg-gray-100">
+      <div class="overflow-hidden">
         <!-- Content Body -->
         <div class=" flex-1 overflow-auto p-4">
-        <!--検索form-->
-          <div class=" mx-auto mt-5 w-screen max-w-screen-md leading-6">
-            <form class="relative flex w-full flex-col justify-between rounded-lg border sm:flex-row sm:items-center sm:p-0">
-              <div class="flex">
-                <label class="focus-within:ring h-14 rounded-md bg-gray-200 px-2 ring-emerald-200 border-none" for="category">
-                  <select class="border-transparent focus:border-transparent focus:ring-0 bg-transparent pl-6 py-4 outline-none border-none" name="spot[spot_category_id]" id="category">
-                    @foreach($spotcategories as $spotcategory)
-                      <option value="{{ $spotcategory->id }}">{{ $spotcategory->name }}</option>
-                    @endforeach
-                  </select>
-                </label>
-                <input type="name" name="search" value="" class="ml-1 h-14 w-full cursor-text rounded-md border py-4 pl-6 outline-none ring-emerald-200 sm:border-0 sm:pr-40 sm:pl-12 focus:ring" placeholder="City, Address, Zip :" />
-              </div>
-              <button type="submit" class="mt-2 inline-flex h-12 w-full items-center justify-center rounded-md bg-emerald-500 px-10 text-center align-middle text-base font-medium normal-case text-white outline-none ring-emerald-200 ring-offset-1 sm:absolute sm:right-0 sm:mt-0 sm:mr-1 sm:w-32 focus:ring">Search</button>
-            </form>
-            <!--<div class="mt-4 divide-y rounded-b-xl border px-4 shadow-lg sm:mr-32 sm:ml-28">-->
-            <!--  <div class="cursor-pointer px-4 py-2 text-gray-600 hover:bg-emerald-400 hover:text-white"><span class="m-0 font-medium">Ca</span> <span>lifornia</span></div>-->
-            <!--  <div class="cursor-pointer px-4 py-2 text-gray-600 hover:bg-emerald-400 hover:text-white"><span class="m-0 font-medium">Ca</span> <span>nada</span></div>-->
-            <!--  <div class="cursor-pointer px-4 py-2 text-gray-600 hover:bg-emerald-400 hover:text-white"><span class="m-0 font-medium">Ca</span> <span>mbodia</span></div>-->
-            <!--  <div class="cursor-pointer px-4 py-2 text-gray-600 hover:bg-emerald-400 hover:text-white"><span class="m-0 font-medium">Ca</span> <span>meo</span></div>-->
-            <!--  <div class="cursor-pointer px-4 py-2 text-gray-600 hover:bg-emerald-400 hover:text-white"><span class="m-0 font-medium">Ca</span> <span>rsville</span></div>-->
-            <!--</div>-->
+          <!-- 検索バー -->
+          <div class="flex justify-center mb-6">
+            <input id="searchInput" type="text" placeholder="探したいキーワード" class="border border-gray-300 rounded-md p-2 w-1/2">
+            <button class="ml-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
+              検索
+            </button>
           </div>
 
+          <!-- モーダル -->
+          <div id="searchModal" class="fixed inset-0 hidden z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <div class="bg-white p-6 rounded-lg shadow-lg max-w-xl w-full"> <!-- 横幅を拡大 -->
+              <h2 class="text-lg font-semibold mb-4">Search for a Location</h2>
+              <form action="/search" method="GET">
+                <!-- クエリ入力 -->
+                <input type="text" name="query" class="w-full border border-gray-300 p-2 rounded-md mb-4" placeholder="探したいキーワード">
+
+                <!-- カテゴリー選択 -->
+                <h3 class="mb-2">Spot Categories:</h3>
+                <div class="flex flex-wrap mb-4">
+                  @foreach($spotcategories as $spotcategory)
+                    <label class="flex items-center mr-4 mb-2">
+                      <input type="checkbox" name="spot[spot_category_ids][]" value="{{ $spotcategory->id }}" class="mr-2">
+                        {{ $spotcategory->name }}
+                      </label>
+                  @endforeach
+                </div>
+
+                <!-- Local -->
+                <h3 class="mb-2">Local:</h3>
+                <div class="flex flex-wrap mb-4">
+                  @foreach($locals as $local)
+                    <label class="flex items-center mr-4 mb-2">
+                      <input type="checkbox" name="spot[local_ids][]" value="{{ $local->id }}" class="mr-2">
+                        {{ $local->name }}
+                    </label>
+                  @endforeach
+                </div>
+
+                <!-- Season -->
+                <h3 class="mb-2">Season:</h3>
+                <div class="flex flex-wrap mb-4">
+                  @foreach($seasons as $season)
+                    <label class="flex items-center mr-4 mb-2">
+                      <input type="checkbox" name="spot[season_ids][]" value="{{ $season->id }}" class="mr-2">
+                        {{ $season->name }}
+                    </label>
+                  @endforeach
+                </div>
+
+                <!-- Month -->
+                <h3 class="mb-2">Month:</h3>
+                <div class="flex flex-wrap mb-4">
+                  @foreach($months as $month)
+                    <label class="flex items-center mr-4 mb-2">
+                      <input type="checkbox" name="spot[month_ids][]" value="{{ $month->id }}" class="mr-2">
+                        {{ $month->name }}
+                    </label>
+                  @endforeach
+                </div>
+
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Search</button>
+              </form>
+              <button id="closeModal" class="mt-4 text-blue-500">Close</button>
+            </div>
+          </div>
+
+          <script>
+            const searchInput = document.getElementById("searchInput");
+            const searchModal = document.getElementById("searchModal");
+            const closeModal = document.getElementById("closeModal");
+
+            // 検索ボックスがクリックされたときモーダルを表示
+            searchInput.addEventListener("focus", () => {
+              searchModal.classList.remove("hidden");
+            });
+
+            // モーダルを閉じるボタン
+            closeModal.addEventListener("click", () => {
+              searchModal.classList.add("hidden");
+            });
+  
+            // モーダル外をクリックしたときも閉じる
+            searchModal.addEventListener("click", (event) => {
+              if (event.target === searchModal) {
+                searchModal.classList.add("hidden");
+              }
+            });
+          </script>
 
               <!--<h1 class="text-2xl font-semibold">Welcome to our website</h1>-->
               <!--<p>... Content goes here ...</p>-->
@@ -85,188 +147,102 @@
             </button>
           </div>
 	            
-          <!--image-->  
-            <h1 class="text-2xl font-semibold my-2">人気スポットランキング<h1></h1>
-            <a href="" class="flex items-center text-indigo-700 border border-indigo-600 py-2 px-6 gap-2 rounded inline-flex items-center">
-              <span>
-                View More
-              </span>
-              <svg class="w-4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                viewBox="0 0 24 24" class="w-6 h-6 ml-2">
+          <!--ranking--> 
+          <div class="flex items-center mt-4">
+            <h1 class="text-xl md:text-2xl font-semibold mr-2">人気スポットランキング</h1>
+            <a href="{{ route('major.ranking') }}" class="flex items-center text-white bg-gradient-to-r from-blue-500 to-indigo-600 border-none py-1 px-3 rounded-full shadow-md transform transition-all duration-200 hover:scale-105 hover:shadow-lg text-sm">
+              <span>View More</span>
+              <svg class="w-3 h-3 md:w-4 md:h-4 ml-2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
                 <path d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
               </svg>
             </a>
-            <!--spotimage-->
-            <div class="max-w-screen-xl mx-auto p-5">
-              <div class="grid md:grid-cols-3 sm:grid-cols-2 gap-10">
-                <div class="rounded overflow-hidden shadow-lg">
-                  <a href="#"></a>
-                    <div class="relative">
-                        <a href="/spots/create">
-                          <img class="w-full"
-                            src="https://images.pexels.com/photos/196667/pexels-photo-196667.jpeg?auto=compress&amp;cs=tinysrgb&amp;dpr=1&amp;w=500"
-                            alt="Sunset in the mountains">
-                          <div class="hover:bg-transparent transition duration-300 absolute bottom- top-0 right-0 left-0 bg-gray-900 opacity-25"></div>
-                        </a>
-                        <!--<a href="#!">-->
-                        <!--  <div class="absolute bottom-0 left-0 bg-indigo-600 px-4 py-2 text-white text-sm hover:bg-white hover:text-indigo-600 transition duration-500 ease-in-out">-->
-                        <!--    Photos-->
-                        <!--  </div>-->
-                        <!--</a>-->
+          </div>
+        </div>
+        
+        <div x-data="swipeCards()" x-init="
+                    let isDown = false; 
+                    let startX; 
+                    let scrollLeft;
+			              $el.addEventListener('mousedown', (e) => {
+			                isDown = true;
+			                startX = e.pageX - $el.offsetLeft;
+			                scrollLeft = $el.scrollLeft;
+			              });
+			              $el.addEventListener('mouseleave', () => {
+			                isDown = false;
+			              });
+			              $el.addEventListener('mouseup', () => {
+			                isDown = false;
+			              });
+			              $el.addEventListener('mousemove', (e) => {
+			                if (!isDown) return;
+			                e.preventDefault();
+			                const x = e.pageX - $el.offsetLeft;
+			                const walk = (x - startX) * 1;
+			                $el.scrollLeft = scrollLeft - walk;
+		                });
+			              " class="overflow-x-scroll scrollbar-hide mb-4 relative px-0.5" style="overflow-y: hidden;">
+	        <div class="flex snap-x snap-mandatory gap-4" style="width: max-content;">
+            <template x-for="card in cards" :key="card.id">
+              <div class="flex-none sm:w-48 md:w-64 h-auto snap-center">
+                <div class="bg-white border border-gray-200 rounded-lg overflow-hidden relative h-full flex flex-col justify-between">
+                  <div>
+                    <!-- 画像の表示 -->
+                    <img :src="card.image" alt="" class="w-full h-40 object-cover">
 
-                        <a href="/spots/1">
-                          <div class="text-sm absolute top-0 right-0 bg-indigo-600 px-4 text-white rounded-full h-16 w-16 flex flex-col items-center justify-center mt-3 mr-3 hover:bg-white hover:text-indigo-600 transition duration-500 ease-in-out">
-                            <span class="font-bold">27</span>
-                            <small>March</small>
-                          </div>
-                        </a>
+                    <!-- 日付ボタンの追加 -->
+                    <a :href="card.link" class="absolute top-3 right-3 z-10" aria-label="カードの詳細リンク">
+                      <div class="text-sm bg-indigo-600 px-4 text-white rounded-full h-16 w-16 flex flex-col items-center justify-center hover:bg-white hover:text-indigo-600 transition duration-500 ease-in-out">
+                        <small class="font-bold" x-text="card.date.month"></small>
                       </div>
-                    
-                      <div class="px-6 py-4">
-                        <a href="#" class="font-semibold text-lg inline-block hover:text-indigo-600 transition duration-500 ease-in-out">
-                          Best View in Newyork City</a>
-                        <p class="text-gray-500 text-sm">
-                          The city that never sleeps
-                        </p>
-                      </div>
-                      <!--<div class="px-6 py-4 flex flex-row items-center">-->
-                      <!--  <span href="#" class="py-1 text-sm font-regular text-gray-900 mr-1 flex flex-row items-center">-->
-                      <!--    <svg height="13px" width="13px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"-->
-                      <!--      xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 512 512"-->
-                      <!--      style="enable-background:new 0 0 512 512;" xml:space="preserve">-->
-                      <!--      <g>-->
-                      <!--        <g>-->
-                      <!--          <path d="M256,0C114.837,0,0,114.837,0,256s114.837,256,256,256s256-114.837,256-256S397.163,0,256,0z M277.333,256c0,11.797-9.536,21.333-21.333,21.333h-85.333c-11.797,0-21.333-9.536-21.333-21.333s9.536-21.333,21.333-21.333h64v-128c0-11.797,9.536-21.333,21.333-21.333s21.333,9.536,21.333,21.333V256z"></path>-->
-                      <!--        </g>-->
-                      <!--      </g>-->
-                      <!--    </svg>-->
-                      <!--    <span class="ml-1">6 mins ago</span>-->
-                      <!--  </span>-->
-                      <!--</div>-->
-                      <div class="px-6 py-4 flex flex-row items-center">
-                        <span class="text-teal-600 font-semibold">
-                          <span>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="far fa-star"></i>
-                          <span>
-                          </span>
-                          <span class="ml-2 text-gray-600 text-sm">34 reviews</span>
-                      </div>
-                  </div>
-                  
-                  <div class="rounded overflow-hidden shadow-lg">
-                    <a href="#"></a>
-                      <div class="relative">
-                        <a href="#">
-                          <img class="w-full"
-                            src="https://images.pexels.com/photos/1653877/pexels-photo-1653877.jpeg?auto=compress&amp;cs=tinysrgb&amp;dpr=1&amp;w=500"
-                            alt="Sunset in the mountains">
-                          <div
-                            class="hover:bg-transparent transition duration-300 absolute bottom-0 top-0 right-0 left-0 bg-gray-900 opacity-25">
-                          </div>
-                        </a>
-                        <a href="#!">
-                          <div
-                            class="absolute bottom-0 left-0 bg-indigo-600 px-4 py-2 text-white text-sm hover:bg-white hover:text-indigo-600 transition duration-500 ease-in-out">
-                            Photos
-                          </div>
-                        </a>
-                        <a href="!#">
-                          <div
-                            class="text-sm absolute top-0 right-0 bg-indigo-600 px-4 text-white rounded-full h-16 w-16 flex flex-col items-center justify-center mt-3 mr-3 hover:bg-white hover:text-indigo-600 transition duration-500 ease-in-out">
-                            <span class="font-bold">20</span>
-                            <small>March</small>
-                          </div>
-                        </a>
-                      </div>
-                      <div class="px-6 py-4">
-                        <a href="#"
-                          class="font-semibold text-lg inline-block hover:text-indigo-600 transition duration-500 ease-in-out">Best
-                          Pizza in Town
-                        </a>
-                        <p class="text-gray-500 text-sm">
-                          The collection of best pizza images in Newyork city
-                        </p>
-                      </div>
-                      <!--<div class="px-6 py-4 flex flex-row items-center">-->
-                      <!--  <span href="#"-->
-                      <!--    class="py-1 text-sm font-regular text-gray-900 mr-1 flex flex-row justify-between items-center">-->
-                      <!--    <svg height="13px" width="13px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"-->
-                      <!--      xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 512 512"-->
-                      <!--      style="enable-background:new 0 0 512 512;" xml:space="preserve">-->
-                      <!--      <g>-->
-                      <!--        <g>-->
-                      <!--          <path -->
-                      <!--            d="M256,0C114.837,0,0,114.837,0,256s114.837,256,256,256s256-114.837,256-256S397.163,0,256,0z M277.333,256 c0,11.797-9.536,21.333-21.333,21.333h-85.333c-11.797,0-21.333-9.536-21.333-21.333s9.536-21.333,21.333-21.333h64v-128 c0-11.797,9.536-21.333,21.333-21.333s21.333,9.536,21.333,21.333V256z">-->
-                      <!--          </path>-->
-                      <!--        </g>-->
-                      <!--      </g>-->
-                      <!--    </svg>-->
-                      <!--    <span class="ml-1">3 mins read</span>-->
-                      <!--  </span>-->
-                      <!--</div>-->
-                  </div>
-            
-                  <div class="rounded overflow-hidden shadow-lg">
-                    <a href="#"></a>
-                    <div class="relative">
-                      <a href="#">
-                        <img class="w-full"
-                          src="https://images.pexels.com/photos/257816/pexels-photo-257816.jpeg?auto=compress&amp;cs=tinysrgb&amp;dpr=1&amp;w=500"
-                          alt="Sunset in the mountains">
-                        <div
-                          class="hover:bg-transparent transition duration-300 absolute bottom-0 top-0 right-0 left-0 bg-gray-900 opacity-25">
-                        </div>
-                      </a>
-                      <a href="#!">
-                        <div
-                          class="absolute bottom-0 left-0 bg-indigo-600 px-4 py-2 text-white text-sm hover:bg-white hover:text-indigo-600 transition duration-500 ease-in-out">
-                          Photos
-                        </div>
-                      </a>
-                      <a href="!#">
-                        <div
-                          class="text-sm absolute top-0 right-0 bg-indigo-600 px-4 text-white rounded-full h-16 w-16 flex flex-col items-center justify-center mt-3 mr-3 hover:bg-white hover:text-indigo-600 transition duration-500 ease-in-out">
-                          <span class="font-bold">15</span>
-                          <small>April</small>
-                        </div>
-                      </a>
+                    </a>
+
+                    <div class="p-4">
+                      <h3 class="text-lg leading-6 font-bold text-gray-900" x-text="card.title"></h3>
+                      <p class="text-gray-600 mt-2 text-sm" x-text="card.description"></p>
                     </div>
-                    <div class="px-6 py-4">
-                      <a href="#"
-                        class="font-semibold text-lg inline-block hover:text-indigo-600 transition duration-500 ease-in-out">Best
-                        Salad Images ever
-                      </a>
-                      <p class="text-gray-500 text-sm">
-                        The collection of best salads of town in pictures
-                      </p>
+                  </div>
+
+                  <!-- 評価の表示 -->
+                  <div class="p-4">
+                    <div class="flex items-center mt-2">
+                      <template x-for="n in 5" :key="n">
+                        <i :class="n <= Math.floor(Number(card.rating)) ? 'fas fa-star text-teal-600' : 'far fa-star text-gray-400'"></i>
+                      </template>
+                      <span class="ml-2 text-gray-600 text-sm" x-text="card.reviewCount + ' reviews'"></span>
                     </div>
-                    <!--<div class="px-6 py-4 flex flex-row items-center">-->
-                    <!--  <span href="#"-->
-                    <!--    class="py-1 text-sm font-regular text-gray-900 mr-1 flex flex-row justify-between items-center">-->
-                    <!--    <svg height="13px" width="13px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"-->
-                    <!--      xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 512 512"-->
-                    <!--      style="enable-background:new 0 0 512 512;" xml:space="preserve">-->
-                    <!--      <g>-->
-                    <!--        <g>-->
-                    <!--          <path-->
-                    <!--            d="M256,0C114.837,0,0,114.837,0,256s114.837,256,256,256s256-114.837,256-256S397.163,0,256,0z M277.333,256 c0,11.797-9.536,21.333-21.333,21.333h-85.333c-11.797,0-21.333-9.536-21.333-21.333s9.536-21.333,21.333-21.333h64v-128 c0-11.797,9.536-21.333,21.333-21.333s21.333,9.536,21.333,21.333V256z">-->
-                    <!--          </path>-->
-                    <!--        </g>-->
-                    <!--      </g>-->
-                    <!--    </svg>-->
-                    <!--    <span class="ml-1">6 mins read</span>-->
-                    <!--  </span>-->
-                    <!--</div>-->
                   </div>
                 </div>
               </div>
-              
-            </div>
-          </div>
+            </template>
+	        </div>
         </div>
-        <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.1/dist/flowbite.min.js"></script>
+      </div>
+    </div>
+    <script>
+	     function swipeCards() {
+			   return {
+			     cards: [
+			       @foreach ($spots as $spot)
+			       {
+			         id: {{ $spot->id }},
+               image: '{{ $spot->spotimages->first()->image_path }}', // 適切な画像URLに置き換えてください
+               title: '{{ $spot->name }}',
+               description: '{{ $spot->truncated_body }}',
+               rating: Math.random() * 5, // デモ用にランダムな評価を生成（適宜修正）
+               reviewCount: {{ rand(10, 100) }}, // デモ用にランダムなレビュー数を生成
+               link: '/spots/{{ $spot->id }}',
+               date: { day: {{ $spot->created_at->day }}, month: '{{ $spot->created_at->format('F') }}' }
+			       },
+			       @endforeach
+			     ],
+			     maxDescriptionLength: 30, // 最大文字数を指定
+           getTruncatedDescription(description) {
+            return description.length > this.maxDescriptionLength
+                ? description.substring(0, this.maxDescriptionLength) + '...' // 切り捨てと省略記号
+                : description;
+           }
+			   };
+			 }
+　　</script>
 </x-app-layout>

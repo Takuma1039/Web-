@@ -13,4 +13,5 @@ class Majorspot extends Model
     {
         return $this->hasMany(Spot::class);
     }
+    
 }

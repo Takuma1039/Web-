@@ -16,6 +16,7 @@ use App\Http\Controllers\SpotlikeController;
 use App\Http\Controllers\LocalController;
 use App\Http\Controllers\SeasonController;
 use App\Http\Controllers\MonthController;
+use App\Http\Controllers\MajorspotController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -36,7 +37,7 @@ Route::get('/spotcategories/{spotcategory}', [SpotcategoryController::class,'ind
 Route::get('/locals/{local}', [LocalController::class,'index']);
 Route::get('/months/{month}', [MonthController::class,'index']);
 Route::get('/seasons/{season}', [SeasonController::class,'index']);
-Route::get('/majorspots/{majorspot}', [MajorspotController::class,'index']);
+Route::get('/majorspots', [MajorspotController::class,'index'])->name('major.ranking');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
