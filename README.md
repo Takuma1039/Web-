@@ -24,7 +24,7 @@ Few Days-Trip (アプリ名[仮])
 <tbody>
 <tr>
 <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">demo103927@gmail.com</font></font></a></td>
-<td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">demo</font></font></td>
+<td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">demo103927</font></font></td>
 </tr>
 </tbody>
 </table></markdown-accessiblity-table>
