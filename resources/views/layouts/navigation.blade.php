@@ -38,7 +38,7 @@
         $isOnline = $user ? $user->isOnline() : false;
     @endphp
     @if ($user)
-        <img class="h-10 w-10 rounded-full object-cover" src="/images/logged-in-icon.png" alt="{{ $user->name }}" />
+        <img class="h-10 w-10 rounded-full object-cover" src="{{ $user->image_path }}" alt="{{ $user->name }}" />
     @else
         <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
             <i class="fas fa-user text-gray-600 text-xl"></i>
