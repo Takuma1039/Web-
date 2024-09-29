@@ -62,3 +62,6 @@
   cursor: pointer;
   float: right;
 }
+#dialog {
+    display: none; /* デフォルトで非表示 */
+}

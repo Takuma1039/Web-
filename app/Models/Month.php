@@ -11,6 +11,11 @@ class Month extends Model
     
     public function spots()
     {
-        return $this->hasMany(Spot::class);
+        return $this->belongsToMany(Spot::class, 'spot_months', 'spot_id', 'month_id');
+    }
+    
+    public function getByCategory(int $limit_count = 5)
+    {
+      return $this->spots()->orderBy('updated_at', 'DESC')->paginate($limit_count);
     }
 }

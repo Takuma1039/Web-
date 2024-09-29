@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('spots', function (Blueprint $table) {
-            $table->foreignId('season_id')->constrained()->onDelete('cascade');
+            $table->text('category_ids')->nullable(); // カテゴリーを保存するカラム
+            $table->text('season_ids')->nullable();   // 季節を保存するカラム
+            $table->text('month_ids')->nullable();    // 月を保存するカラム
         });
     }
 
@@ -22,7 +24,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('spots', function (Blueprint $table) {
-            //
+            $table->dropColumn('category_ids');
+            $table->dropColumn('season_ids');
+            $table->dropColumn('month_ids');
         });
     }
 };

@@ -1,29 +1,17 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use App\Models\Spot;
-use App\Models\Spot_image;
-use App\Models\Category;
-use App\Models\Season;
-use App\Models\Local;
-use App\Models\Month;
-use App\Models\User;
 
-class DashboardController extends Controller
+class MypageController extends Controller
 {
-    public function index(Category $category, Local $local, Season $season, Month $month, Spot_image $spot_image){
-    
-      $spots = Spot::all();
-      foreach ($spots as $spot) {
-            // トランケート処理
-            $spot->truncated_body = $this->truncateAtPunctuation($spot->body, 70); //文字数制限
-            
-            // 画像を取得
-            $spot->images = Spot_Image::where('spot_id', $spot->id)->get(); // 各スポットの画像を取得
-        }
-      return view("Toppage.dashboard")->with(['spotcategories' => $category->get(), 'locals' => $local->get(), 'seasons' => $season->get(), 'months' => $month->get(), 'spots' => $spots]);
+    public function index()
+    {
+      $user = Auth::user();
+      $likedSpots = $user->spotlikes()->with('spot')->get()->pluck('spot');
+
+      return view('mypage.index', compact('likedSpots'));
     }
     
     public function truncateAtPunctuation($string, $maxLength)

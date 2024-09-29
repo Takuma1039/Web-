@@ -3,15 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Spot;
-use App\Models\Category;
 use Illuminate\Http\Request;
+use App\Models\Season;
 
-class SpotcategoryController extends Controller
+class SeasonController extends Controller
 {
-    public function index(Category $category, Request $request)
+    public function index(Season $season, Request $request)
 {
-    // 特定のカテゴリーに関連するスポットを取得し、関連するカテゴリーもロード
-    $spots = $category->spots()->with('spotcategories')->paginate(10);
+    // 特定のシーズンに関連するスポットを取得し、関連するシーズンもロード
+    $spots = $season->spots()->with('seasons')->paginate(10);
     
     // いいねしたスポットを取得
     $likedSpots = Spot::withCount('likes')
@@ -23,7 +23,7 @@ class SpotcategoryController extends Controller
     $query = $request->input('search');
     
     // まず、クエリビルダを開始します
-    $spotsQuery = $category->spots(); //特定のカテゴリに関連するスポットを取得するためのクエリビルダーのインスタンスを生成する
+    $spotsQuery = $season->spots(); //特定のシーズンに関連するスポットを取得するためのクエリビルダーのインスタンスを生成する
     
     // 検索機能を追加
     if ($query) {
@@ -37,10 +37,9 @@ class SpotcategoryController extends Controller
         $spot->truncated_body = $this->truncateAtPunctuation($spot->body, 200);
     }
 
-    return view('spot_categories.index', compact('likedSpots', 'spots', 'category'));
+    return view('season.index', compact('likedSpots', 'spots', 'season'));
 }
-
-    //テキストを特定の文字や句読点で切り捨てるメソッド
+    
     public function truncateAtPunctuation($string, $maxLength)
     {
       if (mb_strlen($string) <= $maxLength) {
@@ -65,4 +64,3 @@ class SpotcategoryController extends Controller
       return mb_substr($truncated, 0, $maxLength) . '...';
     }
 }
-

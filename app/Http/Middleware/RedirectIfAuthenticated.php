@@ -18,7 +18,12 @@ class RedirectIfAuthenticated
     public function handle(Request $request, Closure $next, string ...$guards): Response
     {
         $guards = empty($guards) ? [null] : $guards;
-
+        
+        // ゲストユーザーの情報をセッションに保存する
+        if (!Auth::check()) {
+          session(['guest_user' => true]);
+        }
+        
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
                 return redirect(RouteServiceProvider::HOME);

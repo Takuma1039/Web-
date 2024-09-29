@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
             SeasonSeeder::class,
             MonthSeeder::class,
             LocalSeeder::class,
-            SpotcategorySeeder::class
+            CategorySeeder::class
         ]);
         // \App\Models\User::factory(10)->create();
 

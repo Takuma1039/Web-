@@ -17,7 +17,3 @@ use App\Models\Spot;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
-
-Route::get('/spots', function () {
-    return Spot::all(); // すべてのスポットデータをJSONで返す
-});

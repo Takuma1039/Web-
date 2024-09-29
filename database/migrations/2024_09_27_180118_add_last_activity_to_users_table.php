@@ -11,12 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('spot_categories', function (Blueprint $table) {
-            $table->id();
-            $table->string('name', 50);
-            $table->timestamps();
-            $table->softDeletes();
-            
+        Schema::table('users', function (Blueprint $table) {
+            $table->timestamp('last_activity')->nullable(); // last_activityカラムを追加
         });
     }
 
@@ -25,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('spot_categories');
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('last_activity'); // ロールバック時にカラムを削除
+        });
     }
 };

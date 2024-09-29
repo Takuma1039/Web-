@@ -11,18 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('spots', function (Blueprint $table) {
+        Schema::create('plantypes', function (Blueprint $table) {
             $table->id();
             $table->string('name', 50);
-            $table->string('body', 1000);
-            $table->string('address', 50);
-            $table->string('opendate', 100);
-            $table->string('closedate', 100);
-            $table->string('access', 500);
-            $table->string('price', 100);
-            $table->string('site', 50);
-            $table->double('lat');
-            $table->double('long');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -33,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('spots');
+        Schema::dropIfExists('plantypes');
     }
 };

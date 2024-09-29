@@ -1,123 +1,143 @@
 <x-app-layout>
-  <div class="bg-white dark:bg-gray-800 h-screen h-full py-6 sm:py-8 lg:py-12">
-    <div class="mx-auto max-w-screen-2xl px-4 md:px-8">
-        <div class="flex items-center justify-between gap-8">
-            <div class="flex items-center gap-2">
-              <h2 class="text-2xl font-bold text-gray-800 lg:text-3xl dark:text-white">
-                {{ $spot->name }}
-              </h2>
-              {{-- @authはログイン済ユーザーのみに閲覧できるものを中に定義--}}
-              @auth
-                {{-- 自身がこのスポットにいいねしたのか判定 --}}
-                @if($spot->isLikedByAuthUser())
-                  {{-- こちらがいいね済の際に表示される方で、likedクラスが付与してあることで星に色がつきます --}}
-                  <div class="flex items-center">
-                    <i class="fa-solid fa-star like-btn liked" id={{$spot->id}} style="font-size: 1.5rem;"></i>
-                  </div>
-                @else
-                  <div class="flex items-center">
-                    <i class="fa-solid fa-star like-btn" id={{$spot->id}} style="font-size: 1.5rem;"></i>
-                  </div>
-                @endif
-              @endauth
+  <div class="bg-gray-50 dark:bg-gray-900 min-h-screen py-8">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center">
+            <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white">
+              {{ $spot->name }}
+            </h2>
+            @auth
+  <div class="flex items-center ml-2">
+    <i class="fa-solid fa-star like-btn {{ $spot->isLikedByAuthUser() ? 'liked' : '' }}" id="{{ $spot->id }}" style="font-size: 1.5rem;"></i>
+  </div>
+@endauth
 
-              @guest
-                <p>loginしていません</p>
-              @endguest
-              <!-- いいねメッセージ表示 -->
-              <div id="likeMessage" class="hidden text-sm text-white bg-green-500 px-2 py-1 rounded-md">
-                お気に入り登録しました
-              </div>
-            </div>
-            
-            <a href="#"
-                class="inline-block rounded-lg border bg-white dark:bg-gray-700 dark:border-none px-4 py-2 text-center text-sm font-semibold text-gray-500 dark:text-gray-200 outline-none ring-indigo-300 transition duration-100 hover:bg-gray-100 focus-visible:ring active:bg-gray-200 md:px-8 md:py-3 md:text-base">
-                More
-            </a>
+<!-- いいねメッセージ表示 -->
+<div id="likeMessage" class="hidden text-sm text-white bg-green-500 px-2 py-1 rounded-md">
+  お気に入り登録しました
+</div>
+</div>
+<a href="#"
+  class="inline-block rounded-lg border bg-white dark:bg-gray-700 dark:border-none px-4 py-2 text-center text-sm font-semibold text-gray-500 dark:text-gray-200 outline-none ring-indigo-300 transition duration-100 hover:bg-gray-100 focus-visible:ring active:bg-gray-200 md:px-8 md:py-3 md:text-base">
+  Map
+</a>
+
         </div>
-        <!--カテゴリー-->
-        <div class="flex items-center gap-2 mb-2">
-          @if (!is_null($spot->spotcategory))
-            <a href="/spotcategories/{{ $spot->spotcategory->id }}" class="text-lg text-blue-500 hover:underline">{{ $spot->spotcategory->name }}</a>
-          @else
-            <span>カテゴリーがありません</span>
-          @endif
-            <p><a href="/locals/{{ $spot->local->id }}" class="text-lg text-blue-500 hover:underline">{{ $spot->local->name }}</a></p>
-            <a href="/seasons/{{ $spot->season->id }}" class="text-lg text-blue-500 hover:underline">{{ $spot->season->name }}</a>
-            <a href="/months/{{ $spot->month->id }}" class="text-lg text-blue-500 hover:underline">{{ $spot->month->name }}</a>
-        </div>
-        
-        <div class="mb-4">
+<div class="mb-4">
           <p class="hidden text-gray-500 dark:text-gray-300 md:block">
             {{ $spot->body }}
           </p>
         </div>
+        <!-- カテゴリー、シーズン、月、地域の表示 -->
+        <div class="mb-4 p-4 bg-gray-100 rounded-lg shadow-md">
+  <strong class="text-lg flex items-center">
+    <i class="fa-solid fa-tags mr-2"></i>カテゴリー:
+  </strong>
+  <div class="flex space-x-2 mt-2">
+    @if ($categories->isNotEmpty())
+      @foreach ($categories as $category)
+        <a href="/spotcategories/{{ $category->id }}" class="text-blue-500 hover:text-blue-700 transition duration-200">{{ $category->name }}</a>
+      @endforeach
+    @else
+      <span class="text-gray-500">カテゴリーがありません</span>
+    @endif
+  </div>
+</div>
+
+        <div class="mb-4 p-4 bg-gray-100 rounded-lg shadow-md">
+  <strong class="text-lg flex items-center">
+    <i class="fa-solid fa-snowflake mr-2"></i>シーズン:
+  </strong>
+  @if ($seasons->isNotEmpty())
+    <div class="flex space-x-2 mt-2">
+      @foreach ($seasons as $season)
+        <a href="/seasons/{{ $season->id }}" class="text-blue-500 hover:text-blue-700 transition duration-200">{{ $season->name }}</a>
+      @endforeach
+    </div>
+  @else
+    <span class="text-gray-500">シーズンがありません</span>
+  @endif
+</div>
+
+<div class="mb-4 p-4 bg-gray-100 rounded-lg shadow-md">
+  <strong class="text-lg flex items-center">
+    <i class="fa-solid fa-calendar-alt mr-2"></i>月:
+  </strong>
+  @if ($months->isNotEmpty())
+    <div class="flex space-x-2 mt-2">
+      @foreach ($months as $month)
+        <a href="/months/{{ $month->id }}" class="text-blue-500 hover:text-blue-700 transition duration-200">{{ $month->name }}</a>
+      @endforeach
+    </div>
+  @else
+    <span class="text-gray-500">月がありません</span>
+  @endif
+</div>
+
+<div class="mb-4 p-4 bg-gray-100 rounded-lg shadow-md">
+  <strong class="text-lg flex items-center">
+    <i class="fa-solid fa-map-marker-alt mr-2"></i>地域:
+  </strong>
+  <a href="/locals/{{ $spot->local_id }}" class="text-blue-500 hover:text-blue-700 transition duration-200">{{ $spot->local->name }}</a>
+</div>
 
 
         <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-6 xl:gap-8">
-            <!-- image - start -->
-          @foreach($spot_image as $key => $spot_img)
-            @if($key == 0)
-              <a href="#" class="group relative flex h-48 items-end overflow-hidden rounded-lg bg-gray-100 shadow-lg md:h-80">
-            @elseif($key == 1)
-              <a href="#" class="group relative flex h-48 items-end overflow-hidden rounded-lg bg-gray-100 shadow-lg md:col-span-2 md:h-80">
-            @elseif($key == 2)
-              <a href="#" class="group relative flex h-48 items-end overflow-hidden rounded-lg bg-gray-100 shadow-lg md:col-span-2 md:h-80">
-            @else
-              <a href="#" class="group relative flex h-48 items-end overflow-hidden rounded-lg bg-gray-100 shadow-lg md:h-80">
-           @endif
-                <img src="{{ $spot_img->image_path }}" loading="lazy" alt="Image" class="absolute inset-0 h-full w-full object-cover object-center transition duration-200 group-hover:scale-110" />
-                <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-gray-800 via-transparent to-transparent opacity-50"></div>
-                <span class="relative ml-4 mb-3 inline-block text-sm text-white md:ml-5 md:text-lg">Image{{ $key + 1 }}</span>
-             </a>
-          @endforeach
-        </div>
-        
-        <div class="content">
-          <div class="">
-            <dl>
-	          <dt class="relative p-2 rounded-lg bg-neutral-300 text-center w-36 my-2"><strong>開園時間</strong></dt>
-	          <dd class="w-3/4 mb-2">時期によって異なります。 <a href="http://hitachikaihin.jp/guide/schedule.html" target="_blank">開園時間</a>を確認してください</dd>
-           </dl>
+  @foreach($spotImages as $spot_img)
+    <a href="#" class="group relative flex h-48 items-end overflow-hidden rounded-lg shadow-lg transition-transform duration-300 transform hover:scale-105">
+      <img src="{{ $spot_img->image_path }}" loading="lazy" alt="Image" class="absolute inset-0 h-full w-full object-cover object-center transition duration-200 group-hover:opacity-90" />
+      <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-gray-800 via-transparent to-transparent opacity-40"></div>
+      <span class="relative ml-4 mb-3 inline-block text-sm text-white">Image</span>
+    </a>
+  @endforeach
+</div>
 
-           <dl>
-	         <dt class="relative p-2 rounded-lg bg-neutral-300 text-center w-36 mb-2"><strong>休園日</strong></dt>
-	         <dd class="w-3/4 mb-2">火曜(祝日の場合は翌日)、12/31、1/1、2月第1火～金曜</dd>
-          </dl>
 
-          <dl>
-	        <dt class="relative p-2 rounded-lg bg-neutral-300 text-center w-36 mb-2"><strong>入園料金</strong></dt>
-	        <dd class="w-3/4 mb-2">大人（高校生以上）450円、シルバー（65歳以上）210円、中学生以下無料</dd>
-          </dl>
+        <!-- 詳細情報のセクション -->
+        <div class="content mt-4">
+          <h3 class="text-xl font-bold">詳細情報</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <dl class="p-4 bg-neutral-200 rounded-lg">
+              <dt class="font-semibold">住所</dt>
+              <dd>{!! nl2br(e($spot->address)) !!}</dd>
+            </dl>
+            <dl class="p-4 bg-neutral-200 rounded-lg">
+              <dt class="font-semibold">開園時間</dt>
+              <dd>{!! nl2br(e($spot->opendate)) !!}</dd>
+            </dl>
+            <dl class="p-4 bg-neutral-200 rounded-lg">
+              <dt class="font-semibold">休園日</dt>
+              <dd>{!! nl2br(e($spot->closedate)) !!}</dd>
+            </dl>
+            <dl class="p-4 bg-neutral-200 rounded-lg">
+              <dt class="font-semibold">入園料金</dt>
+              <dd>{!! nl2br(e($spot->price)) !!}</dd>
+            </dl>
+            <dl class="p-4 bg-neutral-200 rounded-lg">
+              <dt class="font-semibold">アクセス</dt>
+              <dd>{!! nl2br(e($spot->access)) !!}</dd>
+            </dl>
+            <dl class="p-4 bg-neutral-200 rounded-lg">
+              <dt class="font-semibold">公式サイト</dt>
+              <dd><a href="{{ $spot->site }}" target="_blank" class="text-blue-500 hover:underline">{{ $spot->site }}</a></dd>
+            </dl>
+          </div>
+        </div>
 
-          <dl>
-	        <dt class="relative p-2 rounded-lg bg-neutral-300 text-center w-36 mb-2"><strong>アクセス</strong></dt>
-	        <dd class="w-3/4 mb-2">【電車】JR常磐線「勝田」駅より路線バス「海浜公園西口（約15分）」下車、または「海浜公園南口（約20分）」下車すぐ<br>
-	            【車】常陸那珂有料道路「ひたち海浜公園」ICすぐ / 常磐自動車道「日立南太田」ICより約15km</dd>
-          </dl>
+        <div class="mt-6 text-center">
+          <a href="javascript:history.back();" class="text-indigo-600 hover:underline">戻る</a>
+        </div>
+      </div>
 
-          <dl>
-	        <dt class="relative p-2 rounded-lg bg-neutral-300 text-center w-36 mb-2"><strong>公式サイト</strong></dt>
-	        <dd class="w-3/4 mb-2"><a href="http://hitachikaihin.jp/" target="_blank">国営ひたち海浜公園</a></dd>
-          </dl>
+      @auth
+        <div class="mt-4 text-right">
+          <p>ログインユーザー: {{ Auth::user()->name }}</p>
+          <a href="/spots/{{ $spot->id }}/edit" class="text-indigo-600 hover:underline">編集</a>
         </div>
-        
-            <div class="content_post">
-                <h3>[住所]</h3>
-                <p>{{ $spot->address }}</p>
-                <h3>[緯度・経度]</h3>
-                <p>緯度 : {{ $spot->lat }}</p>
-                <p>経度 : {{ $spot->long }}</p>
-            </div>
-        </div>
-        <div class="footer">
-            <a href="/dashboard">戻る</a>
-        </div>
-        <p class='user'>ログインユーザー:{{ Auth::user()->name }}</p>
-        <div class="edit">
-          <a href="/spots/{{ $spot->id }}/edit">edit</a>
-        </div>
-      
+      @endauth
+    </div>
+  </div>
         <script type="module">
               const likeBtn = document.querySelector(".like-btn");
               likeBtn.addEventListener("click", async (e) => {

@@ -11,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('plan_categories', function (Blueprint $table) {
-            $table->id();
-            $table->string('name', 50);
-            $table->timestamps();
-            $table->softDeletes();
+        Schema::table('spot_images', function (Blueprint $table) {
+            $table->string('public_id')->after('image_path')->nullable(); // public_idを追加
         });
     }
 
@@ -24,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('plan_categories');
+        Schema::table('spot_images', function (Blueprint $table) {
+            $table->dropColumn('public_id'); // public_idを削除
+        });
     }
 };

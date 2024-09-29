@@ -24,12 +24,20 @@ class ItemRequest extends FormRequest
         if ($this->isMethod('get')) return [];
 
         return [
-            'spot.name' => 'required',
-            'spot.body' => 'required',
-            'spot.address' => 'required',
-            'spot.lat' => 'required',
-            'spot.long' => 'required',
-            'files.*.photo' => 'image|mimes:jpeg,bmp,png',
+            'spot.name' => 'required|string|max:255',
+            'spot.body' => 'required|string',
+            'spot.address' => 'required|string',
+            'spot.access' => 'required|string',
+            'spot.opendate' => 'required|string',
+            'spot.closedate' => 'required|string',
+            'spot.price' => 'required|string',
+            'spot.site' => 'required|string',
+            'spot.lat' => 'required|numeric',
+            'spot.long' => 'required|numeric',
+            'image.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'spot.category_ids' => 'required|array',
+            'spot.season_ids' => 'required|array',
+            'spot.month_ids' => 'required|array',
         ];
     }
 }

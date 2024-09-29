@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('spots', function (Blueprint $table) {
-            $table->foreignId('spot_category_id')->constrained()->onDelete('cascade');
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('icon'); // iconカラムを削除
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('spots', function (Blueprint $table) {
-            //
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('icon')->nullable(); // iconカラムを元に戻す（nullableを指定）
         });
     }
 };

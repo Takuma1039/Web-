@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Model;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -21,8 +22,12 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'last_activity', 
     ];
-
+    
+    protected $dates = [
+        'last_activity', 
+    ];
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -43,21 +48,26 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
     
-    //スポットに対するリレーション
-    public function favorites(){
-    //スポットは複数のユーザーにお気に入り登録される
-    return $this->hasMany(Favorite::class);
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($user) {
+            $user->last_activity = now(); // 新規登録時に現在の時間を設定
+        });
     }
     
     //ユーザーがお気に入り登録したスポットを操作できるようにする
-    public function favorite_spots()
+    public function spotlikes()
     {
-        return $this->belongsToMany(Spot::class, 'favorite_spots', 'user_id', 'spot_id');
+        return $this->hasMany(Spotlike::class);
     }
     
-    //ユーザーがお気に入り登録をする
-    public function is_favorite($spotId)
+    //オンライン・オフライン表示
+    public function isOnline()
     {
-        return $this->favorite_spots()->where('spot_id', $aspotId)->exists();
+        \Log::info('Current Time: ' . now());
+        \Log::info('Last Activity: ' . $this->last_activity);
+        return $this->last_activity && now()->diffInMinutes($this->last_activity) < 5; // 5分以内にアクティブならオンライン
     }
 }

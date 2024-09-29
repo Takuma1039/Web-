@@ -226,7 +226,7 @@
 			       @foreach ($spots as $spot)
 			       {
 			         id: {{ $spot->id }},
-               image: '{{ $spot->spotimages->first()->image_path }}', // 適切な画像URLに置き換えてください
+               image: '{{ $spot->spotimages->first()->image_path ?? asset('images/default-image.jpg') }}', // デフォルト画像の指定
                title: '{{ $spot->name }}',
                description: '{{ $spot->truncated_body }}',
                rating: Math.random() * 5, // デモ用にランダムな評価を生成（適宜修正）
@@ -236,12 +236,6 @@
 			       },
 			       @endforeach
 			     ],
-			     maxDescriptionLength: 30, // 最大文字数を指定
-           getTruncatedDescription(description) {
-            return description.length > this.maxDescriptionLength
-                ? description.substring(0, this.maxDescriptionLength) + '...' // 切り捨てと省略記号
-                : description;
-           }
 			   };
 			 }
 　　</script>
