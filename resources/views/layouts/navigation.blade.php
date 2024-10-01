@@ -90,16 +90,17 @@
                             <i class="fas fa-cog" style="margin-right: 8px;"></i>
                                 設定
                         </a>
-                        <a href="{{ route('logout') }}" 
-                            class="flex items-center px-4 py-2 mt-2 text-gray-100 hover:bg-gray-400 hover:bg-opacity-25 rounded-2xl" 
-                            aria-label="Logout" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                            <i class="fas fa-sign-out-alt" style="margin-right: 8px;"></i>
-                                ログアウト
-                        </a>
-
+                        @if (Auth::check())
+                            <a href="{{ route('logout') }}" 
+                                class="flex items-center px-4 py-2 mt-2 text-gray-100 hover:bg-gray-400 hover:bg-opacity-25 rounded-2xl" 
+                                aria-label="Logout" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                <i class="fas fa-sign-out-alt" style="margin-right: 8px;"></i>
+                                    ログアウト
+                            </a>
                         <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                             @csrf
                         </form>
+                        @endif
                     </div>
 
                 </nav>

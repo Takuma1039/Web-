@@ -23,22 +23,34 @@ class SpotController extends Controller
 
     public function show(Spot $spot)
     {
+        // JSONをデコードしてIDの配列を取得
         $categoryIds = json_decode($spot->category_ids);
         $seasonIds = json_decode($spot->season_ids);
         $monthIds = json_decode($spot->month_ids);
-
+        
+        // カテゴリー、シーズン、月を取得
         $categories = Category::whereIn('id', $categoryIds)->get();
         $seasons = Season::whereIn('id', $seasonIds)->get();
         $months = Month::whereIn('id', $monthIds)->get();
-
+        
+        // スポット画像を取得
         $spotImages = Spot_image::where('spot_id', $spot->id)->get();
-
+        
+        // 口コミを取得
+        $reviews = $spot->reviews()->with('user')->get();
+        
+        // 総合評価の計算
+        $totalReviews = $reviews->count();
+        $averageRating = $totalReviews > 0 ? $reviews->sum('review') / $totalReviews : 0; // 0で割るのを防ぐためのチェック
+    
         return view("Spot.show")->with([
             'spot' => $spot,
             'spotImages' => $spotImages,
             'categories' => $categories,
             'seasons' => $seasons,
             'months' => $months,
+            'reviews' => $reviews,
+            'averageRating' => number_format($averageRating, 2), // 小数点2桁でフォーマット
         ]);
     }
 

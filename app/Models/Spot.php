@@ -65,7 +65,12 @@ class Spot extends Model
     {
         return $this->belongsTo(Recommendspot::class);
     }
-
+    //口コミ
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+    
     public function likes()
     {
         return $this->hasMany(Spotlike::class);

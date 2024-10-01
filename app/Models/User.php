@@ -62,6 +62,11 @@ class User extends Authenticatable
     {
         return $this->hasMany(Spotlike::class);
     }
+    //口コミ
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
     
     //オンライン・オフライン表示
     public function isOnline()

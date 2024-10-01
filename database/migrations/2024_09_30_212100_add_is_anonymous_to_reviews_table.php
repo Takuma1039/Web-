@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('icon')->nullable(); // icon カラムを追加
+        Schema::table('reviews', function (Blueprint $table) {
+            $table->boolean('is_anonymous')->default(false);
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('icon'); // icon カラムを削除
+        Schema::table('reviews', function (Blueprint $table) {
+            $table->dropColumn('is_anonymous');
         });
     }
 };

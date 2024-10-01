@@ -1,18 +1,19 @@
 /* いいね押下時の星の色 */
 .liked {
     color: orangered;
-    transition: 0.2s;
+    transition: all 0.3s ease;
 }
 .flexbox {
+    justify-content: space-between;
     align-items: center;
     display: flex;
 }
 .count-num {
-    font-size: 20px;
-    margin-left: 10px;
+    font-size: 1.25rem; /* 20px */
+    margin-left: 0.625rem; /* 10px */
 }
 .fa-star {
-    font-size: 30px;
+    font-size: 1.875rem; /* 30px */
 }
 .styled-image {
     border-radius: 12px; /* 角を丸くする */
@@ -29,6 +30,7 @@
 
 .card:hover {
     transform: scale(1.05); /* カードのホバー時にスケールを増加 */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 #likeMessage {
   
@@ -52,10 +54,11 @@
 }
 
 .modal-content {
-  background-color: white;
-  padding: 20px;
-  border-radius: 5px;
-  width: 400px; /* モーダルの幅 */
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    width: 90%; /* 最大幅 */
+    max-width: 400px;
 }
 
 .close {

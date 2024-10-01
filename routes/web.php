@@ -18,6 +18,7 @@ use App\Http\Controllers\SeasonController;
 use App\Http\Controllers\MonthController;
 use App\Http\Controllers\MajorspotController;
 use App\Http\Controllers\MypageController;
+use App\Http\Controllers\ReviewController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -32,7 +33,7 @@ use App\Http\Controllers\MypageController;
 Route::get('/', function () {
     return view('welcome');
 });
-
+//login後使用可能
 Route::middleware('auth', 'activity')->group(function () {
     Route::get('/mypage', [MypageController::class, 'index'])->name('Mypage');
     Route::get('/spots/create', [SpotController::class, 'create'])->name('spots.create');  //スポット作成フォーム
@@ -41,6 +42,13 @@ Route::middleware('auth', 'activity')->group(function () {
     Route::patch('/spots/{spot}', [SpotController::class, 'update'])->name('spots.update');  // 更新処理へのルート
     Route::post('/spot/like', [SpotlikeController::class, 'likespot']); //spotのいいね機能
     Route::post('/spots', [SpotController::class, 'store'])->name('store'); //画像を含めたスポット投稿の保存機能
+    Route::post('/spots/{spot}/reviews', [ReviewController::class, 'store'])->name('reviews.store'); //口コミ投稿機能
+    // 口コミの編集
+    Route::get('/reviews/{review}/edit', [ReviewController::class, 'edit'])->name('reviews.edit');
+    Route::put('/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
+    // 口コミの削除
+    Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
+
 
 });
 //guestでも閲覧・操作できるページ
