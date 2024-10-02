@@ -19,6 +19,7 @@ use App\Http\Controllers\MonthController;
 use App\Http\Controllers\MajorspotController;
 use App\Http\Controllers\MypageController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\ReviewLikeController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -48,6 +49,7 @@ Route::middleware('auth', 'activity', 'history')->group(function () {
     Route::get('/favorites', [SpotController::class, 'favorite'])->name('favoritespot'); //お気に入りしたスポット表示
     Route::post('/spot/like', [SpotlikeController::class, 'likespot']); //spotのいいね機能
     Route::post('/spots/{spot}/reviews', [ReviewController::class, 'store'])->name('reviews.store'); //口コミ投稿機能
+    Route::post('/reviews/like', [ReviewLikeController::class, 'likeReview'])->name('reviews.like');
     // 口コミの編集
     Route::get('/reviews/{review}/edit', [ReviewController::class, 'edit'])->name('reviews.edit');
     Route::put('/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
