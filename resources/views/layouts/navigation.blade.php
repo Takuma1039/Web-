@@ -10,6 +10,7 @@
 
                 <!-- 新規登録 & ログインボタン + Windowbar ボタン -->
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    
                     <a href="/register" class="bg-white text-gray-800 border-2 border-gray-800 rounded-full px-6 font-bold uppercase tracking-wide hover:bg-gray-800 hover:text-white transition-all duration-300">
                         新規登録
                     </a>

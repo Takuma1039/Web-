@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Http\Requests\ItemRequest;
 use App\Models\Spot;
 use App\Models\Spot_image;
+use App\Models\Review;
+use App\Models\ReviewImage;
 use App\Models\Category;
 use App\Models\Season;
 use App\Models\Local;
@@ -15,12 +17,13 @@ use Cloudinary;
 
 class SpotController extends Controller
 {
+    //スポット一覧
     public function index()
     {
         $spots = Spot::orderBy('created_at', 'desc')->paginate(10);
         return view('Spot.index', ['spots' => $spots]);
     }
-
+    //スポットの詳細画面
     public function show(Spot $spot)
     {
         // JSONをデコードしてIDの配列を取得
@@ -37,8 +40,14 @@ class SpotController extends Controller
         $spotImages = Spot_image::where('spot_id', $spot->id)->get();
         
         // 口コミを取得
-        $reviews = $spot->reviews()->with('user')->get();
+        $reviews = $spot->reviews()->with('user', 'images')->get();
         
+        // 口コミ画像を取得
+        $reviewImages = [];
+        foreach ($reviews as $review) {
+            $reviewImages[$review->id] = ReviewImage::where('review_id', $review->id)->get();
+        }
+        //dd($reviewImages);
         // 総合評価の計算
         $totalReviews = $reviews->count();
         $averageRating = $totalReviews > 0 ? $reviews->sum('review') / $totalReviews : 0; // 0で割るのを防ぐためのチェック
@@ -50,10 +59,11 @@ class SpotController extends Controller
             'seasons' => $seasons,
             'months' => $months,
             'reviews' => $reviews,
+            'reviewImages' => $reviewImages,
             'averageRating' => number_format($averageRating, 2), // 小数点2桁でフォーマット
         ]);
     }
-
+    //スポット作成
     public function create()
     {
         $spotcategories = Category::all();
@@ -63,7 +73,7 @@ class SpotController extends Controller
 
         return view('Spot.create', compact('spotcategories', 'locals', 'seasons', 'months'));
     }
-
+    //スポット保存
     public function store(ItemRequest $request, Spot $spot)
     {
         $images = $request->file('image');
@@ -102,7 +112,7 @@ class SpotController extends Controller
 
         return redirect('/spots/' . $spot->id)->with('success', 'スポットが作成されました！');
     }
-
+    //スポット編集
     public function edit(Spot $spot)
     {
         $categoryIds = json_decode($spot->category_ids, true) ?? [];
@@ -117,7 +127,7 @@ class SpotController extends Controller
 
         return view('Spot.edit', compact('spot', 'spotcategories', 'locals', 'seasons', 'months', 'categoryIds', 'seasonIds', 'monthIds', 'localIds', 'spotImages'));
     }
-
+    //スポット更新
     public function update(ItemRequest $request, Spot $spot)
     {
         \Log::info('Update method called for spot ID: ' . $spot->id);
@@ -179,7 +189,7 @@ class SpotController extends Controller
 
         return redirect()->route('spots.show', $spot->id)->with('success', 'スポットが更新されました！');
     }
-
+    //お気に入りスポット一覧
     public function favorite(Request $request)
     {
         $user = Auth::user();

@@ -20,7 +20,6 @@ class Review extends Model
     'is_anonymous',
 ];
 
-    
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -29,5 +28,10 @@ class Review extends Model
     public function spot()
     {
         return $this->belongsTo(Spot::class);
+    }
+    
+    public function images()
+    {
+        return $this->hasMany(ReviewImage::class, 'review_id');
     }
 }
