@@ -183,95 +183,94 @@
               @endif
 
               <form action="{{ route('reviews.store', $spot->id) }}" method="POST" enctype="multipart/form-data">
-    @csrf
-    <div class="mb-4">
-        <label for="title" class="block mb-2 text-gray-700 font-semibold">タイトル:</label>
-        <input type="text" id="title" name="title" required maxlength="50" 
-               class="block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2 transition duration-150 ease-in-out">
-        @error('title')
-            <span class="text-red-500 text-sm">{{ $message }}</span>
-        @enderror
-    </div>
+                @csrf
+                <div class="mb-4">
+                  <label for="title" class="block mb-2 text-gray-700 font-semibold">タイトル:</label>
+                  <input type="text" id="title" name="title" required maxlength="50" 
+                    class="block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2 transition duration-150 ease-in-out">
+                  @error('title')
+                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                  @enderror
+                </div>
 
-    <div class="mb-4">
-        <label for="review" class="block mb-2 text-gray-700 font-semibold">評価:</label>
-        <input type="number" id="review" name="review" required step="0.1" min="1.0" max="5.0" 
-               class="block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2 transition duration-150 ease-in-out" 
-               placeholder="1.0 - 5.0の範囲で入力">
-        @error('review')
-            <span class="text-red-500 text-sm">{{ $message }}</span>
-        @enderror
-    </div>
+                <div class="mb-4">
+                  <label for="review" class="block mb-2 text-gray-700 font-semibold">評価:</label>
+                  <input type="number" id="review" name="review" required step="0.1" min="1.0" max="5.0" 
+                    class="block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2 transition duration-150 ease-in-out" 
+                    placeholder="1.0 - 5.0の範囲で入力">
+                  @error('review')
+                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                  @enderror
+                </div>
 
-    <div class="mb-4">
-        <label for="comment" class="block mb-2 text-gray-700 font-semibold">口コミ:</label>
-        <textarea id="comment" name="comment" rows="4" required 
-                  class="block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2 transition duration-150 ease-in-out"></textarea>
-        @error('comment')
-            <span class="text-red-500 text-sm">{{ $message }}</span>
-        @enderror
-    </div>
+                <div class="mb-4">
+                  <label for="comment" class="block mb-2 text-gray-700 font-semibold">口コミ:</label>
+                  <textarea id="comment" name="comment" rows="4" required 
+                    class="block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2 transition duration-150 ease-in-out"></textarea>
+                  @error('comment')
+                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                  @enderror
+                </div>
 
-    <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-700">新しい画像ファイル（複数可）:</label>
-        <input type="file" name="images[]" id="image-input" multiple class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-indigo-200" accept="image/*" onchange="previewImages()">
-        <div id="image-preview" class="grid grid-cols-2 gap-4 mt-2"></div>
-    </div>
-    <!--画像のプレビュー画面用-->
-    <script>
-      function previewImages() {
-    const preview = document.getElementById('image-preview');
-    preview.innerHTML = ''; // プレビューをリセット
+                <div class="mb-4">
+                  <label class="block text-sm font-medium text-gray-700">新しい画像ファイル（複数可）:</label>
+                  <input type="file" name="images[]" id="image-input" multiple class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-indigo-200" accept="image/*" onchange="previewImages()">
+                  <div id="image-preview" class="grid grid-cols-2 gap-4 mt-2"></div>
+                </div>
+                <!--画像のプレビュー画面用-->
+                <script>
+                  function previewImages() {
+                    const preview = document.getElementById('image-preview');
+                    preview.innerHTML = ''; // プレビューをリセット
 
-    const files = document.getElementById('image-input').files;
+                    const files = document.getElementById('image-input').files;
 
-    if (files.length === 0) {
-        preview.innerHTML = '<p class="text-gray-500">画像が選択されていません。</p>';
-        return;
-    }
+                    if (files.length === 0) {
+                      preview.innerHTML = '<p class="text-gray-500">画像が選択されていません。</p>';
+                      return;
+                    }
 
-    for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const reader = new FileReader();
+                    for (let i = 0; i < files.length; i++) {
+                      const file = files[i];
+                      const reader = new FileReader();
 
-        // 画像のプレビューと名前入力欄を作成
-        reader.onload = function(e) {
-            const imgContainer = document.createElement('div');
-            imgContainer.classList.add('flex', 'flex-col', 'items-center', 'mb-4');
+                      // 画像のプレビューと名前入力欄を作成
+                      reader.onload = function(e) {
+                        const imgContainer = document.createElement('div');
+                        imgContainer.classList.add('flex', 'flex-col', 'items-center', 'mb-4');
 
-            const img = document.createElement('img');
-            img.src = e.target.result;
-            img.classList.add('h-32', 'w-full', 'object-cover', 'rounded-lg', 'shadow-lg');
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.classList.add('h-32', 'w-full', 'object-cover', 'rounded-lg', 'shadow-lg');
 
-            // 新しく追加された画像に対する名前入力欄を生成
-            const nameInput = document.createElement('input');
-            nameInput.type = 'text';
-            nameInput.name = `new_image_names[]`; // 新しい画像の名前用
-            nameInput.placeholder = '画像の名前を入力';
-            nameInput.classList.add('mt-1', 'block', 'w-full', 'border', 'border-gray-300', 'rounded-md', 'shadow-sm', 'focus:ring', 'focus:ring-indigo-200');
+                        // 新しく追加された画像に対する名前入力欄を生成
+                        const nameInput = document.createElement('input');
+                        nameInput.type = 'text';
+                        nameInput.name = `new_image_names[]`; // 新しい画像の名前用
+                        nameInput.placeholder = '画像の名前を入力';
+                        nameInput.classList.add('mt-1', 'block', 'w-full', 'border', 'border-gray-300', 'rounded-md', 'shadow-sm', 'focus:ring', 'focus:ring-indigo-200');
 
-            imgContainer.appendChild(img);
-            imgContainer.appendChild(nameInput);
-            preview.appendChild(imgContainer);
-        }
+                        imgContainer.appendChild(img);
+                        imgContainer.appendChild(nameInput);
+                        preview.appendChild(imgContainer);
+                      }
 
-        reader.readAsDataURL(file);
-    }
-}
-    </script>
-    <!-- 匿名選択用チェックボックス -->
-    <div class="mb-4 flex items-center">
-        <input type="hidden" name="is_anonymous" value="0">
-        <input type="checkbox" id="is_anonymous" name="is_anonymous" value="1" class="mr-2">
-        <label for="is_anonymous" class="text-gray-700 font-semibold">匿名で投稿する</label>
-    </div>
+                      reader.readAsDataURL(file);
+                    }
+                  }
+                </script>
+                <!-- 匿名選択用チェックボックス -->
+                <div class="mb-4 flex items-center">
+                  <input type="hidden" name="is_anonymous" value="0">
+                  <input type="checkbox" id="is_anonymous" name="is_anonymous" value="1" class="mr-2">
+                  <label for="is_anonymous" class="text-gray-700 font-semibold">匿名で投稿する</label>
+                </div>
 
-    <div class="flex justify-between">
-        <button type="submit" class="bg-blue-600 text-white rounded-lg px-4 py-2 hover:bg-blue-700 transition">送信</button>
-        <button type="button" id="closeModal" class="ml-2 bg-gray-300 rounded-lg px-4 py-2 hover:bg-gray-400 transition">キャンセル</button>
-    </div>
-</form>
-
+                <div class="flex justify-between">
+                  <button type="submit" class="bg-blue-600 text-white rounded-lg px-4 py-2 hover:bg-blue-700 transition">送信</button>
+                  <button type="button" id="closeModal" class="ml-2 bg-gray-300 rounded-lg px-4 py-2 hover:bg-gray-400 transition">キャンセル</button>
+                </div>
+              </form>
             </div>
           </div>
 
@@ -280,7 +279,7 @@
             <p class="text-gray-500">まだ口コミはありません。</p>
           @else
             @foreach($reviews as $review)
-              <div class="review bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg mb-4 transition-transform transform hover:scale-105">
+              <div class="review bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg mb-4 transition-transform transform">
                 <div class="flex items-center justify-between mb-2">
                   <div class="flex items-center">
                     @for ($i = 0; $i < 5; $i++)
@@ -297,19 +296,18 @@
                       <div class="relative inline-block">
                         <!-- 空の星のベースを描画 -->
                         <i class="fa-solid fa-star text-gray-300 text-xl"></i>
-                        <!--星の色塗り判定-->
+                        <!-- 星の色塗り判定 -->
                         @if ($fullStar)
-                          <!-- 完全な星の塗り -->
                           <i class="fa-solid fa-star text-yellow-500 text-xl absolute top-0 left-0"></i>
                         @elseif ($partialStar)
-                          <!-- 部分的な星の塗り -->
                           <div class="absolute top-0 left-0 h-full overflow-hidden" style="width: {{ $fillPercentage }}%;">
                             <i class="fa-solid fa-star text-yellow-500 text-xl"></i>
                           </div>
                         @endif
                       </div>
                     @endfor
-                    <span class="text-gray-600 ml-2 font-semibold">{{ number_format($reviewValue, 1) }}</span> <!-- 評価の値を表示 -->
+
+                    <span class="text-gray-600 ml-2 font-semibold">{{ number_format($reviewValue, 1) }}</span>
                     <span class="ml-2 text-gray-700 font-semibold">
                       投稿者: 
                       @if ($review->is_anonymous)
@@ -319,7 +317,7 @@
                       @endif
                     </span>
                   </div>
-                  <!--口コミの編集と削除-->
+
                   @auth
                     @if (Auth::id() === $review->user_id)
                       <div class="flex space-x-2">
@@ -333,43 +331,58 @@
                     @endif
                   @endauth
                 </div>
-                <p class="text-gray-700 font-semibold">{{ $review->title }}</p> <!-- タイトルを表示 -->
-                <p class="text-gray-700 mt-2">{{ $review->comment }}</p> <!-- 口コミ内容 -->
-    
+
+                <div class="flex items-center mb-2">
+                  <button class="like-button text-gray-500 hover:text-blue-500 flex items-center" data-review-id="{{ $review->id }}">
+                    @if ($review->likes->where('user_id', auth()->id())->count())
+                      <i class="fas fa-thumbs-up"></i> いいねを取り消す
+                    @else
+                      <i class="far fa-thumbs-up"></i> いいね
+                    @endif
+                  </button>
+                  <span class="ml-2 text-gray-600" id="like-count-{{ $review->id }}">{{ $review->likes ? $review->likes->count() : 0 }} 件のいいね</span>
+                </div>
+
+                <p class="text-gray-700 font-semibold text-lg mt-1 transition-colors duration-200 ease-in-out">
+                  {{ $review->title }}
+                </p>
+                <p class="text-gray-700 mt-2">{{ $review->comment }}</p>
+
                 <!-- 画像ギャラリー -->
-                <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-6 xl:gap-8">
+                <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-6 xl:gap-8 mt-4">
                   @foreach($reviewImages[$review->id] as $index => $review_img)
                     <a class="group relative flex h-32 items-end overflow-hidden rounded-lg shadow-lg transition-transform duration-300 transform hover:scale-105" onclick="openModal('{{ $review_img->image_path }}')">
                       <img src="{{ $review_img->image_path }}" loading="lazy" alt="Image" class="absolute inset-0 h-full w-full object-cover object-center transition duration-200 group-hover:opacity-90" />
                       <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-gray-800 via-transparent to-transparent opacity-40"></div>
-                      <span class="relative ml-4 mb-3 inline-block text-sm text-white">{{ $review_img->name}}</span>
+                      <span class="relative ml-4 mb-3 inline-block text-sm text-white">{{ $review_img->name }}</span>
                     </a>
                   @endforeach
                 </div>
               </div>
-              <!-- モーダルウィンドウ -->
-              <div id="imageModal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black bg-opacity-75">
-                <div class="relative max-w-3xl p-6 bg-white rounded-lg shadow-lg">
-                  <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-800" onclick="closeModal()">×</button>
-                  <img id="modalImage" src="" alt="Modal Image" class="max-w-full h-auto rounded">
-                  <div class="mt-4 text-center">
-                    <button class="inline-block px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600" onclick="closeModal()">閉じる</button>
-                  </div>
-                </div>
-              </div>
-              <!--モーダルウィンドウ用-->
-              <script>
-                function openModal(imagePath) {
-                  document.getElementById('modalImage').src = imagePath;
-                  document.getElementById('imageModal').classList.remove('hidden');
-                }
-
-                function closeModal() {
-                  document.getElementById('imageModal').classList.add('hidden');
-                }
-              </script>
-
             @endforeach
+
+            <!-- モーダルウィンドウ -->
+            <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
+              <div class="relative bg-white rounded-lg shadow-lg overflow-hidden w-full max-w-3xl">
+                <button onclick="closeModal()" class="absolute top-2 right-2 text-gray-600 hover:text-gray-900">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                </button>
+                <img id="modalImage" src="" alt="拡大画像" class="w-full h-auto object-contain">
+              </div>
+            </div>
+            <!--モーダルウィンドウ用-->
+            <script>
+              function openModal(imagePath) {
+                document.getElementById('modalImage').src = imagePath;
+                document.getElementById('imageModal').classList.remove('hidden');
+              }
+
+              function closeModal() {
+                document.getElementById('imageModal').classList.add('hidden');
+              }
+            </script>
           @endif
         </div>
 
@@ -392,7 +405,7 @@
     </div>
   </div>
   <script type="module">
-    // お気に入りボタン用
+    // スポットのお気に入り機能
     const likeBtn = document.querySelector(".like-btn");
     likeBtn.addEventListener("click", async (e) => {
       const clickedEl = e.target;
@@ -449,18 +462,70 @@
     };
 
     // モーダルの表示/非表示切替
-      document.getElementById('reviewBtn').addEventListener('click', function() {
-        document.getElementById('reviewModal').classList.remove('hidden');
-      });
+    document.getElementById('reviewBtn').addEventListener('click', function() {
+      document.getElementById('reviewModal').classList.remove('hidden');
+    });
 
-      document.getElementById('closeModal').addEventListener('click', function() {
-        document.getElementById('reviewModal').classList.add('hidden');
+    document.getElementById('closeModal').addEventListener('click', function() {
+      document.getElementById('reviewModal').classList.add('hidden');
+    });
+    
+    // 背景クリックでモーダルを閉じる
+    document.getElementById('reviewModal').addEventListener('click', function(event) {
+      if (event.target === this) {
+        this.classList.add('hidden');
+      }
+    });
+      
+    //口コミいいね機能
+    document.addEventListener('DOMContentLoaded', function () { //ページの読み込みが完了した後に実行
+      const likeButtons = document.querySelectorAll('.like-button'); //.like-buttonクラスを持つすべての要素を取得し、likeButtonsという変数に格納
+
+      likeButtons.forEach(button => {
+        button.addEventListener('click', async function () { //すべての「いいね」ボタンに対して、クリックイベントリスナーを追加
+          const reviewId = this.getAttribute('data-review-id'); //どの口コミに対して「いいね」をするかを決定
+          const likeCountElement = document.getElementById(`like-count-${reviewId}`); //いいねの数を表示するための要素を、reviewIdに基づいて取得
+
+          // ボタンを無効化して連打を防止
+          this.disabled = true;
+
+          try {
+            const response = await fetch(`/reviews/like`, { //fetchを使って、サーバーに「いいね」操作のリクエストを送信
+              method: 'POST',
+              headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Content-Type': 'application/json',
+              },
+                body: JSON.stringify({ review_id: reviewId }) //「いいね」をする対象のレビューIDをJSON形式で送信
+              });
+
+              // レスポンスのチェック
+              if (!response.ok) {
+                throw new Error('Network response was not ok');
+              }
+
+              const data = await response.json(); //レスポンスをJSON形式に変換してdataとして格納
+
+              // いいね数を更新
+              likeCountElement.textContent = `${data.likeCount} 件のいいね`; //サーバーから返されたデータから、最新の「いいね」数を取得し、likeCountElementに表示
+
+              // いいね状態を視覚的に変更
+              if (data.liked) {
+                  this.innerHTML = '<i class="fas fa-thumbs-up"></i> いいねを取り消す';
+                  this.classList.add('text-blue-500');
+              } else {
+                  this.innerHTML = '<i class="far fa-thumbs-up"></i> いいね';
+                  this.classList.remove('text-blue-500');
+              }
+          } catch (error) {
+              console.error('Error:', error);
+              alert('処理中にエラーが発生しました。もう一度お試しください。');
+          } finally {
+              // リクエストが完了したらボタンを再度有効化
+              this.disabled = false;
+          }
+        });
       });
-      // 背景クリックでモーダルを閉じる
-      document.getElementById('reviewModal').addEventListener('click', function(event) {
-        if (event.target === this) {
-          this.classList.add('hidden');
-        }
-      });
+    });
   </script>
 </x-app-layout>

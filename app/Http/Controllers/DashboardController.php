@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Spot;
 use App\Models\Spot_image;
+use App\Models\Review;
 use App\Models\Category;
 use App\Models\Season;
 use App\Models\Local;
@@ -22,8 +23,14 @@ class DashboardController extends Controller
             
             // 画像を取得
             $spot->images = Spot_Image::where('spot_id', $spot->id)->get(); // 各スポットの画像を取得
+            
+            $spot->reviews = Review::where('spot_id', $spot->id)->get();
+            // 総合評価の計算
+            $totalReviews = $spot->reviews->count();
+            $averageRating = $totalReviews > 0 ? $spot->reviews->sum('review') / $totalReviews : 0; // 0で割るのを防ぐためのチェック
         }
-      return view("Toppage.dashboard")->with(['spotcategories' => $category->get(), 'locals' => $local->get(), 'seasons' => $season->get(), 'months' => $month->get(), 'spots' => $spots]);
+        
+      return view("Toppage.dashboard")->with(['spotcategories' => $category->get(), 'locals' => $local->get(), 'seasons' => $season->get(), 'months' => $month->get(), 'spots' => $spots, 'totalReviews' => $totalReviews, 'averageRating' => number_format($averageRating, 2)]);
     }
     
     public function truncateAtPunctuation($string, $maxLength)
