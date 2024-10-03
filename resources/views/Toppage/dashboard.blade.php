@@ -128,7 +128,7 @@
                     </button>
                 </div>
 	            
-          <!--ranking--> 
+          <!--お気に入りランキング--> 
 <div class="flex items-center mt-4 mb-2">
     <h1 class="text-xl md:text-2xl font-semibold mr-2">人気スポットランキング</h1>
     <a href="{{ route('major.ranking') }}" class="flex items-center text-white bg-gradient-to-r from-blue-500 to-indigo-600 border-none py-1 px-3 rounded-full shadow-md transform transition-all duration-200 hover:scale-105 hover:shadow-lg text-sm">
@@ -142,7 +142,7 @@
 <div id="swipe-container" class="overflow-x-scroll scrollbar-hide mb-4 relative px-0.5" style="overflow-y: hidden;">
     <div id="swipe-content" class="flex snap-x snap-mandatory gap-4" style="width: max-content;">
         <!-- 各カードのループ -->
-        @foreach ($spots as $spot)
+        @foreach ($majorspots as $spot)
             <div class="flex-none sm:w-48 md:w-64 h-auto snap-center">
                 <div class="bg-white border border-gray-200 rounded-lg overflow-hidden relative h-full flex flex-col justify-between">
                     <div>
@@ -163,6 +163,7 @@
                             @for ($i = 0; $i < 5; $i++)
                                 @php
                                     $currentValue = $i + 1;
+                                    $averageRating = $spot->average_rating;
                                     $fullStar = $averageRating >= $currentValue;
                                     $partialStar = !$fullStar && $averageRating > $currentValue - 1 && $averageRating < $currentValue;
                                     $fillPercentage = $partialStar ? ($averageRating - ($currentValue - 1)) * 100 : 0;
@@ -178,7 +179,7 @@
                                     @endif
                                 </div>
                             @endfor
-                            <span class="ml-2 text-gray-600 text-sm"><span class="text-gray-500 italic font-extrabold">{{ $totalReviews }} reviews</span></span>
+                            <span class="ml-2 text-gray-600 text-sm"><span class="text-gray-500 italic font-extrabold">{{ $spot->reviews->count() }} reviews</span></span>
                         </div>
                     </div>
                 </div>
@@ -199,6 +200,185 @@
     </div>
 </div>
 
+<!--口コミスポットランキング-->
+<div class="flex items-center mt-4 mb-2">
+    <h1 class="text-xl md:text-2xl font-semibold mr-2">口コミスポットランキング</h1>
+    <a href="{{ route('review.ranking') }}" class="flex items-center text-white bg-gradient-to-r from-blue-500 to-indigo-600 border-none py-1 px-3 rounded-full shadow-md transform transition-all duration-200 hover:scale-105 hover:shadow-lg text-sm">
+        <span>View More</span>
+        <svg class="w-3 h-3 md:w-4 md:h-4 ml-2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+        </svg>
+    </a>
+</div>
+
+<div id="swipe-container" class="overflow-x-scroll scrollbar-hide mb-4 relative px-0.5" style="overflow-y: hidden;">
+    <div id="swipe-content" class="flex snap-x snap-mandatory gap-4" style="width: max-content;">
+        <!-- 各カードのループ -->
+        @foreach ($reviewspots as $spot)
+            <div class="flex-none sm:w-48 md:w-64 h-auto snap-center">
+                <div class="bg-white border border-gray-200 rounded-lg overflow-hidden relative h-full flex flex-col justify-between">
+                    <div>
+                        <!-- 画像の表示 -->
+                        <a onclick="openModal('{{ $spot->spotimages->first()->image_path ?? asset('images/default-image.jpg') }}')" aria-label="スポットの詳細ページへ移動">
+                            <img src="{{ $spot->spotimages->first()->image_path ?? asset('images/default-image.jpg') }}" alt="" class="w-full h-40 object-cover" loading="lazy">
+                        </a>
+                        <div class="p-4">
+                            <h3 class="text-lg leading-6 font-bold text-gray-900">
+                                <a href="/spots/{{ $spot->id }}" class="transition duration-300 ease-in-out transform hover:text-indigo-600">{{ $spot->name }}</a>
+                            </h3>
+                            <p class="text-gray-600 mt-2 text-sm">{{ $spot->truncated_body }}</p>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex items-center mt-2">
+                            <!-- 評価の表示（詳細は後述） -->
+                            @for ($i = 0; $i < 5; $i++)
+                                @php
+                                    $currentValue = $i + 1;
+                                    $averageRating = $spot->average_rating;
+                                    $fullStar = $averageRating >= $currentValue;
+                                    $partialStar = !$fullStar && $averageRating > $currentValue - 1 && $averageRating < $currentValue;
+                                    $fillPercentage = $partialStar ? ($averageRating - ($currentValue - 1)) * 100 : 0;
+                                @endphp
+                                <div class="relative inline-block">
+                                    <i class="fas fa-star text-gray-400 text-2xl"></i>
+                                    @if ($fullStar)
+                                        <i class="fas fa-star text-yellow-500 text-2xl absolute top-0 left-0"></i>
+                                    @elseif ($partialStar)
+                                        <div class="absolute top-0 left-0 h-full overflow-hidden" style="width: {{ $fillPercentage }}%;">
+                                            <i class="fas fa-star text-yellow-500 text-2xl"></i>
+                                        </div>
+                                    @endif
+                                </div>
+                            @endfor
+                            <span class="ml-2 text-gray-600 text-sm"><span class="text-gray-500 italic font-extrabold">{{ $spot->reviews->count() }} reviews</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endforeach
+    </div>
+</div>
+
+<!--おすすめスポットランキング-->
+<div class="flex items-center mt-4 mb-2">
+    <h1 class="text-xl md:text-2xl font-semibold mr-2">今の時期におすすめなスポットランキング</h1>
+    <a href="{{ route('season.ranking') }}" class="flex items-center text-white bg-gradient-to-r from-blue-500 to-indigo-600 border-none py-1 px-3 rounded-full shadow-md transform transition-all duration-200 hover:scale-105 hover:shadow-lg text-sm">
+        <span>View More</span>
+        <svg class="w-3 h-3 md:w-4 md:h-4 ml-2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+        </svg>
+    </a>
+</div>
+
+<div id="swipe-container" class="overflow-x-scroll scrollbar-hide mb-4 relative px-0.5" style="overflow-y: hidden;">
+    <div id="swipe-content" class="flex snap-x snap-mandatory gap-4" style="width: max-content;">
+        <!-- 各カードのループ -->
+        @foreach ($seasonspots as $spot)
+            <div class="flex-none sm:w-48 md:w-64 h-auto snap-center">
+                <div class="bg-white border border-gray-200 rounded-lg overflow-hidden relative h-full flex flex-col justify-between">
+                    <div>
+                        <!-- 画像の表示 -->
+                        <a onclick="openModal('{{ $spot->spotimages->first()->image_path ?? asset('images/default-image.jpg') }}')" aria-label="スポットの詳細ページへ移動">
+                            <img src="{{ $spot->spotimages->first()->image_path ?? asset('images/default-image.jpg') }}" alt="" class="w-full h-40 object-cover" loading="lazy">
+                        </a>
+                        <div class="p-4">
+                            <h3 class="text-lg leading-6 font-bold text-gray-900">
+                                <a href="/spots/{{ $spot->id }}" class="transition duration-300 ease-in-out transform hover:text-indigo-600">{{ $spot->name }}</a>
+                            </h3>
+                            <p class="text-gray-600 mt-2 text-sm">{{ $spot->truncated_body }}</p>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex items-center mt-2">
+                            <!-- 評価の表示（詳細は後述） -->
+                            @for ($i = 0; $i < 5; $i++)
+                                @php
+                                    $currentValue = $i + 1;
+                                    $averageRating = $spot->average_rating;
+                                    $fullStar = $averageRating >= $currentValue;
+                                    $partialStar = !$fullStar && $averageRating > $currentValue - 1 && $averageRating < $currentValue;
+                                    $fillPercentage = $partialStar ? ($averageRating - ($currentValue - 1)) * 100 : 0;
+                                @endphp
+                                <div class="relative inline-block">
+                                    <i class="fas fa-star text-gray-400 text-2xl"></i>
+                                    @if ($fullStar)
+                                        <i class="fas fa-star text-yellow-500 text-2xl absolute top-0 left-0"></i>
+                                    @elseif ($partialStar)
+                                        <div class="absolute top-0 left-0 h-full overflow-hidden" style="width: {{ $fillPercentage }}%;">
+                                            <i class="fas fa-star text-yellow-500 text-2xl"></i>
+                                        </div>
+                                    @endif
+                                </div>
+                            @endfor
+                            <span class="ml-2 text-gray-600 text-sm"><span class="text-gray-500 italic font-extrabold">{{ $spot->reviews->count() }} reviews</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endforeach
+    </div>
+</div>
+
+<!--スポット一覧-->
+<div class="flex items-center mt-4 mb-2">
+    <h1 class="text-xl md:text-2xl font-semibold mr-2">スポット一覧</h1>
+    <a href="{{ route('spots.index') }}" class="flex items-center text-white bg-gradient-to-r from-blue-500 to-indigo-600 border-none py-1 px-3 rounded-full shadow-md transform transition-all duration-200 hover:scale-105 hover:shadow-lg text-sm">
+        <span>View More</span>
+        <svg class="w-3 h-3 md:w-4 md:h-4 ml-2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+        </svg>
+    </a>
+</div>
+
+<div id="swipe-container" class="overflow-x-scroll scrollbar-hide mb-4 relative px-0.5" style="overflow-y: hidden;">
+    <div id="swipe-content" class="flex snap-x snap-mandatory gap-4" style="width: max-content;">
+        <!-- 各カードのループ -->
+        @foreach ($seasonspots as $spot)
+            <div class="flex-none sm:w-48 md:w-64 h-auto snap-center">
+                <div class="bg-white border border-gray-200 rounded-lg overflow-hidden relative h-full flex flex-col justify-between">
+                    <div>
+                        <!-- 画像の表示 -->
+                        <a onclick="openModal('{{ $spot->spotimages->first()->image_path ?? asset('images/default-image.jpg') }}')" aria-label="スポットの詳細ページへ移動">
+                            <img src="{{ $spot->spotimages->first()->image_path ?? asset('images/default-image.jpg') }}" alt="" class="w-full h-40 object-cover" loading="lazy">
+                        </a>
+                        <div class="p-4">
+                            <h3 class="text-lg leading-6 font-bold text-gray-900">
+                                <a href="/spots/{{ $spot->id }}" class="transition duration-300 ease-in-out transform hover:text-indigo-600">{{ $spot->name }}</a>
+                            </h3>
+                            <p class="text-gray-600 mt-2 text-sm">{{ $spot->truncated_body }}</p>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex items-center mt-2">
+                            <!-- 評価の表示（詳細は後述） -->
+                            @for ($i = 0; $i < 5; $i++)
+                                @php
+                                    $currentValue = $i + 1;
+                                    $averageRating = $spot->average_rating;
+                                    $fullStar = $averageRating >= $currentValue;
+                                    $partialStar = !$fullStar && $averageRating > $currentValue - 1 && $averageRating < $currentValue;
+                                    $fillPercentage = $partialStar ? ($averageRating - ($currentValue - 1)) * 100 : 0;
+                                @endphp
+                                <div class="relative inline-block">
+                                    <i class="fas fa-star text-gray-400 text-2xl"></i>
+                                    @if ($fullStar)
+                                        <i class="fas fa-star text-yellow-500 text-2xl absolute top-0 left-0"></i>
+                                    @elseif ($partialStar)
+                                        <div class="absolute top-0 left-0 h-full overflow-hidden" style="width: {{ $fillPercentage }}%;">
+                                            <i class="fas fa-star text-yellow-500 text-2xl"></i>
+                                        </div>
+                                    @endif
+                                </div>
+                            @endfor
+                            <span class="ml-2 text-gray-600 text-sm"><span class="text-gray-500 italic font-extrabold">{{ $spot->reviews->count() }} reviews</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endforeach
+    </div>
+</div>
 <script>
     // モーダルを開く関数
     function openModal(imageSrc) {

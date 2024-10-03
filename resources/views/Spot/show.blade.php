@@ -9,7 +9,7 @@
             </h2>
             @auth
               <div class="flex items-center ml-2">
-                <i class="fa-solid fa-star like-btn {{ $spot->isLikedByAuthUser() ? 'liked' : '' }}" id="{{ $spot->id }}" style="font-size: 1.5rem;"></i>
+                <i class="fa-solid fa-heart like-btn {{ $spot->isLikedByAuthUser() ? 'liked' : '' }}" id="{{ $spot->id }}" style="font-size: 1.5rem;"></i>
               </div>
             @endauth
 
@@ -18,10 +18,63 @@
               お気に入り登録しました
             </div>
           </div>
-          <a href="#" class="inline-block rounded-lg border bg-white dark:bg-gray-700 dark:border-none px-4 py-2 text-center text-sm font-semibold text-gray-500 dark:text-gray-200 outline-none ring-indigo-300 transition duration-100 hover:bg-gray-100 focus-visible:ring active:bg-gray-200 md:px-8 md:py-3 md:text-base">
+          <!-- Mapボタン -->
+          <a href="javascript:void(0);" class="inline-block rounded-lg border bg-white dark:bg-gray-700 dark:border-none px-4 py-2 text-center text-sm font-semibold text-gray-500 dark:text-gray-200 outline-none ring-indigo-300 transition duration-100 hover:bg-gray-100 focus-visible:ring active:bg-gray-200 md:px-8 md:py-3 md:text-base" onclick="openMapModal()">
             Map
           </a>
+
+          <!-- Mapモーダルウィンドウ -->
+          <div id="mapModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" onclick="closeMapModal()">
+            <div class="relative top-1/2 transform -translate-y-1/2 mx-auto p-5 border w-full max-w-lg shadow-2xl rounded-lg bg-white z-60" onclick="event.stopPropagation();">
+              <button class="absolute top-2 right-2 text-gray-500 hover:text-red-600 transition duration-150" onclick="closeMapModal()">
+                &times;
+              </button>
+              <div id="map" style="width: 100%; height: 400px;"></div>
+            </div>
+          </div>
+
+          <script>
+            // Mapモーダル表示用のJavaScript関数
+            function openMapModal() {
+              document.getElementById('mapModal').classList.remove('hidden');
+
+              // 既にGoogle Mapsがロードされているかどうかを確認
+              if (!window.google || !window.google.maps) {
+                // Google Maps APIを非同期でロード
+                const script = document.createElement('script');
+                script.src = `https://maps.googleapis.com/maps/api/js?key={{ $api_key }}&callback=initMap`;
+                script.async = true;
+                script.defer = true;
+                document.body.appendChild(script);
+              } else {
+                // 既にロード済みの場合はマップを初期化
+                initMap();
+              }
+            }
+
+            // モーダル閉じる用のJavaScript関数
+            function closeMapModal() {
+              document.getElementById('mapModal').classList.add('hidden');
+            }
+
+            // Google Maps APIでマップを初期化する関数
+            function initMap() {
+              var spotLocation = { lat: {{ $spot->lat }}, lng: {{ $spot->long }} };
+
+              var map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 14,
+                center: spotLocation
+              });
+
+              var marker = new google.maps.Marker({
+                position: spotLocation,
+                map: map,
+                title: '{{ $spot->name }}'
+              });
+            }
+          </script>
         </div>
+        
         <div class="p-4">
           <div class="flex items-center">
             <span class="font-bold text-lg">総合評価</span>
@@ -122,7 +175,28 @@
             </a>
           @endforeach
         </div>
+        <!-- モーダルウィンドウ -->
+        <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden" onclick="closeModal()">
+          <div class="relative bg-white rounded-lg shadow-lg overflow-hidden w-full max-w-3xl" onclick="event.stopPropagation();">
+            <button onclick="closeModal()" class="absolute top-2 right-2 text-gray-600 hover:text-gray-900">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+            <img id="modalImage" src="" alt="拡大画像" class="w-full h-auto object-contain">
+          </div>
+        </div>
+        <!--モーダルウィンドウ用-->
+        <script>
+          function openModal(imagePath) {
+            document.getElementById('modalImage').src = imagePath;
+            document.getElementById('imageModal').classList.remove('hidden');
+          }
 
+          function closeModal() {
+            document.getElementById('imageModal').classList.add('hidden');
+          }
+        </script>
 
         <!-- 詳細情報のセクション -->
         <div class="content mt-4">
@@ -133,15 +207,15 @@
               <dd>{!! nl2br(e($spot->address)) !!}</dd>
             </dl>
             <dl class="p-4 bg-neutral-200 rounded-lg">
-              <dt class="font-semibold">開園時間</dt>
+              <dt class="font-semibold">時間</dt>
               <dd>{!! nl2br(e($spot->opendate)) !!}</dd>
             </dl>
             <dl class="p-4 bg-neutral-200 rounded-lg">
-              <dt class="font-semibold">休園日</dt>
+              <dt class="font-semibold">定休日</dt>
               <dd>{!! nl2br(e($spot->closedate)) !!}</dd>
             </dl>
             <dl class="p-4 bg-neutral-200 rounded-lg">
-              <dt class="font-semibold">入園料金</dt>
+              <dt class="font-semibold">料金</dt>
               <dd>{!! nl2br(e($spot->price)) !!}</dd>
             </dl>
             <dl class="p-4 bg-neutral-200 rounded-lg">
@@ -331,18 +405,19 @@
                     @endif
                   @endauth
                 </div>
-
-                <div class="flex items-center mb-2">
-                  <button class="like-button text-gray-500 hover:text-blue-500 flex items-center" data-review-id="{{ $review->id }}">
-                    @if ($review->likes->where('user_id', auth()->id())->count())
-                      <i class="fas fa-thumbs-up"></i> いいねを取り消す
-                    @else
-                      <i class="far fa-thumbs-up"></i> いいね
-                    @endif
-                  </button>
-                  <span class="ml-2 text-gray-600" id="like-count-{{ $review->id }}">{{ $review->likes ? $review->likes->count() : 0 }} 件のいいね</span>
-                </div>
-
+                <!--いいねボタン-->
+                @auth
+                  <div class="flex items-center mb-2">
+                    <button class="like-button text-gray-500 hover:text-blue-500 flex items-center" data-review-id="{{ $review->id }}">
+                      @if ($review->likes->where('user_id', auth()->id())->count())
+                        <i class="fas fa-thumbs-up"></i> いいねを取り消す
+                      @else
+                        <i class="far fa-thumbs-up"></i> いいね
+                      @endif
+                    </button>
+                    <span class="ml-2 text-gray-600" id="like-count-{{ $review->id }}">{{ $review->likes ? $review->likes->count() : 0 }} 件のいいね</span>
+                  </div>
+                @endauth
                 <p class="text-gray-700 font-semibold text-lg mt-1 transition-colors duration-200 ease-in-out">
                   {{ $review->title }}
                 </p>
@@ -360,29 +435,6 @@
                 </div>
               </div>
             @endforeach
-
-            <!-- モーダルウィンドウ -->
-            <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
-              <div class="relative bg-white rounded-lg shadow-lg overflow-hidden w-full max-w-3xl">
-                <button onclick="closeModal()" class="absolute top-2 right-2 text-gray-600 hover:text-gray-900">
-                  <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
-                    <path d="M6 18L18 6M6 6l12 12"></path>
-                  </svg>
-                </button>
-                <img id="modalImage" src="" alt="拡大画像" class="w-full h-auto object-contain">
-              </div>
-            </div>
-            <!--モーダルウィンドウ用-->
-            <script>
-              function openModal(imagePath) {
-                document.getElementById('modalImage').src = imagePath;
-                document.getElementById('imageModal').classList.remove('hidden');
-              }
-
-              function closeModal() {
-                document.getElementById('imageModal').classList.add('hidden');
-              }
-            </script>
           @endif
         </div>
 
@@ -404,7 +456,7 @@
       @endauth
     </div>
   </div>
-  <script type="module">
+  <script>
     // スポットのお気に入り機能
     const likeBtn = document.querySelector(".like-btn");
     likeBtn.addEventListener("click", async (e) => {

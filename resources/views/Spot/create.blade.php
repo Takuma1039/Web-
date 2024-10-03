@@ -35,7 +35,7 @@
             <div class="mt-1 flex flex-wrap">
                 @foreach($seasons as $season)
                     <div class="flex items-center mr-4">
-                        <input type="checkbox" name="spot[season_id][]" value="{{ $season->id }}" id="season-{{ $season->id }}" {{ in_array($season->id, old('spot.season_id', [])) ? 'checked' : '' }} class="mr-2">
+                        <input type="checkbox" name="spot[season_ids][]" value="{{ $season->id }}" id="season-{{ $season->id }}" {{ in_array($season->id, old('spot.season_ids', [])) ? 'checked' : '' }} class="mr-2">
                         <label for="season-{{ $season->id }}" class="text-sm text-gray-600">{{ $season->name }}</label>
                     </div>
                 @endforeach
@@ -48,7 +48,7 @@
             <div class="mt-1 flex flex-wrap">
                 @foreach($months as $month)
                     <div class="flex items-center mr-4">
-                        <input type="checkbox" name="spot[month_id][]" value="{{ $month->id }}" id="month-{{ $month->id }}" {{ in_array($month->id, old('spot.month_id', [])) ? 'checked' : '' }} class="mr-2">
+                        <input type="checkbox" name="spot[month_ids][]" value="{{ $month->id }}" id="month-{{ $month->id }}" {{ in_array($month->id, old('spot.months_id', [])) ? 'checked' : '' }} class="mr-2">
                         <label for="month-{{ $month->id }}" class="text-sm text-gray-600">{{ $month->name }}</label>
                     </div>
                 @endforeach
@@ -92,13 +92,13 @@
         </div>
 
         <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700">開館日</label>
+            <label class="block text-sm font-medium text-gray-700">時間</label>
             <textarea type="text" name="spot[opendate]" placeholder="開館日" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-indigo-200">{{ old('spot.opendate') }}</textarea>
             <p class="text-red-500 text-sm">{{ $errors->first('spot.opendate') }}</p>
         </div>
 
         <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700">閉館日</label>
+            <label class="block text-sm font-medium text-gray-700">定休日</label>
             <textarea type="text" name="spot[closedate]" placeholder="閉館日" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-indigo-200">{{ old('spot.closedate') }}</textarea>
             <p class="text-red-500 text-sm">{{ $errors->first('spot.closedate') }}</p>
         </div>
@@ -117,9 +117,45 @@
 
         <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700">画像ファイル（複数可）:</label>
-            <input type="file" name="image[]" multiple class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-indigo-200">
+            <input type="file" name="image[]" id="image-input" multiple class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-indigo-200" accept="image/*" onchange="previewImages()">
+            <div id="image-preview" class="grid grid-cols-2 gap-4 mt-2"></div>
         </div>
+        
+        <!--画像のプレビュー画面用-->
+                <script>
+                  function previewImages() {
+                    const preview = document.getElementById('image-preview');
+                    preview.innerHTML = ''; // プレビューをリセット
 
+                    const files = document.getElementById('image-input').files;
+
+                    if (files.length === 0) {
+                      preview.innerHTML = '<p class="text-gray-500">画像が選択されていません。</p>';
+                      return;
+                    }
+
+                    for (let i = 0; i < files.length; i++) {
+                      const file = files[i];
+                      const reader = new FileReader();
+
+                      // 画像のプレビューと名前入力欄を作成
+                      reader.onload = function(e) {
+                        const imgContainer = document.createElement('div');
+                        imgContainer.classList.add('flex', 'flex-col', 'items-center', 'mb-4');
+
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.classList.add('h-32', 'w-full', 'object-cover', 'rounded-lg', 'shadow-lg');
+
+                        imgContainer.appendChild(img);
+                        preview.appendChild(imgContainer);
+                      }
+
+                      reader.readAsDataURL(file);
+                    }
+                  }
+                </script>
+                
         <button type="submit" class="mt-4 bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700">アップロード</button>
     </form>
     @if ($errors->any())

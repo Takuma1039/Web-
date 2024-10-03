@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        <title>{{ config('app.name', 'Few Days-trip') }}</title>
         
         <!-- Css -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -16,6 +16,8 @@
         <script src="https://kit.fontawesome.com/77786c3cf3.js" crossorigin="anonymous"></script>
         <!--slider-->
         <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.1/dist/flowbite.min.js"></script>
+        <!--GoogleMap-->
+        <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet">
     </head>
     <body class="font-sans antialiased">
         <div class="bg-gray-100">
