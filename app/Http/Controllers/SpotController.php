@@ -20,8 +20,15 @@ class SpotController extends Controller
     //スポット一覧
     public function index()
     {
-        $spots = Spot::orderBy('created_at', 'desc')->paginate(10);
-        return view('Spot.index', ['spots' => $spots]);
+        $spots = Spot::with('spotimages') // 関連する画像を一緒に取得
+                 ->withCount('likes') // いいねの数を取得
+                 ->paginate(10);
+        
+        foreach ($spots as $spot) {
+        $spot->truncated_body = $this->truncateAtPunctuation($spot->body, 150);
+        }
+        
+        return view('Spot.index', compact('spots'));
     }
     //スポットの詳細画面
     public function show(Spot $spot)
@@ -52,6 +59,9 @@ class SpotController extends Controller
         $totalReviews = $reviews->count();
         $averageRating = $totalReviews > 0 ? $reviews->sum('review') / $totalReviews : 0; // 0で割るのを防ぐためのチェック
     
+        // GoogleMapのAPI
+        $api_key = config('app.google_maps_api_key');
+        
         return view("Spot.show")->with([
             'spot' => $spot,
             'spotImages' => $spotImages,
@@ -60,9 +70,11 @@ class SpotController extends Controller
             'months' => $months,
             'reviews' => $reviews,
             'reviewImages' => $reviewImages,
+            'api_key' => $api_key,
             'averageRating' => number_format($averageRating, 2), // 小数点2桁でフォーマット
         ]);
     }
+    
     //スポット作成
     public function create()
     {
@@ -196,6 +208,30 @@ class SpotController extends Controller
         $likedSpots = $user->spotlikes()->with('spot')->get()->pluck('spot');
     
         return view('Spot.favorite', compact('likedSpots'));
+    }
+    
+    public function truncateAtPunctuation($string, $maxLength)
+    {
+      if (mb_strlen($string) <= $maxLength) {
+        return $string; // 文字数が上限を超えない場合はそのまま返す
+      }
+
+      // 最大長を超える部分を切り出す
+      $truncated = mb_substr($string, 0, $maxLength);
+    
+      // 句読点を探す
+      $lastPunctuation = mb_strrpos($truncated, '。');
+      if ($lastPunctuation === false) {
+        $lastPunctuation = mb_strrpos($truncated, '、');
+      }
+
+      // 最後の句読点が見つかった場合
+      if ($lastPunctuation !== false) {
+        return mb_substr($truncated, 0, $lastPunctuation + 1) . '...'; // 句読点まで含める
+      }
+
+      // 句読点が見つからない場合は、指定した文字数で切り捨てる
+      return mb_substr($truncated, 0, $maxLength) . '...';
     }
 }
 

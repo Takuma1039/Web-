@@ -12,8 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('majorspots', function (Blueprint $table) {
-            
+            $table->id();
             $table->foreignId('spot_id')->constrained()->onDelete('cascade');
+            $table->timestamps();
         });
     }
 
