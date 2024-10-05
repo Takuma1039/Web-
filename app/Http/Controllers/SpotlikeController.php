@@ -17,9 +17,6 @@ class SpotlikeController extends Controller
 
     $spot_id = $request->spot_id;
 
-    // デバッグ用
-    \Log::info('Request received: ', $request->all());
-
     // いいねの状態を判定
     $alreadyLiked = Spotlike::where('user_id', $user_id)->where('spot_id', $spot_id)->exists();
 

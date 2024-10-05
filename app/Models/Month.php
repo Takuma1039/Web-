@@ -11,7 +11,7 @@ class Month extends Model
     
     public function spots()
     {
-        return $this->belongsToMany(Spot::class, 'spot_months', 'spot_id', 'month_id');
+        return $this->belongsToMany(Spot::class, 'spot_months', 'month_id', 'spot_id');
     }
     
     public function getByCategory(int $limit_count = 5)

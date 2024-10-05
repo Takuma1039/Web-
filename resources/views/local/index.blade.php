@@ -3,9 +3,7 @@
     <div class="container mx-auto px-4 py-8">
       <h1 class="text-2xl font-bold mb-6">地域:
         @if($local) <!-- $localが存在するかどうかを確認 -->
-          <a href="/locals/{{ $local->id }}">
-            {{ $local->name }}
-          </a>
+          {{ $local->name }}
         @else
           スポットが属する地域はありません <!-- 地域がない場合のメッセージ -->
         @endif
@@ -26,21 +24,17 @@
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <div class="col-span-2">
-          @forelse($likedSpots as $spot)
+          @forelse($spots as $spot)
             <div class="p-4 bg-white rounded-lg shadow-md mb-4">
               <div class="flex items-center mb-2">
                 <a href="/spots/{{ $spot->id }}" class="ml-4 text-xl font-bold text-indigo-600 hover:underline">
                   {{ $spot->name }}
                 </a>
                 @auth
-                  <div class="flexbox ml-2">
-                    <i class="fa-solid fa-star like-btn {{ $spot->isLikedByAuthUser() ? 'liked' : '' }}" id="like-btn-{{ $spot->id }}" style="font-size: 1.25rem;"></i>
+                  <div class="ml-4">
+                    <x-like-button :spot="$spot" /> <!-- コンポーネントを呼び出す -->
                   </div>
                 @endauth
-                <!-- いいねメッセージ表示 -->
-                <div id="likeMessage-{{ $spot->id }}" class="hidden text-sm text-white bg-green-500 px-2 py-1 ml-2 rounded-md">
-                  お気に入り登録しました
-                </div>
               </div>
           
               <div class="flex mb-2">
@@ -48,7 +42,7 @@
                   <p class="text-gray-600 mb-2">
                     {{ $spot->truncated_body }}
                   </p>
-                  <span class="text-sm font-medium text-gray-600" id="likeCount-{{ $spot->id }}">{{ $spot->likes_count }} いいね</span>
+                  <span class="text-sm font-medium text-gray-600" id="likeCount-{{ $spot->id }}">{{ $spot->likes->count() }} いいね</span>
                 </div>
                 
                 <div class="w-1/2 pl-2">
@@ -76,13 +70,6 @@
   </div>
   
   <script type="module">
-    document.addEventListener('DOMContentLoaded', () => {
-      const likeBtns = document.querySelectorAll(".like-btn");
-      likeBtns.forEach(btn => {
-        btn.addEventListener("click", handleLikeButtonClick);
-      });
-    });
-
     document.addEventListener('DOMContentLoaded', function() {
       const searchInput = document.querySelector('input[name="search"]');
       
@@ -97,43 +84,5 @@
           });
       });
     });
-
-    async function handleLikeButtonClick(e) {
-      const clickedEl = e.target;
-      const spotId = clickedEl.id.split('-')[2]; // 'like-btn-{id}'からidを取得
-      clickedEl.disabled = true; // ボタンを無効化
-
-      clickedEl.classList.toggle("liked");
-      const likeMessage = document.getElementById(`likeMessage-${spotId}`);
-      const likeCountEl = document.getElementById(`likeCount-${spotId}`); // いいねカウントの要素を取得
-
-      try {
-        const res = await fetch("/spot/like", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
-          },
-          body: JSON.stringify({ spot_id: spotId }),
-        });
-
-        if (!res.ok) throw new Error("Network response was not ok");
-
-        const data = await res.json();
-
-        // いいねカウントとメッセージを更新
-        likeCountEl.textContent = `${data.likes_count} いいね`; // likes_countを更新
-        likeMessage.textContent = clickedEl.classList.contains("liked") ? "お気に入り登録しました" : "お気に入り解除しました"; // liked状態によってメッセージを切り替え
-        likeMessage.classList.remove("hidden");
-
-        setTimeout(() => {
-          likeMessage.classList.add("hidden");
-        }, 800);
-      } catch (error) {
-        alert("処理が失敗しました。画面を再読み込みし、通信環境の良い場所で再度お試しください。");
-      } finally {
-        clickedEl.disabled = false; // ボタンを再度有効化
-      }
-    }
   </script>
 </x-app-layout>

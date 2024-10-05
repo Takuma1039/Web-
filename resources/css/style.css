@@ -32,10 +32,6 @@
     transform: scale(1.05); /* カードのホバー時にスケールを増加 */
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
-#likeMessage {
-  
-  margin-left: 0.5rem; /* メッセージとボタンの間にスペースを追加 */
-}
 
 .hidden {
   display: none;
@@ -68,3 +64,4 @@
 #dialog {
     display: none; /* デフォルトで非表示 */
 }
+

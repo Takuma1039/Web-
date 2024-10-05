@@ -12,17 +12,11 @@
               <img src="{{ $spot->spotimages->first()->image_path ?? asset('images/default-image.jpg') }}" 
                    alt="{{ $spot->name ?? 'デフォルトのスポット画像' }}" class="w-full h-48 object-cover">
             </a>
-            @auth
               <div class="flex items-center justify-between p-2">
                 <h2 class="text-lg font-bold text-gray-800">{{ $spot->name }}</h2>
                 <i class="fa-solid fa-star like-btn {{ $spot->isLikedByAuthUser() ? 'liked' : '' }}" 
                    id="{{ $spot->id }}" style="font-size: 1.25rem;"></i>
               </div>
-            @else
-              <p class="p-4">
-                <a href="{{ route('login') }}" class="text-blue-500 hover:underline">ログインしていません</a>
-              </p>
-            @endauth
           </div>
         @endforeach
       </div>
@@ -30,10 +24,6 @@
 
     <p class="no-spots-message hidden">まだお気に入り登録したスポットはありません。</p>
     
-  </div>
-
-  <div class="footer mt-6">
-      <a href="javascript:history.back();" class="text-blue-500 hover:underline">戻る</a>
   </div>
 
   <script type="module">

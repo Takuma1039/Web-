@@ -4,104 +4,26 @@
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
         <div class="flex items-center justify-between mb-4">
           <div class="flex items-center">
-            <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white">
+            <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white flex items-center">
               {{ $spot->name }}
+              @auth
+                <div class="ml-4">
+                  <!--お気に入りボタンコンポーネント追加-->
+                  <x-like-button :spot="$spot" />
+                </div>
+              @endauth
             </h2>
-            @auth
-              <div class="flex items-center ml-2">
-                <i class="fa-solid fa-heart like-btn {{ $spot->isLikedByAuthUser() ? 'liked' : '' }}" id="{{ $spot->id }}" style="font-size: 1.5rem;"></i>
-              </div>
-            @endauth
-
-            <!-- いいねメッセージ表示 -->
-            <div id="likeMessage" class="hidden text-sm text-white bg-green-500 px-2 py-1 rounded-md">
-              お気に入り登録しました
-            </div>
           </div>
-          <!-- Mapボタン -->
-          <a href="javascript:void(0);" class="inline-block rounded-lg border bg-white dark:bg-gray-700 dark:border-none px-4 py-2 text-center text-sm font-semibold text-gray-500 dark:text-gray-200 outline-none ring-indigo-300 transition duration-100 hover:bg-gray-100 focus-visible:ring active:bg-gray-200 md:px-8 md:py-3 md:text-base" onclick="openMapModal()">
-            Map
-          </a>
-
-          <!-- Mapモーダルウィンドウ -->
-          <div id="mapModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" onclick="closeMapModal()">
-            <div class="relative top-1/2 transform -translate-y-1/2 mx-auto p-5 border w-full max-w-lg shadow-2xl rounded-lg bg-white z-60" onclick="event.stopPropagation();">
-              <button class="absolute top-2 right-2 text-gray-500 hover:text-red-600 transition duration-150" onclick="closeMapModal()">
-                &times;
-              </button>
-              <div id="map" style="width: 100%; height: 400px;"></div>
-            </div>
-          </div>
-
-          <script>
-            // Mapモーダル表示用のJavaScript関数
-            function openMapModal() {
-              document.getElementById('mapModal').classList.remove('hidden');
-
-              // 既にGoogle Mapsがロードされているかどうかを確認
-              if (!window.google || !window.google.maps) {
-                // Google Maps APIを非同期でロード
-                const script = document.createElement('script');
-                script.src = `https://maps.googleapis.com/maps/api/js?key={{ $api_key }}&callback=initMap`;
-                script.async = true;
-                script.defer = true;
-                document.body.appendChild(script);
-              } else {
-                // 既にロード済みの場合はマップを初期化
-                initMap();
-              }
-            }
-
-            // モーダル閉じる用のJavaScript関数
-            function closeMapModal() {
-              document.getElementById('mapModal').classList.add('hidden');
-            }
-
-            // Google Maps APIでマップを初期化する関数
-            function initMap() {
-              var spotLocation = { lat: {{ $spot->lat }}, lng: {{ $spot->long }} };
-
-              var map = new google.maps.Map(document.getElementById('map'), {
-                zoom: 14,
-                center: spotLocation
-              });
-
-              var marker = new google.maps.Marker({
-                position: spotLocation,
-                map: map,
-                title: '{{ $spot->name }}'
-              });
-            }
-          </script>
+          
+          <!--GoogleMap表示コンポーネント追加-->
+          <x-map-modal :api-key="$api_key" :latitude="$spot->lat" :longitude="$spot->long" :spot-name="$spot->name" />
         </div>
-        
         <div class="p-4">
           <div class="flex items-center">
             <span class="font-bold text-lg">総合評価</span>
+            <!-- 総合評価評価コンポーネント追加 -->
             <div class="flex items-center ml-2">
-              @for ($i = 0; $i < 5; $i++)
-                @php
-                  $currentValue = $i + 1; // 現在の星の値（1〜5）
-                  $fullStar = $averageRating >= $currentValue; // 完全な星の表示
-                  $partialStar = !$fullStar && $averageRating > $currentValue - 1 && $averageRating < $currentValue; // 部分的な星の表示
-                  $fillPercentage = $partialStar ? ($averageRating - ($currentValue - 1)) * 100 : 0; // 部分的な星の塗り
-                @endphp
-
-                <div class="relative inline-block">
-                  <!-- 空の星のベースを描画 -->
-                  <i class="fas fa-star text-gray-300 text-xl"></i>
-
-                  @if ($fullStar)
-                    <!-- 完全な星の塗り -->
-                    <i class="fas fa-star text-yellow-500 text-xl absolute top-0 left-0"></i>
-                 @elseif ($partialStar)
-                    <!-- 部分的な星の塗り -->
-                    <div class="absolute top-0 left-0 h-full overflow-hidden" style="width: {{ $fillPercentage }}%;">
-                      <i class="fas fa-star text-yellow-500 text-xl"></i>
-                    </div>
-                  @endif
-                </div>
-              @endfor
+              <x-rating :average-rating="$averageRating" />
               <span class="text-gray-600 ml-2 font-semibold">{{ number_format($averageRating, 2) }}</span> <!-- 総合評価の値を表示 -->
             </div>
           </div>
@@ -130,7 +52,7 @@
 
         <div class="mb-4 p-4 bg-gray-100 rounded-lg shadow-md">
           <strong class="text-lg flex items-center">
-            <i class="fa-solid fa-snowflake mr-2"></i>シーズン:
+            <i class="fa-solid fa-snowflake mr-2"></i>おすすめシーズン:
           </strong>
           @if ($seasons->isNotEmpty())
             <div class="flex space-x-2 mt-2">
@@ -175,28 +97,8 @@
             </a>
           @endforeach
         </div>
-        <!-- モーダルウィンドウ -->
-        <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden" onclick="closeModal()">
-          <div class="relative bg-white rounded-lg shadow-lg overflow-hidden w-full max-w-3xl" onclick="event.stopPropagation();">
-            <button onclick="closeModal()" class="absolute top-2 right-2 text-gray-600 hover:text-gray-900">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
-                <path d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-            </button>
-            <img id="modalImage" src="" alt="拡大画像" class="w-full h-auto object-contain">
-          </div>
-        </div>
-        <!--モーダルウィンドウ用-->
-        <script>
-          function openModal(imagePath) {
-            document.getElementById('modalImage').src = imagePath;
-            document.getElementById('imageModal').classList.remove('hidden');
-          }
-
-          function closeModal() {
-            document.getElementById('imageModal').classList.add('hidden');
-          }
-        </script>
+        <!-- モーダルコンポーネント -->
+        <x-modal-window />
 
         <!-- 詳細情報のセクション -->
         <div class="content mt-4">
@@ -286,53 +188,11 @@
                   @enderror
                 </div>
 
-                <div class="mb-4">
-                  <label class="block text-sm font-medium text-gray-700">新しい画像ファイル（複数可）:</label>
-                  <input type="file" name="images[]" id="image-input" multiple class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-indigo-200" accept="image/*" onchange="previewImages()">
-                  <div id="image-preview" class="grid grid-cols-2 gap-4 mt-2"></div>
+                <div>
+                　<!--画像のプレビューコンポーネント追加-->
+                  <x-image-preview input-name="images[]" />
                 </div>
-                <!--画像のプレビュー画面用-->
-                <script>
-                  function previewImages() {
-                    const preview = document.getElementById('image-preview');
-                    preview.innerHTML = ''; // プレビューをリセット
-
-                    const files = document.getElementById('image-input').files;
-
-                    if (files.length === 0) {
-                      preview.innerHTML = '<p class="text-gray-500">画像が選択されていません。</p>';
-                      return;
-                    }
-
-                    for (let i = 0; i < files.length; i++) {
-                      const file = files[i];
-                      const reader = new FileReader();
-
-                      // 画像のプレビューと名前入力欄を作成
-                      reader.onload = function(e) {
-                        const imgContainer = document.createElement('div');
-                        imgContainer.classList.add('flex', 'flex-col', 'items-center', 'mb-4');
-
-                        const img = document.createElement('img');
-                        img.src = e.target.result;
-                        img.classList.add('h-32', 'w-full', 'object-cover', 'rounded-lg', 'shadow-lg');
-
-                        // 新しく追加された画像に対する名前入力欄を生成
-                        const nameInput = document.createElement('input');
-                        nameInput.type = 'text';
-                        nameInput.name = `new_image_names[]`; // 新しい画像の名前用
-                        nameInput.placeholder = '画像の名前を入力';
-                        nameInput.classList.add('mt-1', 'block', 'w-full', 'border', 'border-gray-300', 'rounded-md', 'shadow-sm', 'focus:ring', 'focus:ring-indigo-200');
-
-                        imgContainer.appendChild(img);
-                        imgContainer.appendChild(nameInput);
-                        preview.appendChild(imgContainer);
-                      }
-
-                      reader.readAsDataURL(file);
-                    }
-                  }
-                </script>
+                
                 <!-- 匿名選択用チェックボックス -->
                 <div class="mb-4 flex items-center">
                   <input type="hidden" name="is_anonymous" value="0">
@@ -408,14 +268,15 @@
                 <!--いいねボタン-->
                 @auth
                   <div class="flex items-center mb-2">
-                    <button class="like-button text-gray-500 hover:text-blue-500 flex items-center" data-review-id="{{ $review->id }}">
+                    <button class="like-button text-gray-500 hover:text-pink-500 flex items-center transition duration-200 ease-in-out" data-review-id="{{ $review->id }}">
                       @if ($review->likes->where('user_id', auth()->id())->count())
-                        <i class="fas fa-thumbs-up"></i> いいねを取り消す
+                        <i class="fas fa-thumbs-up"></i>
                       @else
-                        <i class="far fa-thumbs-up"></i> いいね
+                        <i class="far fa-thumbs-up"></i>
                       @endif
                     </button>
                     <span class="ml-2 text-gray-600" id="like-count-{{ $review->id }}">{{ $review->likes ? $review->likes->count() : 0 }} 件のいいね</span>
+                    <span id="like-message-{{ $review->id }}" class="ml-2 text-pink-600 hidden text-sm font-semibold bg-pink-100 px-2 py-1 rounded-md transition duration-300"></span> <!-- メッセージ表示用 -->
                   </div>
                 @endauth
                 <p class="text-gray-700 font-semibold text-lg mt-1 transition-colors duration-200 ease-in-out">
@@ -437,10 +298,6 @@
             @endforeach
           @endif
         </div>
-
-        <div class="mt-6 text-center">
-          <a href="javascript:history.back();" class="text-indigo-600 hover:underline">戻る</a>
-        </div>
       </div>
 
       @php
@@ -457,63 +314,12 @@
     </div>
   </div>
   <script>
-    // スポットのお気に入り機能
-    const likeBtn = document.querySelector(".like-btn");
-    likeBtn.addEventListener("click", async (e) => {
-      const clickedEl = e.target;
-      const spotId = clickedEl.id;
-      // リクエストが完了するまでボタンを無効化して、連打を防止する
-      clickedEl.disabled = true;
-      // ビジュアル的に「いいね」の状態を切り替える
-      clickedEl.classList.toggle("liked");
-                      
-      try {
-        const res = await fetch("/spot/like", {
-          //リクエストメソッドはPOST
-          method: "POST",
-          headers: {
-            //Content-Typeでサーバーに送るデータの種類を伝える。今回はapplication/json
-            "Content-Type": "application/json", //サーバーに送るデータの種類を指定
-            //csrfトークンを付与
-            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"), // CSRFトークンを付与
-          },
-          body: JSON.stringify({ spot_id: spotId }), // データをJSON形式で送信
-        });
-        // レスポンスのチェック
-        if (!res.ok) {
-          throw new Error("Network response was not ok");
-        }
-        // レスポンスをJSON形式で取得
-        const data = await res.json();
-        // 「いいね」状態に応じてメッセージを変更
-        if (clickedEl.classList.contains("liked")) {
-          likeMessage.textContent = "お気に入り登録しました";
-        } else {
-          likeMessage.textContent = "お気に入り解除しました";
-        }
-
-        // メッセージを表示
-        likeMessage.classList.remove("hidden");
-
-        // 0.8秒後にメッセージ非表示
-        setTimeout(() => {
-          likeMessage.classList.add("hidden");
-        }, 800);
-        // エラーハンドリング
-      } catch (error) {
-          alert("処理が失敗しました。画面を再読み込みし、通信環境の良い場所で再度お試しください。");
-      } finally {
-          // リクエストが完了したらボタンを再度有効化する
-          clickedEl.disabled = false;
-        }
-    });
-    
     //口コミ投稿メッセージ表示用
     document.querySelector('form').onsubmit = function() {
       alert('口コミが投稿されました！');
     };
 
-    // モーダルの表示/非表示切替
+    // 口コミ投稿モーダルの表示/非表示切替
     document.getElementById('reviewBtn').addEventListener('click', function() {
       document.getElementById('reviewModal').classList.remove('hidden');
     });
@@ -530,54 +336,70 @@
     });
       
     //口コミいいね機能
-    document.addEventListener('DOMContentLoaded', function () { //ページの読み込みが完了した後に実行
-      const likeButtons = document.querySelectorAll('.like-button'); //.like-buttonクラスを持つすべての要素を取得し、likeButtonsという変数に格納
+    document.addEventListener('DOMContentLoaded', function () {
+    const likeButtons = document.querySelectorAll('.like-button');
 
-      likeButtons.forEach(button => {
-        button.addEventListener('click', async function () { //すべての「いいね」ボタンに対して、クリックイベントリスナーを追加
-          const reviewId = this.getAttribute('data-review-id'); //どの口コミに対して「いいね」をするかを決定
-          const likeCountElement = document.getElementById(`like-count-${reviewId}`); //いいねの数を表示するための要素を、reviewIdに基づいて取得
+    likeButtons.forEach(button => {
+        let isProcessing = false;
 
-          // ボタンを無効化して連打を防止
-          this.disabled = true;
+        button.addEventListener('click', async function () {
+            if (isProcessing) return;
+            isProcessing = true;
 
-          try {
-            const response = await fetch(`/reviews/like`, { //fetchを使って、サーバーに「いいね」操作のリクエストを送信
-              method: 'POST',
-              headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                'Content-Type': 'application/json',
-              },
-                body: JSON.stringify({ review_id: reviewId }) //「いいね」をする対象のレビューIDをJSON形式で送信
-              });
+            const reviewId = this.getAttribute('data-review-id');
+            const likeCountElement = document.getElementById(`like-count-${reviewId}`);
+            const messageElement = document.getElementById(`like-message-${reviewId}`);
 
-              // レスポンスのチェック
-              if (!response.ok) {
-                throw new Error('Network response was not ok');
-              }
+            this.disabled = true;
+            this.classList.add('opacity-50');
 
-              const data = await response.json(); //レスポンスをJSON形式に変換してdataとして格納
+            try {
+                const response = await fetch(`/reviews/like`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ review_id: reviewId })
+                });
 
-              // いいね数を更新
-              likeCountElement.textContent = `${data.likeCount} 件のいいね`; //サーバーから返されたデータから、最新の「いいね」数を取得し、likeCountElementに表示
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
 
-              // いいね状態を視覚的に変更
-              if (data.liked) {
-                  this.innerHTML = '<i class="fas fa-thumbs-up"></i> いいねを取り消す';
-                  this.classList.add('text-blue-500');
-              } else {
-                  this.innerHTML = '<i class="far fa-thumbs-up"></i> いいね';
-                  this.classList.remove('text-blue-500');
-              }
-          } catch (error) {
-              console.error('Error:', error);
-              alert('処理中にエラーが発生しました。もう一度お試しください。');
-          } finally {
-              // リクエストが完了したらボタンを再度有効化
-              this.disabled = false;
-          }
+                const data = await response.json();
+
+                // いいね数を更新
+                likeCountElement.textContent = `${data.likeCount} 件のいいね`;
+
+                // いいね状態に応じてメッセージを表示
+                if (data.liked) {
+                    messageElement.textContent = "いいね！";
+                    this.innerHTML = '<i class="fas fa-thumbs-up"></i>';
+                    this.classList.add('text-blue-500');
+                } else {
+                    messageElement.textContent = "いいねを取り消しました！";
+                    this.innerHTML = '<i class="far fa-thumbs-up"></i>';
+                    this.classList.remove('text-blue-500');
+                }
+
+                // メッセージを表示
+                messageElement.classList.remove('hidden');
+
+                // 数秒後にメッセージを非表示にする
+                setTimeout(() => {
+                    messageElement.classList.add('hidden');
+                }, 1000);
+            } catch (error) {
+                console.error('Error:', error);
+                alert('処理中にエラーが発生しました。もう一度お試しください。');
+            } finally {
+                this.disabled = false;
+                this.classList.remove('opacity-50');
+                isProcessing = false;
+            }
         });
-      });
     });
+});
   </script>
 </x-app-layout>

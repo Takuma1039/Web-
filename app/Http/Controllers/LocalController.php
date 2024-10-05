@@ -11,13 +11,7 @@ class LocalController extends Controller
     public function index(Local $local, Request $request)
 {
     // 特定の地域に関連するスポットを取得し、関連する地域もロード
-    $spots = $local->spots()->with('local')->paginate(10);
-    
-    // いいねしたスポットを取得
-    $likedSpots = Spot::withCount('likes')
-        ->orderBy('likes_count', 'desc')
-        ->take(10)
-        ->get();
+    $spots = $local->spots()->with('local')->withCount('likes');
 
     // 検索機能の実装
     $query = $request->input('search');
@@ -33,11 +27,11 @@ class LocalController extends Controller
     // 最後にページネーションを適用
     $spots = $spotsQuery->orderBy('updated_at', 'DESC')->paginate(10);
 
-    foreach ($likedSpots as $spot) {
+    foreach ($spots as $spot) {
         $spot->truncated_body = $this->truncateAtPunctuation($spot->body, 200);
     }
 
-    return view('local.index', compact('likedSpots', 'spots', 'local'));
+    return view('local.index', compact('spots', 'local'));
 }
     
     public function truncateAtPunctuation($string, $maxLength)

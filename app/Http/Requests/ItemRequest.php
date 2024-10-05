@@ -34,7 +34,8 @@ class ItemRequest extends FormRequest
             'spot.site' => 'required|string',
             'spot.lat' => 'required|numeric',
             'spot.long' => 'required|numeric',
-            'image.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'image_names.*' => 'nullable|string|max:255', // 画像名のバリデーション
             'spot.category_ids' => 'required|array',
             'spot.season_ids' => 'required|array',
             'spot.month_ids' => 'required|array',

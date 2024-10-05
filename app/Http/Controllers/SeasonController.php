@@ -11,19 +11,12 @@ class SeasonController extends Controller
     public function index(Season $season, Request $request)
 {
     // 特定のシーズンに関連するスポットを取得し、関連するシーズンもロード
-    $spots = $season->spots()->with('seasons')->paginate(10);
-    
-    // いいねしたスポットを取得
-    $likedSpots = Spot::withCount('likes')
-        ->orderBy('likes_count', 'desc')
-        ->take(10)
-        ->get();
-
+    $spotsQuery = Spot::whereHas('seasons', function ($query) use ($season) {
+            $query->where('seasons.id', $season->id);
+        })->with('seasons')->withCount('likes'); // 関連するシーズンといいねの数を取得
+        
     // 検索機能の実装
     $query = $request->input('search');
-    
-    // まず、クエリビルダを開始します
-    $spotsQuery = $season->spots(); //特定のシーズンに関連するスポットを取得するためのクエリビルダーのインスタンスを生成する
     
     // 検索機能を追加
     if ($query) {
@@ -31,13 +24,13 @@ class SeasonController extends Controller
     }
 
     // 最後にページネーションを適用
-    $spots = $spotsQuery->orderBy('updated_at', 'DESC')->paginate(10);
+    $spots = $spotsQuery->orderBy('likes_Count', 'DESC')->paginate(10);
 
-    foreach ($likedSpots as $spot) {
+    foreach ($spots as $spot) {
         $spot->truncated_body = $this->truncateAtPunctuation($spot->body, 200);
     }
 
-    return view('season.index', compact('likedSpots', 'spots', 'season'));
+    return view('season.index', compact('spots', 'season'));
 }
     
     public function truncateAtPunctuation($string, $maxLength)

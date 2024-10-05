@@ -14,119 +14,196 @@ use App\Models\Season;
 use App\Models\Local;
 use App\Models\Month;
 use Cloudinary;
+use Illuminate\Support\Facades\DB;
 
 class SpotController extends Controller
 {
     //スポット一覧
-    public function index()
+    public function index(Request $request, Category $category, Local $local, Season $season, Month $month)
     {
+        //dd($request->session()->get('history'));
+        // 現在のURLを取得
+        $currentUrl = url()->current();
+        $currentPageName = 'スポット一覧'; // 適切なページ名に変更
+
+        // 履歴の管理
+        $this->updateHistory($request, $currentUrl, $currentPageName);
+        // 履歴を取得
+        $history = $request->session()->get('history', []);
+        
+        // 最新のページがすでに履歴にある場合は更新
+        if (count($history) > 0 && end($history)['url'] == $currentUrl) {
+            return view('Spot.index', [
+                'spots' => Spot::with('spotimages')
+                    ->withCount('likes')
+                    ->orderBy('name', 'asc')
+                    ->paginate(10),
+                'spotcategories' => $category->get(),
+                'locals' => $local->get(),
+                'seasons' => $season->get(),
+                'months' => $month->get(),
+            ]); // 履歴が同じ場合はビューを返すだけ
+        }
+
+        // スポット情報の取得
         $spots = Spot::with('spotimages') // 関連する画像を一緒に取得
-                 ->withCount('likes') // いいねの数を取得
-                 ->paginate(10);
+                     ->withCount('likes') // いいねの数を取得
+                     ->orderBy('name', 'asc')
+                     ->paginate(10);
         
         foreach ($spots as $spot) {
-        $spot->truncated_body = $this->truncateAtPunctuation($spot->body, 150);
+            $spot->truncated_body = $this->truncateAtPunctuation($spot->body, 150);
         }
         
-        return view('Spot.index', compact('spots'));
-    }
-    //スポットの詳細画面
-    public function show(Spot $spot)
-    {
-        // JSONをデコードしてIDの配列を取得
-        $categoryIds = json_decode($spot->category_ids);
-        $seasonIds = json_decode($spot->season_ids);
-        $monthIds = json_decode($spot->month_ids);
-        
-        // カテゴリー、シーズン、月を取得
-        $categories = Category::whereIn('id', $categoryIds)->get();
-        $seasons = Season::whereIn('id', $seasonIds)->get();
-        $months = Month::whereIn('id', $monthIds)->get();
-        
-        // スポット画像を取得
-        $spotImages = Spot_image::where('spot_id', $spot->id)->get();
-        
-        // 口コミを取得
-        $reviews = $spot->reviews()->with('user', 'images')->get();
-        
-        // 口コミ画像を取得
-        $reviewImages = [];
-        foreach ($reviews as $review) {
-            $reviewImages[$review->id] = ReviewImage::where('review_id', $review->id)->get();
-        }
-        //dd($reviewImages);
-        // 総合評価の計算
-        $totalReviews = $reviews->count();
-        $averageRating = $totalReviews > 0 ? $reviews->sum('review') / $totalReviews : 0; // 0で割るのを防ぐためのチェック
-    
-        // GoogleMapのAPI
-        $api_key = config('app.google_maps_api_key');
-        
-        return view("Spot.show")->with([
-            'spot' => $spot,
-            'spotImages' => $spotImages,
-            'categories' => $categories,
-            'seasons' => $seasons,
-            'months' => $months,
-            'reviews' => $reviews,
-            'reviewImages' => $reviewImages,
-            'api_key' => $api_key,
-            'averageRating' => number_format($averageRating, 2), // 小数点2桁でフォーマット
+        return view('Spot.index')->with([
+            'spots' => $spots,
+            'spotcategories' => $category->get(),
+            'locals' => $local->get(),
+            'seasons' => $season->get(),
+            'months' => $month->get(),
         ]);
     }
     
-    //スポット作成
-    public function create()
-    {
-        $spotcategories = Category::all();
-        $locals = Local::all();
-        $seasons = Season::all();
-        $months = Month::all();
+    //スポットの詳細画面
+    public function show(Request $request, Spot $spot)
+{
+    $currentUrl = url()->current();
+    $currentPageName = $spot->name;
+    
+    // リレーションを使用してカテゴリ、シーズン、月を取得
+    $categories = $spot->spotcategories;
+    $seasons = $spot->seasons;
+    $months = $spot->months;
 
-        return view('Spot.create', compact('spotcategories', 'locals', 'seasons', 'months'));
+    // スポット画像を取得
+    $spotImages = $spot->spotimages;
+
+    // 口コミと関連する画像を一括取得 (Eager Loading)
+    $reviews = $spot->reviews()->with('user', 'images')->get();
+
+    // 口コミ画像の構築
+    $reviewImages = $reviews->mapWithKeys(function ($review) {
+        return [$review->id => $review->images];
+    });
+
+    // 総合評価の計算
+    $averageRating = $reviews->avg('review') ?? 0;
+
+    // Google Map APIキー
+    $api_key = config('app.google_maps_api_key');
+    
+    // 履歴の管理
+    $this->updateHistory($request, $currentUrl, $currentPageName);
+    // 履歴を取得
+    $history = $request->session()->get('history', []);
+    
+    // 同じURLが連続して追加されないようにする
+    if (count($history) > 0 && end($history)['url'] == $currentUrl) {
+        return view('Spot.show', compact(
+            'spot', 'spotImages', 'categories', 
+            'seasons', 'months', 'reviews', 'reviewImages', 
+            'api_key', 'averageRating'
+        ));
     }
+
+    // ビューにデータを渡す
+    return view('Spot.show', compact(
+        'spot', 'spotImages', 'categories', 
+        'seasons', 'months', 'reviews', 'reviewImages', 
+        'api_key', 'averageRating'
+    ));
+}
+
+    
+    //スポット作成
+    public function create(Request $request)
+{
+    $currentUrl = url()->current();
+    $currentPageName = 'スポット作成';
+
+    // 履歴の管理
+    $this->updateHistory($request, $currentUrl, $currentPageName);
+    // 履歴を取得
+    $history = $request->session()->get('history', []);
+    
+    // 最新のページがすでに履歴にある場合は更新
+    if (count($history) > 0 && end($history)['url'] == $currentUrl) {
+        return view('Spot.create', [
+            'spotcategories' => Category::all(),
+            'locals' => Local::all(),
+            'seasons' => Season::all(),
+            'months' => Month::all(),
+        ]); // 履歴が同じ場合はビューを返すだけ
+    }
+
+    return view('Spot.create', compact('spotcategories', 'locals', 'seasons', 'months'));
+}
+
     //スポット保存
     public function store(ItemRequest $request, Spot $spot)
-    {
-        $images = $request->file('image');
-        $input = $request['spot'];
+{
+    $images = $request->file('images');
+    if (is_null($images) || !is_array($images)) {
+        return redirect()->back()->withErrors('画像が選択されていません。');
+    }
 
-        // local_idを単一の値に変更
-        $input['local_id'] = $request->input('spot.local_id.0');
+    $input = $request['spot'];
+    $localIds = $request->input('spot.local_id', []);
+    $input['local_id'] = !empty($localIds) ? $localIds[0] : null;
 
-        // カテゴリー、シーズン、月のデータをJSONとして保存
-        $input['category_ids'] = json_encode($request->input('spot.category_ids', []));
-        $input['season_ids'] = json_encode($request->input('spot.season_id', []));
-        $input['month_ids'] = json_encode($request->input('spot.month_id', []));
+    // JSONとして保存
+    $input['category_ids'] = json_encode($request->input('spot.category_ids', []));
+    $input['season_ids'] = json_encode($request->input('spot.season_ids', []));
+    $input['month_ids'] = json_encode($request->input('spot.month_ids', []));
 
-        try {
+    try {
+        DB::transaction(function () use ($spot, $input, $request, $images) {
             if (!$spot->fill($input)->save()) {
-                return redirect()->back()->withErrors('スポットの保存に失敗しました。');
+                throw new \Exception('スポットの保存に失敗しました。');
             }
 
-            // 中間テーブルへのカテゴリーの挿入
+            // 中間テーブルへの挿入
             $spot->spotcategories()->attach($request->input('spot.category_ids', []));
             $spot->seasons()->sync($request->input('spot.season_ids', []));
             $spot->months()->sync($request->input('spot.month_ids', []));
-            
+
             // 画像データの保存
             foreach ($images as $image) {
-                $uploadResult = Cloudinary::upload($image->getRealPath());
-                $spot_image = new Spot_image();
-                $spot_image->spot_id = $spot->id;
-                $spot_image->image_path = $uploadResult->getSecurePath();
-                $spot_image->public_id = $uploadResult->getPublicId(); // public_idを保存
-                $spot_image->save();
+                try {
+                    $uploadResult = Cloudinary::upload($image->getRealPath());
+                    $spot_image = new Spot_image();
+                    $spot_image->spot_id = $spot->id;
+                    $spot_image->image_path = $uploadResult->getSecurePath();
+                    $spot_image->public_id = $uploadResult->getPublicId();
+                    $spot_image->save();
+                } catch (\Exception $e) {
+                    throw new \Exception('画像のアップロードに失敗しました: ' . $e->getMessage());
+                }
             }
-        } catch (\Exception $e) {
-            return redirect()->back()->withErrors('エラーが発生しました: ' . $e->getMessage());
-        }
-
-        return redirect('/spots/' . $spot->id)->with('success', 'スポットが作成されました！');
+        });
+    } catch (\Exception $e) {
+        return redirect()->back()->withErrors('エラーが発生しました: ' . $e->getMessage());
     }
+
+    return redirect('/spots/' . $spot->id)->with('success', 'スポットが作成されました！');
+}
+
     //スポット編集
     public function edit(Spot $spot)
     {
+        $currentUrl = url()->current();
+        $currentPageName = 'スポット作成';
+        
+        // 履歴の管理
+        $this->updateHistory($request, $currentUrl, $currentPageName);
+        // 履歴を取得
+        $history = $request->session()->get('history', []);
+        
+        // 最新のページがすでに履歴にある場合は更新
+    if (count($history) > 0 && end($history)['url'] == $currentUrl) {
+        return view('Spot.edit', compact('spot', 'spotcategories', 'locals', 'seasons', 'months', 'categoryIds', 'seasonIds', 'monthIds', 'localIds', 'spotImages')); // 履歴が同じ場合はビューを返すだけ
+    }
+    
         $categoryIds = json_decode($spot->category_ids, true) ?? [];
         $seasonIds = json_decode($spot->season_ids, true) ?? [];
         $monthIds = json_decode($spot->month_ids, true) ?? [];
@@ -201,14 +278,60 @@ class SpotController extends Controller
 
         return redirect()->route('spots.show', $spot->id)->with('success', 'スポットが更新されました！');
     }
-    //お気に入りスポット一覧
-    public function favorite(Request $request)
-    {
-        $user = Auth::user();
-        $likedSpots = $user->spotlikes()->with('spot')->get()->pluck('spot');
     
-        return view('Spot.favorite', compact('likedSpots'));
+    // お気に入りスポット一覧
+public function favorite(Request $request)
+{
+    // 現在のURLを取得
+    $currentUrl = url()->current();
+    $currentPageName = 'お気に入りスポット一覧'; // 適切なページ名に変更
+
+    // 履歴の管理
+    $this->updateHistory($request, $currentUrl, $currentPageName);
+    // 履歴を取得
+    $history = $request->session()->get('history', []);
+    
+    // ユーザーを取得
+    $user = $request->user();
+    
+    // 最新のページがすでに履歴にある場合は更新
+    if (count($history) > 0 && end($history)['url'] == $currentUrl) {
+        return view('Spot.favorite', [
+            'likedSpots' => $user->spotlikes()->with('spot')->get()->pluck('spot'),
+        ]); // 履歴が同じ場合はビューを返すだけ
     }
+
+    // お気に入りスポットを取得
+    $likedSpots = $user->spotlikes()->with('spot')->get()->pluck('spot');
+
+    return view('Spot.favorite', compact('likedSpots'));
+}
+
+// 履歴を更新するメソッド
+private function updateHistory(Request $request, $currentUrl, $currentPageName)
+{
+    $history = $request->session()->get('history', []);
+    
+    // 古い履歴を削除するロジック
+    if (count($history) >= 5) {
+        array_shift($history); // 最初の履歴を削除
+    }
+
+    // 同じURLが連続して追加されないようにする
+    if (count($history) > 0 && end($history)['url'] == $currentUrl) {
+        $request->session()->put('history', $history); // 更新後にセッションに保存
+        return;
+    }
+
+    // 新しい履歴を追加
+    $history[] = [
+        'url' => $currentUrl,
+        'name' => $currentPageName
+    ];
+
+    $request->session()->put('history', $history); // 更新後にセッションに保存
+}
+
     
     public function truncateAtPunctuation($string, $maxLength)
     {

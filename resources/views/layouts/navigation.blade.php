@@ -1,13 +1,22 @@
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-100" aria-label="Main Navigation">
+<nav x-data="{ open: false }" class="bg-white border-b border-gray-100 fixed top-0 w-full z-50" aria-label="Main Navigation">
     <!-- Primary Navigation Menu -->
     <div class="flex flex-col overflow-hidden justify-between h-16">
         <div class="bg-white shadow">
             <div class="flex justify-between items-center py-4 px-2">
                 <!-- Few Days-Trip タイトル -->
-                <a href="/dashboard" aria-label="Dashboard">
+                <a href="/" aria-label="Dashboard">
                     <h1 class="text-xl font-semibold">Few Days-Trip</h1>
                 </a>
-
+                @include('components.breadcrumb') {{-- パンくずリストをここに表示 --}}
+                @php
+                  $yourDeveloperId = 1; // 開発者のIDを指定
+                @endphp
+                @if (auth()->check() && auth()->user()->id === $yourDeveloperId)
+                  <form action="{{ route('history.clear') }}" method="POST" class="inline">
+                    @csrf
+                    <button type="submit" class="text-red-600 hover:text-red-800">履歴を削除</button>
+                  </form>
+                @endif
                 <!-- 新規登録 & ログインボタン + Windowbar ボタン -->
                 @guest
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
@@ -39,7 +48,7 @@
         $user = Auth::user();
         $isOnline = $user ? $user->isOnline() : false;
     @endphp
-    @if ($user)
+    @if ($user && $user->image_path)
         <img class="h-10 w-10 rounded-full object-cover" src="{{ $user->image_path }}" alt="{{ $user->name }}" />
     @else
         <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">

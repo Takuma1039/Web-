@@ -11,19 +11,12 @@ class SpotcategoryController extends Controller
     public function index(Category $category, Request $request)
 {
     // 特定のカテゴリーに関連するスポットを取得し、関連するカテゴリーもロード
-    $spots = $category->spots()->with('spotcategories')->paginate(10);
+    $spotsQuery = Spot::whereHas('spotcategories', function ($query) use ($category) {
+            $query->where('spot_categories.category_id', $category->id);
+        })->with('spotcategories')->withCount('likes'); // 関連するカテゴリーといいねの数を取得
     
-    // いいねしたスポットを取得
-    $likedSpots = Spot::withCount('likes')
-        ->orderBy('likes_count', 'desc')
-        ->take(10)
-        ->get();
-
     // 検索機能の実装
     $query = $request->input('search');
-    
-    // まず、クエリビルダを開始します
-    $spotsQuery = $category->spots(); //特定のカテゴリに関連するスポットを取得するためのクエリビルダーのインスタンスを生成する
     
     // 検索機能を追加
     if ($query) {
@@ -31,13 +24,12 @@ class SpotcategoryController extends Controller
     }
 
     // 最後にページネーションを適用
-    $spots = $spotsQuery->orderBy('updated_at', 'DESC')->paginate(10);
-
-    foreach ($likedSpots as $spot) {
+    $spots = $spotsQuery->orderBy('likes_Count', 'DESC')->paginate(10);
+    foreach ($spots as $spot) {
         $spot->truncated_body = $this->truncateAtPunctuation($spot->body, 200);
     }
 
-    return view('spot_categories.index', compact('likedSpots', 'spots', 'category'));
+    return view('spot_categories.index', compact('spots', 'category'));
 }
 
     //テキストを特定の文字や句読点で切り捨てるメソッド
