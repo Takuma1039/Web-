@@ -1,5 +1,5 @@
 <x-app-layout>
-    <form action="/spots" method="POST" enctype="multipart/form-data" class="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
+    <form action="/spots/store" method="POST" enctype="multipart/form-data" class="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
         @csrf
         <h2 class="text-2xl font-bold mb-4">スポット情報を入力</h2>
 
@@ -111,13 +111,13 @@
 
         <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700">公式サイト</label>
-            <input type="text" name="spot[site]" placeholder="公式サイト" value="{{ old('spot.site') }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-indigo-200"/>
+            <textarea type="text" name="spot[site]" placeholder="公式サイト" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-indigo-200"/>{{ old('spot.site') }}</textarea>
             <p class="text-red-500 text-sm">{{ $errors->first('spot.site') }}</p>
         </div>
 
         <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700">画像ファイル（複数可）:</label>
-            <input type="file" name="image[]" id="image-input" multiple class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-indigo-200" accept="image/*" onchange="previewImages()">
+            <input type="file" name="images[]" id="image-input" multiple class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-indigo-200" accept="image/*" onchange="previewImages()">
             <div id="image-preview" class="grid grid-cols-2 gap-4 mt-2"></div>
         </div>
         

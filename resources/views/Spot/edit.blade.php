@@ -112,7 +112,7 @@
 
         <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700">公式サイト</label>
-            <input type="text" name="spot[site]" placeholder="公式サイト" value="{{ old('spot.site', $spot->site) }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-indigo-200"/>
+            <textarea type="text" name="spot[site]" placeholder="公式サイト" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-indigo-200"/>{{ old('spot.site', $spot->site) }}</textarea>
             <p class="text-red-500 text-sm">{{ $errors->first('spot.site') }}</p>
         </div>
 

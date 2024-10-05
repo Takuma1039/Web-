@@ -22,6 +22,8 @@ use App\Http\Controllers\SeasonSpotController;
 use App\Http\Controllers\MypageController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ReviewLikeController;
+use App\Http\Controllers\HistoryController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -33,20 +35,18 @@ use App\Http\Controllers\ReviewLikeController;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
 //開発者のみ
-Route::middleware('auth', 'activity', 'history', 'developer')->group(function () {
+Route::middleware('auth', 'activity', 'developer')->group(function () {
     Route::get('/spots/create', [SpotController::class, 'create'])->name('spots.create');  //スポット作成フォーム
     Route::get('/spots/{spot}/edit', [SpotController::class, 'edit'])->name('spots.edit');  // 編集画面へのルート
     Route::patch('/spots/{spot}', [SpotController::class, 'update'])->name('spots.update');  // 更新処理へのルート
-    Route::post('/spots', [SpotController::class, 'store'])->name('store'); //画像を含めたスポット投稿の保存機能
+    Route::post('/spots/store', [SpotController::class, 'store'])->name('store'); //画像を含めたスポット投稿の保存機能
+    Route::post('/history/clear', [HistoryController::class, 'clearHistory'])->name('history.clear'); //履歴の削除
+
 });
 
 //login後使用可能
-Route::middleware('auth', 'activity', 'history')->group(function () {
+Route::middleware('auth', 'activity')->group(function () {
     Route::get('/mypage', [MypageController::class, 'index'])->name('Mypage'); //マイページ
     Route::get('/favorites', [SpotController::class, 'favorite'])->name('favoritespot'); //お気に入りしたスポット表示
     Route::post('/spot/like', [SpotlikeController::class, 'likespot']); //spotのお気に入り機能
@@ -61,9 +61,9 @@ Route::middleware('auth', 'activity', 'history')->group(function () {
 
 });
 //guestでも閲覧・操作できるページ
-Route::middleware('activity', 'history')->group(function () {
-    Route::get('/spotlist', [SpotController::class, 'index'])->name('spots.index'); //スポット一覧
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('Toppage');  //トップページ
+Route::middleware('activity')->group(function () {
+    Route::get('/spots', [SpotController::class, 'index'])->name('spots.index'); //スポット一覧
+    Route::get('/', [DashboardController::class, 'index'])->name('Toppage');  //トップページ
     Route::get('/spotcategories/{category}', [SpotcategoryController::class,'index']); //スポットカテゴリーごとの一覧
     Route::get('/locals/{local}', [LocalController::class,'index']); //地域ごとの一覧
     Route::get('/months/{month}', [MonthController::class,'index']); //月ごとの一覧
@@ -74,7 +74,7 @@ Route::middleware('activity', 'history')->group(function () {
     Route::get('/spots/{spot}', [SpotController::class, 'show'])->name('spots.show'); //スポット詳細画面表示
 });
 //プロフィール
-Route::middleware('auth', 'activity', 'history')->group(function () {
+Route::middleware('auth', 'activity')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/profile/update-icon', [ProfileController::class, 'updateIcon'])->name('profile.updateIcon');

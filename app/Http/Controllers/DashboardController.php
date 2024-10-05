@@ -14,96 +14,123 @@ use App\Models\User;
 
 class DashboardController extends Controller
 {
-    public function index(Category $category, Local $local, Season $season, Month $month){
-        // majorspotsテーブルからいいね数の多い順でスポットを取得
-        $majorspots = Spot::withCount('likes') // likesはリレーション名
-            ->join('majorspots', 'spots.id', '=', 'majorspots.spot_id') // majorspotsテーブルと結合
-            ->having('likes_count', '>', 0)      // いいね数が0より大きいスポットだけを取得
-            ->orderBy('likes_count', 'desc') // likes_countで降順に並び替え
-            ->get(['spots.*']); // spotsテーブルのすべてのカラムを取得
-        
-        // reviewspotsテーブルからスポットごとのレビュー数をカウントし、レビュー数順でスポットを取得
-        $reviewspots = Spot::withCount('reviews') // reviewsのカウントを取得
-            ->join('review_spots', 'spots.id', '=', 'review_spots.spot_id') // review_spotsテーブルと結合
-            ->having('reviews_count', '>', 0)      // review数が0より大きいスポットだけを取得
-            ->orderBy('reviews_count', 'desc') // reviews_countで降順に並び替え
-            ->get();
-            
-        // seasonspotsテーブルからスポットごとのいいね数をカウントし、いいね数順でスポットを取得
-        $seasonspots = Spot::withCount('likes', 'months') // likes, monthsはリレーション名
-                ->join('season_spots', 'spots.id', '=', 'season_spots.spot_id') // season_spotsテーブルと結合
-                ->having('likes_count', '>', 0)      // いいね数が0より大きいスポットだけを取得
-                ->orderBy('likes_count', 'desc')  // いいね数で降順に並び替え
-                ->take(10)  // 上位10件を取得
-                ->get();
-                
-        // 各人気スポットに対してトランケート処理と画像、レビューを取得
-        foreach ($majorspots as $spot) {
-            // トランケート処理
-            $spot->truncated_body = $this->truncateAtPunctuation($spot->body, 70); //文字数制限
-            
-            // 画像を取得
-            $spot->images = Spot_Image::where('spot_id', $spot->id)->get(); // 各スポットの画像を取得
-            
-            //口コミの取得
-            $spot->reviews = Review::where('spot_id', $spot->id)->get();
-            
-            // 総合評価の計算
-            $totalReviews = $spot->reviews->count();
-            $averageRating = $totalReviews > 0 ? $spot->reviews->sum('review') / $totalReviews : 0; // 0で割るのを防ぐためのチェック
-            
-            // 各スポットに評価を追加
-            $spot->average_rating = number_format($averageRating, 2);
+    public function index(Category $category, Local $local, Season $season, Month $month, Request $request)
+{
+    // 現在のURLとページ名を取得
+    $currentUrl = url()->current();
+    $currentPageName = 'ホーム'; // 適切なページ名に変更
+
+    // 履歴をセッションに保存
+    $history = $request->session()->get('history', []);
+    
+    // 古い履歴を削除するロジック（オプション）
+    if (count($history) >= 5) { // 5件を超えたら古いものを削除
+        $request->session()->forget('history.0'); // 最初の履歴を削除
+    }
+    
+    // majorspotsテーブルからいいね数の多い順でスポットを取得
+    $majorspots = Spot::withCount('likes')
+        ->join('majorspots', 'spots.id', '=', 'majorspots.spot_id')
+        ->having('likes_count', '>', 0)
+        ->orderBy('likes_count', 'desc')
+        ->get(['spots.*']);
+
+    // reviewspotsテーブルからスポットごとのレビュー数をカウントし、レビュー数順でスポットを取得
+    $reviewspots = Spot::withCount('reviews')
+        ->join('review_spots', 'spots.id', '=', 'review_spots.spot_id')
+        ->having('reviews_count', '>', 0)
+        ->orderBy('reviews_count', 'desc')
+        ->get();
+
+    // seasonspotsテーブルからスポットごとのいいね数をカウントし、いいね数順でスポットを取得
+    $seasonspots = Spot::withCount('likes')
+        ->with('months')
+        ->join('season_spots', 'spots.id', '=', 'season_spots.spot_id')
+        ->having('likes_count', '>', 0)
+        ->orderBy('likes_count', 'desc')
+        ->take(10)
+        ->get();
+    
+    // スポット一覧
+    $spotlists = Spot::withCount('likes')->orderBy('name', 'asc')->get();
+    
+    // 各スポットリストに対して共通処理を実行
+    $this->processSpotData($majorspots);
+    $this->processSpotData($reviewspots);
+    $this->processSpotData($seasonspots);
+    $this->processSpotData($spotlists);
+    
+    // スライドショー用にランダムなスポットの画像を取得
+    $randomSpots = $spotlists->random(5); // ランダムに5つのスポットを選択
+    $slideImages = [];
+    
+    foreach ($majorspots as $spot) {
+        if ($spot->images->isNotEmpty()) {
+            // 画像を全て追加
+            foreach ($spot->images as $image) {
+                $slideImages[] = $image->image_path; // 画像パスを配列に追加
+            }
         }
-        
-        // 各口コミ人気スポットに対してトランケート処理と画像、レビューを取得
-        foreach ($reviewspots as $spot) {
-            // トランケート処理
-            $spot->truncated_body = $this->truncateAtPunctuation($spot->body, 70); //文字数制限
-            
-            // 画像を取得
-            $spot->images = Spot_Image::where('spot_id', $spot->id)->get(); // 各スポットの画像を取得
-            
-            //口コミの取得
-            $spot->reviews = Review::where('spot_id', $spot->id)->get();
-            
-            // 総合評価の計算
-            $totalReviews = $spot->reviews->count();
-            $averageRating = $totalReviews > 0 ? $spot->reviews->sum('review') / $totalReviews : 0; // 0で割るのを防ぐためのチェック
-            
-            // 各スポットに評価を追加
-            $spot->average_rating = number_format($averageRating, 2);
-        }
-        
-        // 各シーズン人気スポットに対してトランケート処理と画像、レビューを取得
-        foreach ($seasonspots as $spot) {
-            // トランケート処理
-            $spot->truncated_body = $this->truncateAtPunctuation($spot->body, 70); //文字数制限
-            
-            // 画像を取得
-            $spot->images = Spot_Image::where('spot_id', $spot->id)->get(); // 各スポットの画像を取得
-            
-            //口コミの取得
-            $spot->reviews = Review::where('spot_id', $spot->id)->get();
-            
-            // 総合評価の計算
-            $totalReviews = $spot->reviews->count();
-            $averageRating = $totalReviews > 0 ? $spot->reviews->sum('review') / $totalReviews : 0; // 0で割るのを防ぐためのチェック
-            
-            // 各スポットに評価を追加
-            $spot->average_rating = number_format($averageRating, 2);
-        }
-        
+    }
+
+    // 画像をシャッフルしてから最初の5つを取得
+    $slideImages = collect($slideImages)->shuffle()->take(5)->toArray();
+    // 最新のページがすでに履歴にある場合は更新
+    if (count($history) > 0 && end($history)['url'] == $currentUrl) {
         return view("Toppage.dashboard")->with([
-            'spotcategories' => $category->get(), 
-            'locals' => $local->get(), 
-            'seasons' => $season->get(), 
-            'months' => $month->get(), 
-            'majorspots' => $majorspots, 
+            'spotcategories' => $category->get(),
+            'locals' => $local->get(),
+            'seasons' => $season->get(),
+            'months' => $month->get(),
+            'majorspots' => $majorspots,
             'reviewspots' => $reviewspots,
             'seasonspots' => $seasonspots,
+            'spotlists' => $spotlists,
+            'slideImages' => $slideImages,
         ]);
     }
+
+    // 新しい履歴を追加
+    $request->session()->push('history', [
+        'url' => $currentUrl,
+        'name' => $currentPageName
+    ]);
+    
+    return view("Toppage.dashboard")->with([
+        'spotcategories' => $category->get(),
+        'locals' => $local->get(),
+        'seasons' => $season->get(),
+        'months' => $month->get(),
+        'majorspots' => $majorspots,
+        'reviewspots' => $reviewspots,
+        'seasonspots' => $seasonspots,
+        'spotlists' => $spotlists,
+        'slideImages' => $slideImages,
+    ]);
+}
+
+
+    private function processSpotData($spots)
+{
+    foreach ($spots as $spot) {
+        // トランケート処理
+        $spot->truncated_body = $this->truncateAtPunctuation($spot->body, 70); // 文字数制限
+        
+        // 画像を取得
+        $spot->images = Spot_Image::where('spot_id', $spot->id)->get(); // 各スポットの画像を取得
+        
+        // 口コミの取得
+        $spot->reviews = Review::where('spot_id', $spot->id)->get();
+        
+        // 総合評価の計算
+        $totalReviews = $spot->reviews->count();
+        $averageRating = $totalReviews > 0 ? $spot->reviews->sum('review') / $totalReviews : 0; // 0で割るのを防ぐためのチェック
+        
+        // 各スポットに評価を追加
+        $spot->average_rating = number_format($averageRating, 2);
+    }
+}
+
     
     public function truncateAtPunctuation($string, $maxLength)
     {

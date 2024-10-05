@@ -10,35 +10,27 @@ class MonthController extends Controller
 {
     public function index(Month $month, Request $request)
 {
-    // 特定の月に関連するスポットを取得し、関連する月もロード
-    $spots = $month->spots()->with('seasons')->paginate(10);
-    
-    // いいねしたスポットを取得
-    $likedSpots = Spot::withCount('likes')
-        ->orderBy('likes_count', 'desc')
-        ->take(10)
-        ->get();
+    // 特定の月に関連するスポットを取得するクエリ
+        $spotsQuery = Spot::whereHas('months', function ($query) use ($month) {
+            $query->where('months.id', $month->id);
+        })->with('months')->withCount('likes'); // 関連する月といいねの数を取得
 
-    // 検索機能の実装
-    $query = $request->input('search');
-    
-    // まず、クエリビルダを開始します
-    $spotsQuery = $month->spots(); //特定のシーズンに関連するスポットを取得するためのクエリビルダーのインスタンスを生成する
-    
-    // 検索機能を追加
-    if ($query) {
-        $spotsQuery->where('name', 'like', '%' . $query . '%'); //nameカラムに対して部分一致の検索条件を追加する
+        // 検索機能を追加
+        $query = $request->input('search');
+        if ($query) {
+            $spotsQuery->where('name', 'like', '%' . $query . '%'); // 部分一致検索
+        }
+
+        // ページネーションとソートを適用
+        $spots = $spotsQuery->orderBy('likes_Count', 'DESC')->paginate(10);
+
+        // 各スポットの本文をトランケート
+        foreach ($spots as $spot) {
+            $spot->truncated_body = $this->truncateAtPunctuation($spot->body, 200);
+        }
+        
+        return view('month.index', compact('spots', 'month'));
     }
-
-    // 最後にページネーションを適用
-    $spots = $spotsQuery->orderBy('updated_at', 'DESC')->paginate(10);
-
-    foreach ($likedSpots as $spot) {
-        $spot->truncated_body = $this->truncateAtPunctuation($spot->body, 200);
-    }
-
-    return view('month.index', compact('likedSpots', 'spots', 'month'));
-}
     
     public function truncateAtPunctuation($string, $maxLength)
     {
