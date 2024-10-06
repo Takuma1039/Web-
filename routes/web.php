@@ -23,6 +23,7 @@ use App\Http\Controllers\MypageController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ReviewLikeController;
 use App\Http\Controllers\HistoryController;
+use App\Http\Controllers\PlanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -50,6 +51,7 @@ Route::middleware('auth', 'activity')->group(function () {
     Route::get('/mypage', [MypageController::class, 'index'])->name('Mypage'); //マイページ
     Route::get('/favorites', [SpotController::class, 'favorite'])->name('favoritespot'); //お気に入りしたスポット表示
     Route::post('/spot/like', [SpotlikeController::class, 'likespot']); //spotのお気に入り機能
+    Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews'); //口コミ
     Route::post('/spots/{spot}/reviews', [ReviewController::class, 'store'])->name('reviews.store'); //口コミ投稿機能
     Route::post('/reviews/like', [ReviewLikeController::class, 'likeReview'])->name('reviews.like'); //口コミいいね機能
     // 口コミの編集
@@ -72,6 +74,7 @@ Route::middleware('activity')->group(function () {
     Route::get('/reviewspots', [ReviewSpotController::class,'index'])->name('review.ranking'); //口コミスポットランキング
     Route::get('/seasonspots', [SeasonSpotController::class,'index'])->name('season.ranking'); //今の時期におすすめなスポットランキング
     Route::get('/spots/{spot}', [SpotController::class, 'show'])->name('spots.show'); //スポット詳細画面表示
+    Route::get('/search', [SpotController::class, 'search'])->name('spot.search');
 });
 //プロフィール
 Route::middleware('auth', 'activity')->group(function () {
@@ -81,17 +84,16 @@ Route::middleware('auth', 'activity')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-/*Route::controller(PlanpostController::class)->middleware(['auth'])->group(function(){
-    Route::get('/', 'index')->name('index');
-    Route::post('/planposts', 'store')->name('store');
-    Route::get('/planposts/create', 'create')->name('create');
-    Route::get('/planposts/{planpost}', 'show')->name('show');
-    Route::put('/planposts/{planpost}', 'update')->name('update');
-    Route::delete('/planposts/{planpost}', 'delete')->name('delete');
-    Route::get('/planposts/{planpost}/edit', 'edit')->name('edit');
+Route::controller(PlanController::class)->middleware(['auth'])->group(function(){
+    Route::get('/plans', 'index')->name('plans.index'); //旅行計画一覧
+    Route::get('/plans/create', 'create')->name('plans.create'); //旅行計画の作成
+    Route::get('/plans/{plan}', 'show')->name('plans.show'); //旅行計画の詳細
+    Route::get('/plans/{plan}/edit', 'edit')->name('plans.edit'); //旅行計画の編集
+    Route::put('/plans/{plan}', 'update')->name('plans.update'); //旅行計画の更新
+    Route::delete('/plans/{plan}', 'delete')->name('delete'); //旅行計画の削除
+    Route::post('/plans/store', 'store')->name('store'); //旅行計画の保存
 });
 
-Route::get('/plan_categories/{plan_category}', [PlancategoryController::class,'index'])->middleware("auth");
-Route::get('/user', [UserController::class, 'index']); */
+//Route::get('/plancategories/{plancategory}', [PlancategoryController::class,'index'])->middleware("auth");
 
 require __DIR__.'/auth.php';

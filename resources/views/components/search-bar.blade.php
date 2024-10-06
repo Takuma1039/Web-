@@ -1,5 +1,5 @@
 <!-- 検索バー -->
-<div class="flex justify-center mb-6">
+<div class="flex justify-center mb-6" id="closeModal">
     <input id="searchInput" type="text" placeholder="探したいキーワード" class="border border-gray-300 rounded-md p-2 w-1/2 focus:outline-none focus:ring-2 focus:ring-blue-500">
     <button class="ml-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200">
         検索
@@ -55,7 +55,6 @@
 
             <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200">検索</button>
         </form>
-        <button id="closeModal" class="mt-4 text-blue-500 hover:underline">閉じる</button>
     </div>
 </div>
 
@@ -67,6 +66,14 @@
     searchInput.addEventListener("focus", () => {
         searchModal.classList.remove("hidden");
     });
+    
+    searchInput.addEventListener("keypress", (event) => {
+        if (event.key === "Enter") {
+            event.preventDefault();  // デフォルトのフォーム送信を防ぐ
+            searchModal.classList.remove("hidden");
+        }
+    });
+
 
     closeModal.addEventListener("click", () => {
         searchModal.classList.add("hidden");

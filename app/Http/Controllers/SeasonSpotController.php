@@ -30,9 +30,6 @@ class SeasonSpotController extends Controller
     // 履歴の管理
     $this->updateHistory($request, $currentUrl, $currentPageName);
 
-    // 履歴を取得
-    $history = $request->session()->get('history', []);
-
     // スポット情報の取得
     $spotsQuery = Spot::whereHas('months', function ($query) use ($matchingMonth) {
         $query->where('months.id', $matchingMonth->id);
@@ -69,19 +66,6 @@ class SeasonSpotController extends Controller
         );
     }
 
-    // 最新のページがすでに履歴にある場合はビューを返す
-    if (count($history) > 0 && end($history)['url'] == $currentUrl) {
-        return view('SeasonSpot.index', [
-            'spotcategories' => $category->get(),
-            'locals' => $local->get(),
-            'seasons' => $season->get(),
-            'months' => $month->get(),
-            'seasonranking' => $seasonranking,
-            'currentMonth' => $currentMonth,
-            'matchingMonth' => $matchingMonth,
-        ]); // 履歴が同じ場合はビューを返すだけ
-    }
-
     // ランキングページのビューにデータを渡す        
     return view('SeasonSpot.index')->with([
         'spotcategories' => $category->get(),
@@ -94,29 +78,34 @@ class SeasonSpotController extends Controller
     ]);
 }
 
+    // 履歴を更新するメソッド
     private function updateHistory(Request $request, $currentUrl, $currentPageName)
-{
-    $history = $request->session()->get('history', []);
+    {
+        $history = $request->session()->get('history', []);
+
+        // 同じURLが既に履歴に存在するか確認
+        foreach ($history as $key => $item) {
+            if ($item['url'] === $currentUrl) {
+                // すでに存在する場合は、そのエントリを更新
+                $history[$key]['name'] = $currentPageName; // 名前を更新
+                $request->session()->put('history', $history); // 更新後にセッションに保存
+                return; // 処理を終了
+            }
+        }
     
-    // 古い履歴を削除するロジック
-    if (count($history) >= 5) {
-        array_shift($history); // 最初の履歴を削除
-    }
+        // 古い履歴を削除するロジック
+        if (count($history) >= 5) {
+            array_shift($history); // 最初の履歴を削除
+        }
 
-    // 同じURLが連続して追加されないようにする
-    if (count($history) > 0 && end($history)['url'] == $currentUrl) {
+        // 新しい履歴を追加
+        $history[] = [
+            'url' => $currentUrl,
+            'name' => $currentPageName
+        ];
+
         $request->session()->put('history', $history); // 更新後にセッションに保存
-        return;
     }
-
-    // 新しい履歴を追加
-    $history[] = [
-        'url' => $currentUrl,
-        'name' => $currentPageName
-    ];
-
-    $request->session()->put('history', $history); // 更新後にセッションに保存
-}
     
     public function truncateAtPunctuation($string, $maxLength)
     {

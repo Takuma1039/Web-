@@ -1,13 +1,13 @@
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-100 fixed top-0 w-full z-50" aria-label="Main Navigation">
+<nav x-data="{ open: false }" class="bg-white border-b border-gray-100 fixed top-0 w-full h-auto z-50" aria-label="Main Navigation">
     <!-- Primary Navigation Menu -->
-    <div class="flex flex-col overflow-hidden justify-between h-16">
+    <div class="flex flex-col overflow-hidden justify-between">
         <div class="bg-white shadow">
             <div class="flex justify-between items-center py-4 px-2">
                 <!-- Few Days-Trip タイトル -->
                 <a href="/" aria-label="Dashboard">
                     <h1 class="text-xl font-semibold">Few Days-Trip</h1>
                 </a>
-                @include('components.breadcrumb') {{-- パンくずリストをここに表示 --}}
+                @include('components.breadcrumb') {{-- パンくずリスト --}}
                 @php
                   $yourDeveloperId = 1; // 開発者のIDを指定
                 @endphp
@@ -16,6 +16,7 @@
                     @csrf
                     <button type="submit" class="text-red-600 hover:text-red-800">履歴を削除</button>
                   </form>
+                  <a href="/spots/create">スポット作成</a>
                 @endif
                 <!-- 新規登録 & ログインボタン + Windowbar ボタン -->
                 @guest
@@ -70,10 +71,6 @@
     </div>
 </div>
 
-
-
-
-
                     <div class="flex flex-col flex-1 gap-3">
                         @if (Auth::check())
                             <a href="/mypage" class="flex items-center px-4 py-2 mt-2 text-gray-100 hover:bg-gray-400 hover:bg-opacity-25 rounded-2xl" aria-label="My Page">
@@ -84,17 +81,17 @@
                                 <i class="fas fa-id-card" style="margin-right: 8px;"></i>
                                     プロフィール
                             </a>
-                            <a href="/spots/create" class="flex items-center px-4 py-2 mt-2 text-gray-100 hover:bg-gray-400 hover:bg-opacity-25 rounded-2xl" aria-label="Create Travel Plan">
+                            <a href="/plans/create" class="flex items-center px-4 py-2 mt-2 text-gray-100 hover:bg-gray-400 hover:bg-opacity-25 rounded-2xl" aria-label="Create Travel Plan">
                                 <i class="fas fa-plus-circle" style="margin-right: 8px;"></i>
                                     旅行プラン作成
                             </a>
                             <a href="/favorites" class="flex items-center px-4 py-2 mt-2 text-gray-100 hover:bg-gray-400 hover:bg-opacity-25 rounded-2xl" aria-label="Favorites">
                                 <i class="fas fa-people-group" style="margin-right: 8px;"></i>
-                                    みんなの投稿
+                                    みんなの旅行計画
                             </a>
-                            <a href="#" class="flex items-center px-4 py-2 mt-2 text-gray-100 hover:bg-gray-400 hover:bg-opacity-25 rounded-2xl" aria-label="Reviews">
+                            <a href="/reviews" class="flex items-center px-4 py-2 mt-2 text-gray-100 hover:bg-gray-400 hover:bg-opacity-25 rounded-2xl" aria-label="Reviews">
                                 <i class="fas fa-comment-dots" style="margin-right: 8px;"></i>
-                                    口コミ投稿
+                                    口コミ投稿一覧
                             </a>
                         @endif
                         <a href="#" class="flex items-center px-4 py-2 mt-2 text-gray-100 hover:bg-gray-400 hover:bg-opacity-25 rounded-2xl" aria-label="Settings">

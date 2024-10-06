@@ -20,38 +20,13 @@ class DashboardController extends Controller
     $currentUrl = url()->current();
     $currentPageName = 'ホーム'; // 適切なページ名に変更
 
-    // 履歴をセッションに保存
-    $history = $request->session()->get('history', []);
+    // 履歴の管理
+    $this->updateHistory($request, $currentUrl, $currentPageName);
     
-    // 古い履歴を削除するロジック（オプション）
-    if (count($history) >= 5) { // 5件を超えたら古いものを削除
-        $request->session()->forget('history.0'); // 最初の履歴を削除
-    }
-    
-    // majorspotsテーブルからいいね数の多い順でスポットを取得
-    $majorspots = Spot::withCount('likes')
-        ->join('majorspots', 'spots.id', '=', 'majorspots.spot_id')
-        ->having('likes_count', '>', 0)
-        ->orderBy('likes_count', 'desc')
-        ->get(['spots.*']);
-
-    // reviewspotsテーブルからスポットごとのレビュー数をカウントし、レビュー数順でスポットを取得
-    $reviewspots = Spot::withCount('reviews')
-        ->join('review_spots', 'spots.id', '=', 'review_spots.spot_id')
-        ->having('reviews_count', '>', 0)
-        ->orderBy('reviews_count', 'desc')
-        ->get();
-
-    // seasonspotsテーブルからスポットごとのいいね数をカウントし、いいね数順でスポットを取得
-    $seasonspots = Spot::withCount('likes')
-        ->with('months')
-        ->join('season_spots', 'spots.id', '=', 'season_spots.spot_id')
-        ->having('likes_count', '>', 0)
-        ->orderBy('likes_count', 'desc')
-        ->take(10)
-        ->get();
-    
-    // スポット一覧
+    // スポットのデータを取得する共通メソッド
+    $majorspots = $this->getSpotsWithLikes();
+    $reviewspots = $this->getSpotsWithReviews();
+    $seasonspots = $this->getSeasonSpots();
     $spotlists = Spot::withCount('likes')->orderBy('name', 'asc')->get();
     
     // 各スポットリストに対して共通処理を実行
@@ -60,41 +35,8 @@ class DashboardController extends Controller
     $this->processSpotData($seasonspots);
     $this->processSpotData($spotlists);
     
-    // スライドショー用にランダムなスポットの画像を取得
-    $randomSpots = $spotlists->random(5); // ランダムに5つのスポットを選択
-    $slideImages = [];
-    
-    foreach ($majorspots as $spot) {
-        if ($spot->images->isNotEmpty()) {
-            // 画像を全て追加
-            foreach ($spot->images as $image) {
-                $slideImages[] = $image->image_path; // 画像パスを配列に追加
-            }
-        }
-    }
-
-    // 画像をシャッフルしてから最初の5つを取得
-    $slideImages = collect($slideImages)->shuffle()->take(5)->toArray();
-    // 最新のページがすでに履歴にある場合は更新
-    if (count($history) > 0 && end($history)['url'] == $currentUrl) {
-        return view("Toppage.dashboard")->with([
-            'spotcategories' => $category->get(),
-            'locals' => $local->get(),
-            'seasons' => $season->get(),
-            'months' => $month->get(),
-            'majorspots' => $majorspots,
-            'reviewspots' => $reviewspots,
-            'seasonspots' => $seasonspots,
-            'spotlists' => $spotlists,
-            'slideImages' => $slideImages,
-        ]);
-    }
-
-    // 新しい履歴を追加
-    $request->session()->push('history', [
-        'url' => $currentUrl,
-        'name' => $currentPageName
-    ]);
+    // スライドショー用の画像取得
+    $slideImages = $this->getSlideImages($majorspots);
     
     return view("Toppage.dashboard")->with([
         'spotcategories' => $category->get(),
@@ -109,29 +51,106 @@ class DashboardController extends Controller
     ]);
 }
 
+    private function getSpotsWithLikes()
+{
+    return Spot::withCount('likes')
+        ->join('majorspots', 'spots.id', '=', 'majorspots.spot_id')
+        ->having('likes_count', '>', 0)
+        ->orderBy('likes_count', 'desc')
+        ->get(['spots.*']);
+}
+
+private function getSpotsWithReviews()
+{
+    return Spot::withCount('reviews')
+        ->join('review_spots', 'spots.id', '=', 'review_spots.spot_id')
+        ->having('reviews_count', '>', 0)
+        ->orderBy('reviews_count', 'desc')
+        ->get();
+}
+
+private function getSeasonSpots()
+{
+    return Spot::withCount('likes')
+        ->with('months')
+        ->join('season_spots', 'spots.id', '=', 'season_spots.spot_id')
+        ->having('likes_count', '>', 0)
+        ->orderBy('likes_count', 'desc')
+        ->take(10)
+        ->get();
+}
+
+private function getSlideImages($majorspots)
+{
+    $slideImages = [];
+
+    foreach ($majorspots as $spot) {
+        if ($spot->images->isNotEmpty()) {
+            foreach ($spot->images as $image) {
+                $slideImages[] = $image->image_path;
+            }
+        }
+    }
+
+    return collect($slideImages)->shuffle()->take(5)->toArray();
+}
+
+// 履歴を更新するメソッド
+private function updateHistory(Request $request, $currentUrl, $currentPageName)
+{
+    $history = $request->session()->get('history', []);
+    
+    // 同じURLが既に履歴に存在するか確認
+    foreach ($history as $key => $item) {
+        if ($item['url'] === $currentUrl) {
+            // すでに存在する場合は、そのエントリを更新
+            $history[$key]['name'] = $currentPageName; // 名前を更新
+            $request->session()->put('history', $history); // 更新後にセッションに保存
+            return; // 処理を終了
+        }
+    }
+
+    // 古い履歴を削除するロジック
+    if (count($history) >= 5) {
+        array_shift($history); // 最初の履歴を削除
+    }
+
+    // 新しい履歴を追加
+    $history[] = [
+        'url' => $currentUrl,
+        'name' => $currentPageName
+    ];
+
+    $request->session()->put('history', $history); // 更新後にセッションに保存
+}
 
     private function processSpotData($spots)
 {
+    // 事前に関連データを取得
+    $spotIds = $spots->pluck('id'); // スポットIDを取得
+
+    $images = Spot_Image::whereIn('spot_id', $spotIds)->get()->groupBy('spot_id');
+    $reviews = Review::whereIn('spot_id', $spotIds)->get()->groupBy('spot_id');
+
     foreach ($spots as $spot) {
         // トランケート処理
-        $spot->truncated_body = $this->truncateAtPunctuation($spot->body, 70); // 文字数制限
+        $spot->truncated_body = $this->truncateAtPunctuation($spot->body, 70);
         
         // 画像を取得
-        $spot->images = Spot_Image::where('spot_id', $spot->id)->get(); // 各スポットの画像を取得
+        $spot->images = $images[$spot->id] ?? collect(); // 画像を関連付け
         
         // 口コミの取得
-        $spot->reviews = Review::where('spot_id', $spot->id)->get();
+        $spot->reviews = $reviews[$spot->id] ?? collect(); // 口コミを関連付け
         
         // 総合評価の計算
         $totalReviews = $spot->reviews->count();
-        $averageRating = $totalReviews > 0 ? $spot->reviews->sum('review') / $totalReviews : 0; // 0で割るのを防ぐためのチェック
+        $averageRating = $totalReviews > 0 ? $spot->reviews->sum('review') / $totalReviews : 0;
         
         // 各スポットに評価を追加
         $spot->average_rating = number_format($averageRating, 2);
     }
 }
 
-    
     public function truncateAtPunctuation($string, $maxLength)
     {
       if (mb_strlen($string) <= $maxLength) {
@@ -155,4 +174,6 @@ class DashboardController extends Controller
       // 句読点が見つからない場合は、指定した文字数で切り捨てる
       return mb_substr($truncated, 0, $maxLength);
     }
+    
+    
 }
