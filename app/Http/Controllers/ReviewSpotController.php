@@ -21,9 +21,6 @@ class ReviewSpotController extends Controller
     // 履歴の管理
     $this->updateHistory($request, $currentUrl, $currentPageName);
 
-    // 履歴を取得
-    $history = $request->session()->get('history', []);
-
     // スポットをいいね数の多い順で取得
     $reviewranking = Spot::withCount('reviews') // reviewsはリレーション名
         ->having('reviews_count', '>', 0)      // review数が0より大きいスポットだけを取得
@@ -53,17 +50,6 @@ class ReviewSpotController extends Controller
         );
     }
 
-    // 最新のページがすでに履歴にある場合はビューを返す
-    if (count($history) > 0 && end($history)['url'] == $currentUrl) {
-        return view('ReviewSpot.index', [
-            'spotcategories' => $category->get(),
-            'locals' => $local->get(),
-            'seasons' => $season->get(),
-            'months' => $month->get(),
-            'reviewranking' => $reviewranking,
-        ]); // 履歴が同じ場合はビューを返すだけ
-    }
-
     // ランキングページのビューにデータを渡す        
     return view('ReviewSpot.index')->with([
         'spotcategories' => $category->get(),
@@ -75,25 +61,33 @@ class ReviewSpotController extends Controller
 }
 
 // 履歴を更新するメソッド
-private function updateHistory(Request $request, $currentUrl, $currentPageName)
-{
-    $history = $request->session()->get('history', []);
+    private function updateHistory(Request $request, $currentUrl, $currentPageName)
+    {
+        $history = $request->session()->get('history', []);
+
+        // 同じURLが既に履歴に存在するか確認
+        foreach ($history as $key => $item) {
+            if ($item['url'] === $currentUrl) {
+                // すでに存在する場合は、そのエントリを更新
+                $history[$key]['name'] = $currentPageName; // 名前を更新
+                $request->session()->put('history', $history); // 更新後にセッションに保存
+                return; // 処理を終了
+            }
+        }
     
-    // すでに履歴に同じURLが存在する場合は何もしない
-    if (count($history) > 0 && end($history)['url'] == $currentUrl) {
-        return;
+        // 古い履歴を削除するロジック
+        if (count($history) >= 5) {
+            array_shift($history); // 最初の履歴を削除
+        }
+
+        // 新しい履歴を追加
+        $history[] = [
+            'url' => $currentUrl,
+            'name' => $currentPageName
+        ];
+
+        $request->session()->put('history', $history); // 更新後にセッションに保存
     }
-
-    // 履歴に新しいエントリーを追加
-    $history[] = [
-        'url' => $currentUrl,
-        'name' => $currentPageName,
-        'timestamp' => now(),
-    ];
-
-    // 履歴をセッションに保存
-    $request->session()->put('history', $history);
-}
 
     
     public function truncateAtPunctuation($string, $maxLength)

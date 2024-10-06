@@ -36,7 +36,9 @@
             
             <!-- Page Content -->
             <main>
+              <div class="pt-20">   
                 {{ $slot }}
+              </div>
             </main>
         </div>
     </body>

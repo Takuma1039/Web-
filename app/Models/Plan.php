@@ -8,4 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class Plan extends Model
 {
     use HasFactory;
+    
+    protected $fillable = [
+        'spot_id',  
+        'name',
+        'comment',
+    ];
+    
 }

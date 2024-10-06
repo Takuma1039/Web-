@@ -71,6 +71,11 @@ class Spot extends Model
         return $this->hasMany(Review::class);
     }
     
+    public function plan()
+    {
+        return $this->belongsTo(Plan::class);
+    }
+    
     public function likes()
     {
         return $this->hasMany(Spotlike::class);
