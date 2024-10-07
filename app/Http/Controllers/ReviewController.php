@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use App\Http\Requests\ReviewRequest;
 use App\Models\Review;
 use App\Models\ReviewImage;
 use App\Models\Spot;
@@ -51,23 +52,14 @@ class ReviewController extends Controller
 }
 
     
-    public function store(Request $request, $spotId)
+    public function store(ReviewRequest $request, $spotId)
 {
-    $validatedData = $request->validate([
-        'title' => 'required|max:50',
-        'comment' => 'required|string|max:500',
-        'review' => 'required|numeric|between:1,5',
-        'images.*' => 'image|mimes:jpg,png,jpeg,gif|max:2048',
-        'image_names.*' => 'nullable|string|max:255', // 画像名のバリデーション
-        'is_anonymous' => 'nullable|boolean',
-    ]);
-
     try {
         // 口コミの保存
         $review = new Review();
-        $review->title = $validatedData['title'];
-        $review->comment = $validatedData['comment'];
-        $review->review = $validatedData['review'];
+        $review->title = $request->title;
+        $review->comment = $request->comment;
+        $review->review = $request->review;
         $review->spot_id = $spotId;
         $review->user_id = auth()->id();
         $review->is_anonymous = $request->has('is_anonymous');
@@ -106,18 +98,8 @@ class ReviewController extends Controller
     }
 
 
-    public function update(Request $request, $id)
+    public function update(ReviewRequest $request, $id)
 {
-    $validatedData = $request->validate([
-        'title' => 'required|max:50',
-        'comment' => 'required|string|max:500',
-        'review' => 'required|numeric|between:1,5',
-        'images.*' => 'nullable|image|mimes:jpg,png,jpeg,gif|max:2048',
-        'is_anonymous' => 'nullable|boolean',
-        'image_names.*' => 'nullable|string|max:255', // 画像名のバリデーション
-        'image_ids.*' => 'nullable|integer|exists:review_images,id' // 画像IDのバリデーション
-    ]);
-
     $review = Review::findOrFail($id);
     $spotId = $review->spot_id;
 
@@ -173,9 +155,9 @@ class ReviewController extends Controller
 
     // 口コミの更新
     $review->update([
-        'title' => $validatedData['title'],
-        'comment' => $validatedData['comment'],
-        'review' => $validatedData['review'],
+        'title' => $request->title,
+        'comment' => $request->comment,
+        'review' => $request->review,
         'is_anonymous' => $request->has('is_anonymous') ? 1 : 0,
     ]);
 

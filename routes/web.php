@@ -90,8 +90,8 @@ Route::controller(PlanController::class)->middleware(['auth'])->group(function()
     Route::get('/plans/{plan}', 'show')->name('plans.show'); //旅行計画の詳細
     Route::get('/plans/{plan}/edit', 'edit')->name('plans.edit'); //旅行計画の編集
     Route::put('/plans/{plan}', 'update')->name('plans.update'); //旅行計画の更新
-    Route::delete('/plans/{plan}', 'delete')->name('delete'); //旅行計画の削除
-    Route::post('/plans/store', 'store')->name('store'); //旅行計画の保存
+    Route::delete('/plans/{plan}', 'delete')->name('plans.delete'); //旅行計画の削除
+    Route::post('/plans/store', 'store')->name('plans.store'); //旅行計画の保存
 });
 
 //Route::get('/plancategories/{plancategory}', [PlancategoryController::class,'index'])->middleware("auth");

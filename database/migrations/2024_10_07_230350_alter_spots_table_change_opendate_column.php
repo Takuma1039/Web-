@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('planposts', function (Blueprint $table) {
-            $table->foreignId('plan_id')->constrained()->onDelete('cascade');
+        Schema::table('spots', function (Blueprint $table) {
+            // 例: siteカラムのデータ型を VARCHAR(255) に変更
+            $table->string('opendate', 255)->change();
         });
     }
 
@@ -21,8 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('planposts', function (Blueprint $table) {
-            //
-        });
+        //
     }
 };

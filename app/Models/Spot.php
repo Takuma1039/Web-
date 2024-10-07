@@ -71,9 +71,10 @@ class Spot extends Model
         return $this->hasMany(Review::class);
     }
     
-    public function plan()
+    public function plans()
     {
-        return $this->belongsTo(Plan::class);
+        return $this->belongsToMany(Plan::class, 'plan_destinations')
+                    ->withPivot('order_no'); //追加のフィールドorderを含める
     }
     
     public function likes()

@@ -10,9 +10,15 @@ class Plan extends Model
     use HasFactory;
     
     protected $fillable = [
-        'spot_id',  
-        'name',
-        'comment',
+        'user_id', 
+        'title', 
+        'start_date'
     ];
     
+    public function destinations()
+    {
+        return $this->belongsToMany(Spot::class, 'plan_destinations')
+                    ->withPivot('order')
+                    ->orderBy('order'); //目的地を指定された順序で取得
+    }
 }

@@ -14,25 +14,20 @@
           @php
             $currentRank = 1;  // 現在の順位
             $previousLikeCount = null;  // 前のいいね数を保存するための変数
-            $skipCount = 0;  // 同じ順位が連続した場合にスキップするための変数
           @endphp
 
           @forelse($majorranking as $index => $spot)
             @php
               // 現在のスポットのいいね数と前のスポットのいいね数を比較
               if ($previousLikeCount === null || $previousLikeCount !== $spot->likes_count) {
-                // 前のスポットといいね数が異なる場合は、順位を更新
-                $currentRank += $skipCount;  // スキップしていた分を順位に加算
-                $skipCount = 1;  // スキップ数をリセット
-              } else {
-                // 同じいいね数ならスキップ数を増やす
-                $skipCount++;
+                // いいね数が異なる場合は、現在の順位をインクリメント
+                $currentRank = $index + 1;  // 順位を更新
               }
               $previousLikeCount = $spot->likes_count;  // 現在のいいね数を前のいいね数に更新
             @endphp
             <div class="p-4 bg-white rounded-lg shadow-md mb-4">
               <div class="flex items-center mb-2">
-                <span class="text-xl font-semibold text-blue-500">第{{ $index + 1 }}位</span>
+                <span class="text-xl font-semibold text-blue-500">第{{ $currentRank }}位</span>
                 <a href="/spots/{{ $spot->id }}" class="ml-4 text-xl font-bold text-indigo-600 hover:underline">
                   {{ $spot->name }}
                 </a>
@@ -82,4 +77,3 @@
     </div>
   </div>
 </x-app-layout>
-

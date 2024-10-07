@@ -31,6 +31,13 @@ class MajorSpotController extends Controller
     foreach ($majorranking as $spot) {
         $spot->truncated_body = $this->truncateAtPunctuation($spot->body, 200);
     }
+    
+    foreach ($majorranking as $spot) {
+        Majorspot::updateOrCreate(
+            ['spot_id' => $spot->id], // すでに存在する場合は更新
+            ['created_at' => now()], 
+        );
+    }
 
     // ランキングページのビューにデータを渡す        
     return view('MajorSpot.index')->with([
