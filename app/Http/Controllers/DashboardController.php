@@ -53,10 +53,10 @@ class DashboardController extends Controller
 
     private function getSpotsWithLikes()
 {
-    return Spot::select('spots.*')
-        ->join('majorspots', 'spots.id', '=', 'majorspots.spot_id')
-        ->where(function ($query) {
-            $query->selectRaw('count(*)')
+    return Spot::select('spots.*') //spotsテーブルのすべてのカラムを選択
+        ->join('majorspots', 'spots.id', '=', 'majorspots.spot_id') //majorspotsテーブルとspotsテーブルを結合
+        ->where(function ($query) { //サブクエリを定義
+            $query->selectRaw('count(*)') //spotlikesテーブルのspot_idがspotsテーブルのidと一致するレコードの数をカウント
                 ->from('spotlikes')
                 ->whereColumn('spotlikes.spot_id', 'spots.id');
         }, '>', 0)  // likes_count をWHEREでフィルタ

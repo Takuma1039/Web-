@@ -21,9 +21,14 @@ class MajorSpotController extends Controller
     $this->updateHistory($request, $currentUrl, $currentPageName);
 
     // スポット情報の取得
-    $majorranking = Spot::withCount('likes') // いいね数をカウントして取得
-        ->having('likes_count', '>', 0) // いいね数が0より大きいスポットだけを取得
-        ->orderBy('likes_count', 'desc') // いいね数で降順に並び替え
+    $majorranking = Spot::select('spots.*') //spotsテーブルのすべてのカラムを選択
+        ->join('majorspots', 'spots.id', '=', 'majorspots.spot_id') //majorspotsテーブルとspotsテーブルを結合
+        ->where(function ($query) { //サブクエリを定義
+            $query->selectRaw('count(*)') //spotlikesテーブルのspot_idがspotsテーブルのidと一致するレコードの数をカウント
+                ->from('spotlikes')
+                ->whereColumn('spotlikes.spot_id', 'spots.id');
+        }, '>', 0)  // likes_count をWHEREでフィルタ
+        ->orderByRaw('(select count(*) from spotlikes where spotlikes.spot_id = spots.id) desc') // likes_count をORDER BYで指定
         ->paginate(10);
     
     // 各スポットのbodyを切り捨てる
