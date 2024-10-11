@@ -77,6 +77,11 @@ class Spot extends Model
                     ->withPivot('order_no'); //追加のフィールドorderを含める
     }
     
+    public function planDestinations()
+    {
+        return $this->hasMany(PlanDestination::class);
+    }
+    
     public function likes()
     {
         return $this->hasMany(Spotlike::class);

@@ -1,6 +1,28 @@
+@props(['spot', 'ranking' => null])
+
 <div class="flex-none sm:w-48 md:w-64 h-auto snap-center">
     <div class="bg-white border border-gray-200 rounded-lg overflow-hidden relative h-full flex flex-col justify-between">
         <div>
+            <!-- ランキング表示 -->
+            @if ($ranking !== null)
+                @if ($ranking == 1)
+                    <!-- 1位の画像アイコン -->
+                    <div class="absolute top-2 px-3 py-1">
+                        <img src="{{ asset('storage/image/gold-medal.png') }}" alt="1st place" class="w-10 h-10">
+                    </div>
+                @elseif ($ranking == 2)
+                    <!-- 2位の画像アイコン -->
+                    <div class="absolute top-2 px-3 py-1">
+                        <img src="{{ asset('storage/image/silver-medal.png') }}" alt="2nd place" class="w-10 h-10">
+                    </div>
+                @elseif ($ranking == 3)
+                    <!-- 3位の画像アイコン -->
+                    <div class="absolute top-2 px-3 py-1">
+                        <img src="{{ asset('storage/image/bronze-medal.png') }}" alt="3rd place" class="w-10 h-10">
+                    </div>
+                @endif
+            @endif
+
             <!-- 画像の表示 -->
             <a onclick="openModal('{{ $spot->spotimages->first()->image_path ?? asset('images/default-image.jpg') }}')" aria-label="スポットの詳細ページへ移動">
                 <img src="{{ $spot->spotimages->first()->image_path ?? asset('images/default-image.jpg') }}" alt="" class="w-full h-40 object-cover" loading="lazy">

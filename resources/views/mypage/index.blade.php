@@ -1,139 +1,166 @@
 <x-app-layout>
   <div class="container mx-auto px-4 py-8">
-    <h1 class="text-2xl font-bold mb-6">マイページ</h1>
+    <h1 class="text-4xl font-extrabold text-gray-800 text-center mb-8">マイページ</h1>
     
     <!-- お気に入りスポットセクション -->
     <div class="mb-8">
-      <div class="flex items-center mt-4">
-        <h2 class="text-xl md:text-2xl font-semibold mr-2">お気に入りのスポット</h2>
-        <a href="{{ route('favoritespot') }}" class="flex items-center text-white bg-gradient-to-r from-blue-500 to-indigo-600 border-none py-1 px-3 rounded-full shadow-md transform transition-all duration-200 hover:scale-105 hover:shadow-lg text-sm">
-          <span>View More</span>
-          <svg class="w-3 h-3 md:w-4 md:h-4 ml-2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
-            <path d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-          </svg>
-        </a>
-      </div>
-
-      @if($likedSpots->isEmpty())
+        <div class="flex items-center mt-4 mb-2">
+          <h1 class="text-xl md:text-2xl font-semibold mr-2">お気に入りスポット</h1>
+          <x-view-more-button route="favoritespot" />
+        </div>
+        @if($likedSpots->isEmpty())
         <p>まだお気に入り登録したスポットはありません。</p>
       @else
-        <div x-data="swipeCards()" class="mb-4 overflow-x-scroll scrollbar-hide relative">
-          <div class="flex snap-x snap-mandatory gap-4" style="width: max-content;">
-            <template x-for="spot in likedSpots" :key="spot.id">
-              <div class="flex-none sm:w-48 md:w-64 h-auto snap-center">
-                <div class="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-lg flex flex-col">
-                  <a :href="spot.link">
-                    <img :src="spot.image" alt="" class="w-full h-32 object-cover"> <!-- 高さを小さく -->
-                  </a>
-                  <div class="p-2 flex-grow">
-                    <h3 class="text-md leading-5 font-bold text-gray-900" x-text="spot.title"></h3> <!-- フォントサイズを小さく -->
-                    <p class="text-gray-600 mt-1 text-xs" x-text="spot.description"></p> <!-- フォントサイズを小さく -->
-                  </div>
-                  <div class="p-2">
-                    <a :href="spot.link" class="text-blue-500 hover:underline">詳細を見る</a>
-                  </div>
-                </div>
-              </div>
-            </template>
+        <div id="swipe-container" class="overflow-x-scroll scrollbar-hide mb-4 relative px-0.5" style="overflow-y: hidden;">
+          <div id="swipe-content" class="flex snap-x snap-mandatory gap-4" style="width: max-content;">
+            <!-- 各カードのループ -->
+            @foreach ($likedSpots as $likedSpot)
+              <x-spot-card :spot="$likedSpot->spot" />
+            @endforeach
           </div>
         </div>
       @endif
     </div>
+        <!-- モーダルコンポーネント -->
+        <x-modal-window />
+
 
     <!-- 作成した旅行計画セクション -->
     <div class="mb-8">
-      <h2 class="text-xl font-semibold mb-2">作成した旅行計画一覧</h2>
-      <div x-data="swipeCards()" class="mb-4 overflow-x-scroll scrollbar-hide relative">
-        <div class="flex snap-x snap-mandatory gap-4" style="width: max-content;">
-          <template x-for="plan in travelPlans" :key="plan.id">
-            <div class="flex-none sm:w-48 md:w-64 h-auto snap-center">
-              <div class="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-lg flex flex-col">
-                <a :href="plan.link">
-                  <img :src="plan.image" alt="" class="w-full h-32 object-cover"> <!-- 高さを小さく -->
-                </a>
-                <div class="p-2 flex-grow">
-                  <h3 class="text-md leading-5 font-bold text-gray-900" x-text="plan.title"></h3> <!-- フォントサイズを小さく -->
-                  <p class="text-gray-600 mt-1 text-xs" x-text="plan.description"></p> <!-- フォントサイズを小さく -->
-                </div>
-                <div class="p-2">
-                  <a :href="plan.link" class="text-blue-500 hover:underline">詳細を見る</a>
-                </div>
-              </div>
-            </div>
-          </template>
+        <div class="flex items-center mt-4 mb-2">
+          <h1 class="text-xl md:text-2xl font-semibold mr-2">作成した旅行計画</h1>
+          <x-view-more-button route="plans.index" />
         </div>
+        @if($likedSpots->isEmpty())
+          <p>まだ作成した旅行計画はありません。</p>
+        @else
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        @foreach ($plans as $plan)
+          <div class="p-6 max-w-sm bg-white rounded-lg border border-gray-200 shadow-md hover:shadow-lg transition duration-300">
+            <h2 class="text-xl font-bold mb-4">{{ $plan->title }}</h2>
+            <p class="text-gray-700 mb-2">旅行日: {{ $plan->start_date->format('Y年m月d日') }} {{ $plan->start_time->format('H時i分') }}</p>
+            <ul class="list-disc pl-5">
+              @foreach ($plan->destinations as $destination)
+                <li>{{ $destination->name }}</li>
+               @endforeach
+            </ul>
+            <div class="mt-4 flex justify-between">
+              <a href="{{ route('plans.show', $plan->id) }}" class="text-blue-600 hover:underline">
+                詳細を見る
+              </a>
+              <form action="{{ route('plans.destroy', $plan->id) }}" method="POST" onsubmit="return confirm('本当に削除しますか？');">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="text-red-600 hover:underline">削除</button>
+              </form>
+            </div>
+          </div>
+        @endforeach
+        </div>
+        @endif
       </div>
-    </div>
 
     <!-- いいねした旅行計画一覧セクション -->
     <div class="mb-8">
-      <h2 class="text-xl font-semibold mb-2">いいねした旅行計画一覧</h2>
-      <div x-data="swipeCards()" class="mb-4 overflow-x-scroll scrollbar-hide relative">
-        <div class="flex snap-x snap-mandatory gap-4" style="width: max-content;">
-          <template x-for="likedPlan in likedTravelPlans" :key="likedPlan.id">
-            <div class="flex-none sm:w-48 md:w-64 h-auto snap-center">
-              <div class="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-lg flex flex-col">
-                <a :href="likedPlan.link">
-                  <img :src="likedPlan.image" alt="" class="w-full h-32 object-cover"> <!-- 高さを小さく -->
-                </a>
-                <div class="p-2 flex-grow">
-                  <h3 class="text-md leading-5 font-bold text-gray-900" x-text="likedPlan.title"></h3> <!-- フォントサイズを小さく -->
-                  <p class="text-gray-600 mt-1 text-xs" x-text="likedPlan.description"></p> <!-- フォントサイズを小さく -->
-                </div>
-                <div class="p-2">
-                  <a :href="likedPlan.link" class="text-blue-500 hover:underline">詳細を見る</a>
-                </div>
-              </div>
-            </div>
-          </template>
+        <div class="flex items-center mt-4 mb-2">
+          <h1 class="text-xl md:text-2xl font-semibold mr-2">いいねした旅行計画</h1>
+          <x-view-more-button route="plans.index" />
         </div>
+        @if($likedSpots->isEmpty())
+          <p>まだいいねした旅行計画はありません。</p>
+        @else
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        @foreach ($plans as $plan)
+          <div class="p-6 max-w-sm bg-white rounded-lg border border-gray-200 shadow-md hover:shadow-lg transition duration-300">
+            <h2 class="text-xl font-bold mb-4">{{ $plan->title }}</h2>
+            <p class="text-gray-700 mb-2">旅行日: {{ $plan->start_date->format('Y年m月d日') }} {{ $plan->start_time->format('H時i分') }}</p>
+            <ul class="list-disc pl-5">
+              @foreach ($plan->destinations as $destination)
+                <li>{{ $destination->name }}</li>
+               @endforeach
+            </ul>
+            <div class="mt-4 flex justify-between">
+              <a href="{{ route('plans.show', $plan->id) }}" class="text-blue-600 hover:underline">
+                詳細を見る
+              </a>
+              <form action="{{ route('plans.destroy', $plan->id) }}" method="POST" onsubmit="return confirm('本当に削除しますか？');">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="text-red-600 hover:underline">削除</button>
+              </form>
+            </div>
+          </div>
+        @endforeach
+        </div>
+        @endif
       </div>
-    </div>
 
-  </div>
-
-  <div class="footer mt-6">
-    <a href="javascript:history.back();" class="text-blue-500 hover:underline">戻る</a>
   </div>
 
   <script>
-    function swipeCards() {
-      return {
-        likedSpots: [
-          @foreach ($likedSpots as $spot)
-          {
-            id: {{ $spot->id }},
-            image: '{{ $spot->spotimages->first()->image_path ?? asset('images/default-image.jpg') }}',
-            title: '{{ $spot->name }}',
-            description: '{{ Str::limit($spot->body, 100) }}',
-            link: '/spots/{{ $spot->id }}',
-          },
-          @endforeach
-        ],
-        travelPlans: [
-          @foreach ($travelPlans as $plan)
-          {
-            id: {{ $plan->id }},
-            image: '{{ $plan->image_path ?? asset('images/default-image.jpg') }}',
-            title: '{{ $plan->name }}',
-            description: '{{ Str::limit($plan->description, 100) }}',
-            link: '/travel-plans/{{ $plan->id }}',
-          },
-          @endforeach
-        ],
-        likedTravelPlans: [
-          @foreach ($likedTravelPlans as $likedPlan)
-          {
-            id: {{ $likedPlan->id }},
-            image: '{{ $likedPlan->image_path ?? asset('images/default-image.jpg') }}',
-            title: '{{ $likedPlan->name }}',
-            description: '{{ Str::limit($likedPlan->description, 100) }}',
-            link: '/travel-plans/{{ $likedPlan->id }}',
-          },
-          @endforeach
-        ],
-      };
-    }
+    // スワイプ操作の実装
+const swipeContainer = document.getElementById('swipe-container');
+let isDown = false;
+let startX;
+let scrollLeft;
+
+// マウスイベント
+const mouseDownHandler = (e) => {
+    isDown = true;
+    swipeContainer.classList.add('active');
+    startX = e.pageX - swipeContainer.offsetLeft;
+    scrollLeft = swipeContainer.scrollLeft;
+};
+
+const mouseLeaveHandler = () => {
+    isDown = false;
+    swipeContainer.classList.remove('active');
+};
+
+const mouseUpHandler = () => {
+    isDown = false;
+    swipeContainer.classList.remove('active');
+};
+
+const mouseMoveHandler = (e) => {
+    if (!isDown) return;
+    e.preventDefault();
+    const x = e.pageX - swipeContainer.offsetLeft;
+    const walk = (x - startX) * 1; // スクロール量を調整
+    swipeContainer.scrollLeft = scrollLeft - walk;
+};
+
+// タッチイベント
+const touchStartHandler = (e) => {
+    isDown = true;
+    swipeContainer.classList.add('active');
+    startX = e.touches[0].pageX - swipeContainer.offsetLeft;
+    scrollLeft = swipeContainer.scrollLeft;
+};
+
+const touchEndHandler = () => {
+    isDown = false;
+    swipeContainer.classList.remove('active');
+};
+
+const touchMoveHandler = (e) => {
+    if (!isDown) return;
+    e.preventDefault();
+    const x = e.touches[0].pageX - swipeContainer.offsetLeft;
+    const walk = (x - startX) * 1; // スクロール量を調整
+    swipeContainer.scrollLeft = scrollLeft - walk;
+};
+
+// イベントリスナーの登録
+swipeContainer.addEventListener('mousedown', mouseDownHandler);
+swipeContainer.addEventListener('mouseleave', mouseLeaveHandler);
+swipeContainer.addEventListener('mouseup', mouseUpHandler);
+swipeContainer.addEventListener('mousemove', mouseMoveHandler);
+
+// タッチイベントの登録
+swipeContainer.addEventListener('touchstart', touchStartHandler);
+swipeContainer.addEventListener('touchend', touchEndHandler);
+swipeContainer.addEventListener('touchmove', touchMoveHandler);
   </script>
 </x-app-layout>
 

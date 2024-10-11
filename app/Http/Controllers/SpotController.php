@@ -32,7 +32,7 @@ class SpotController extends Controller
         $spots = Spot::with('spotimages') // 関連する画像を一緒に取得
                      ->withCount('likes') // いいねの数を取得
                      ->orderBy('name', 'asc')
-                     ->paginate(10);
+                     ->paginate(12);
         
         foreach ($spots as $spot) {
             $spot->truncated_body = $this->truncateAtPunctuation($spot->body, 150);

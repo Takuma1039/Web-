@@ -57,9 +57,9 @@
           <p class="text-center text-gray-500">現在、スポット情報はありません。</p>
         @endforelse
       </div>
-      <!-- ページネーション -->
-      <div class="mt-8">
-        {{ $spots->links() }}
+      <!-- ページネーションの表示 -->
+      <div class='mt-8'>
+        <x-pagination :paginator="$spots" />
       </div>
     </div>
   </div>

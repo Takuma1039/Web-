@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\PlanpostController;
 use App\Http\Controllers\ToppageController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\UserController;
@@ -24,6 +23,7 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ReviewLikeController;
 use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\PlanController;
+use App\Http\Controllers\PlanpostController;
 
 /*
 |--------------------------------------------------------------------------
@@ -51,7 +51,6 @@ Route::middleware('auth', 'activity')->group(function () {
     Route::get('/mypage', [MypageController::class, 'index'])->name('Mypage'); //マイページ
     Route::get('/favorites', [SpotController::class, 'favorite'])->name('favoritespot'); //お気に入りしたスポット表示
     Route::post('/spot/like', [SpotlikeController::class, 'likespot']); //spotのお気に入り機能
-    Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews'); //口コミ
     Route::post('/spots/{spot}/reviews', [ReviewController::class, 'store'])->name('reviews.store'); //口コミ投稿機能
     Route::post('/reviews/like', [ReviewLikeController::class, 'likeReview'])->name('reviews.like'); //口コミいいね機能
     // 口コミの編集
@@ -73,8 +72,9 @@ Route::middleware('activity')->group(function () {
     Route::get('/majorspots', [MajorSpotController::class,'index'])->name('major.ranking'); //人気のスポットランキング
     Route::get('/reviewspots', [ReviewSpotController::class,'index'])->name('review.ranking'); //口コミスポットランキング
     Route::get('/seasonspots', [SeasonSpotController::class,'index'])->name('season.ranking'); //今の時期におすすめなスポットランキング
+    Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews'); //口コミ
     Route::get('/spots/{spot}', [SpotController::class, 'show'])->name('spots.show'); //スポット詳細画面表示
-    Route::get('/search', [SpotController::class, 'search'])->name('spot.search');
+    Route::get('/search', [SpotController::class, 'search'])->name('spot.search'); //検索
 });
 //プロフィール
 Route::middleware('auth', 'activity')->group(function () {
@@ -90,10 +90,11 @@ Route::controller(PlanController::class)->middleware(['auth'])->group(function()
     Route::get('/plans/{plan}', 'show')->name('plans.show'); //旅行計画の詳細
     Route::get('/plans/{plan}/edit', 'edit')->name('plans.edit'); //旅行計画の編集
     Route::put('/plans/{plan}', 'update')->name('plans.update'); //旅行計画の更新
-    Route::delete('/plans/{plan}', 'delete')->name('plans.delete'); //旅行計画の削除
+    Route::delete('/plans/{plan}', 'destroy')->name('plans.destroy'); //旅行計画の削除
     Route::post('/plans/store', 'store')->name('plans.store'); //旅行計画の保存
 });
 
+Route::post('/plans/{plan}/posts', [PlanpostController::class, 'post'])->name('plans.post');
 //Route::get('/plancategories/{plancategory}', [PlancategoryController::class,'index'])->middleware("auth");
 
 require __DIR__.'/auth.php';

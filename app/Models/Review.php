@@ -39,4 +39,5 @@ class Review extends Model
     {
         return $this->hasMany(ReviewLike::class); 
     }
+
 }
