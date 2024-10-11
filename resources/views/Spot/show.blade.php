@@ -167,6 +167,12 @@
           @if($reviews->isEmpty())
             <p class="text-gray-500">まだ口コミはありません。</p>
           @else
+          @if(session('reviews'))
+    @foreach(session('reviews') as $review)
+        <!-- 口コミの表示 -->
+    @endforeach
+@endif
+
             @foreach($reviews as $review)
               <div class="review bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg mb-4 transition-transform transform">
                 <div class="flex items-center justify-between mb-2">
