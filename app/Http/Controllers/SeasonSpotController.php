@@ -31,18 +31,18 @@ class SeasonSpotController extends Controller
     $this->updateHistory($request, $currentUrl, $currentPageName);
 
     // スポット情報の取得
-    $spotsQuery = Spot::whereHas('months', function ($query) use ($matchingMonth) {
+    $spots = Spot::whereHas('months', function ($query) use ($matchingMonth) {
         $query->where('months.id', $matchingMonth->id);
     })->with('months')->withCount('likes');
 
-    // 検索機能を追加
-    $query = $request->input('search');
-    if ($query) {
-        $spotsQuery->where('name', 'like', '%' . $query . '%'); // 部分一致検索
-    }
-
     // ページネーションとソートを適用
-    $seasonranking = $spotsQuery->having('likes_count', '>', 0)->orderBy('likes_count', 'DESC')->paginate(10);
+    $seasonranking = $spots->where(function($query) {
+        $query->selectRaw('count(*)')
+            ->from('spotlikes')
+            ->whereColumn('spotlikes.spot_id', 'spots.id');
+    }, '>', 0) // サブクエリを使っていいね数が0より大きいものだけを取得
+    ->orderByRaw('(select count(*) from spotlikes where spotlikes.spot_id = spots.id) desc') // いいね数で降順に並び替え
+    ->paginate(10);
     
     // 各スポットのbodyを切り捨てる
     foreach ($seasonranking as $spot) {

@@ -22,10 +22,15 @@ class ReviewSpotController extends Controller
     $this->updateHistory($request, $currentUrl, $currentPageName);
 
     // スポットをいいね数の多い順で取得
-    $reviewranking = Spot::withCount('reviews') // reviewsはリレーション名
-        ->having('reviews_count', '>', 0)      // review数が0より大きいスポットだけを取得
-        ->orderBy('reviews_count', 'desc')  // review数で降順に並び替え
-        ->paginate(10);
+    $reviewranking = Spot::withCount('reviews')
+    ->where(function ($query) { // サブクエリを定義
+        $query->selectRaw('count(*)') // reviewsテーブルのspot_idがspotsテーブルのidと一致するレコードの数をカウント
+            ->from('reviews')
+            ->whereColumn('reviews.spot_id', 'spots.id');
+    }, '>', 0) // review数が0より大きいものだけを取得
+    ->orderByRaw('(select count(*) from reviews where reviews.spot_id = spots.id) desc') // review数で降順に並び替え
+    ->paginate(10); // ページネーション
+
 
     // 各スポットのbodyを切り捨てる
     foreach ($reviewranking as $spot) {
