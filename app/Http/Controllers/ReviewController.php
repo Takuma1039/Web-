@@ -87,7 +87,7 @@ class ReviewController extends Controller
 
         \DB::commit();
 
-        return redirect()->route('spots.show', $spotId)->with('success', '口コミが投稿されました。')->with('reviews', $reviews);
+        return redirect()->route('spots.show', $spotId)->with('success', '口コミが投稿されました。');
     } catch (\Exception $e) {
         \DB::rollBack();
         \Log::error('Error storing review: ' . $e->getMessage());

@@ -44,6 +44,16 @@
         <button type="submit" class="bg-blue-600 text-white rounded-lg px-4 py-2 hover:bg-blue-700 transition">送信</button>
         <button type="button" id="closeModal" class="ml-2 bg-gray-300 rounded-lg px-4 py-2 hover:bg-gray-400 transition">キャンセル</button>
     </div>
+    <!-- エラーメッセージの表示 -->
+              @if ($errors->any())
+                <div class="mb-4 text-red-600">
+                  <ul>
+                    @foreach ($errors->all() as $error)
+                      <li>{{ $error }}</li>
+                    @endforeach
+                  </ul>
+                </div>
+              @endif
 </form>
 <script>
     //口コミ投稿メッセージ表示用
