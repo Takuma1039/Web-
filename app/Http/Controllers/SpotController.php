@@ -315,9 +315,9 @@ class SpotController extends Controller
     public function search(Request $request, Category $category, Local $local, Season $season, Month $month)
     {
         // 検索キーワード
-        $query = $request->input('query');
+        $query = $request->input('query'); //検索したキーワードの取得
 
-        // 各フィルタ条件
+        // 検索に使用するフィルター条件を取得
         $filters = [
             'spotCategoryIds' => $request->input('spot.spot_category_ids', []),
             'localIds' => $request->input('spot.local_ids', []),
@@ -325,7 +325,7 @@ class SpotController extends Controller
             'monthIds' => $request->input('spot.month_ids', []),
         ];
     
-        // 検索条件を文字列に変換
+        // 履歴表示用に検索条件を文字列に変換
         $searchConditions = [];
 
         if ($query) {
@@ -364,13 +364,13 @@ class SpotController extends Controller
             'spot[month_ids]' => $filters['monthIds'],
         ]));
     
-        // 履歴管理の関数を呼び出す
+        // 履歴の管理
         $this->manageHistory($request, $currentUrl, $currentPageName, $filters);
     
-        // 検索クエリの基本
+        // スポットを取得するためのクエリビルダーを初期化
         $spots = Spot::query();
         
-        // 検索キーワードが存在する場合
+        // 検索キーワードが存在する場合(名前、住所、カテゴリー、地域、シーズン、月に存在するキーワード)
         if ($query) {
             $spots->where(function($q) use ($query) {
                 $q->where('name', 'LIKE', '%' . $query . '%')
@@ -390,14 +390,15 @@ class SpotController extends Controller
             });
         }
 
-        // フィルタリングの適用
+        // キーワード以外の場合フィルタリングの適用
         $relationships = [
             'spotCategoryIds' => 'spotcategories',
             'localIds' => 'local',
             'seasonIds' => 'seasons',
             'monthIds' => 'months',
         ];
-
+        
+        //フィルタリングの適用
         foreach ($filters as $key => $ids) {
             if (!empty($ids)) {
                 $spots->whereHas($relationships[$key], function($q) use ($ids) {

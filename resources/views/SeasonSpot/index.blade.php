@@ -78,9 +78,8 @@
         </div>
       </div>
       
-      <!-- ページネーション -->
-     <!-- ページネーションの表示 -->
-<x-pagination :paginator="$seasonranking" />
+      <!-- ページネーションの表示 -->
+      <x-pagination :paginator="$seasonranking" />
     </div>
   </div>
 </x-app-layout>

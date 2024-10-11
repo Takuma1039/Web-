@@ -10,21 +10,22 @@ class SpotcategoryController extends Controller
 {
     public function index(Category $category, Request $request)
 {
+    // 現在のURLを取得
+    $currentUrl = url()->current();
+    $currentPageName = $category->name; // 適切なページ名に変更
+
+    // 履歴の管理
+    $this->updateHistory($request, $currentUrl, $currentPageName);
+        
     // 特定のカテゴリーに関連するスポットを取得し、関連するカテゴリーもロード
     $spotsQuery = Spot::whereHas('spotcategories', function ($query) use ($category) {
             $query->where('spot_categories.category_id', $category->id);
         })->with('spotcategories')->withCount('likes'); // 関連するカテゴリーといいねの数を取得
-    
-    // 検索機能の実装
-    $query = $request->input('search');
-    
-    // 検索機能を追加
-    if ($query) {
-        $spotsQuery->where('name', 'like', '%' . $query . '%'); //nameカラムに対して部分一致の検索条件を追加する
-    }
 
     // 最後にページネーションを適用
-    $spots = $spotsQuery->orderBy('likes_Count', 'DESC')->paginate(10);
+    $spots = $spotsQuery->orderByRaw('(select count(*) from spotlikes where spotlikes.spot_id = spots.id) desc')
+        ->paginate(10);
+    
     foreach ($spots as $spot) {
         $spot->truncated_body = $this->truncateAtPunctuation($spot->body, 200);
     }
@@ -55,6 +56,35 @@ class SpotcategoryController extends Controller
 
       // 句読点が見つからない場合は、指定した文字数で切り捨てる
       return mb_substr($truncated, 0, $maxLength) . '...';
+    }
+    
+    // 履歴を更新するメソッド
+    private function updateHistory(Request $request, $currentUrl, $currentPageName)
+    {
+        $history = $request->session()->get('history', []);
+
+        // 同じURLが既に履歴に存在するか確認
+        foreach ($history as $key => $item) {
+            if ($item['url'] === $currentUrl) {
+                // すでに存在する場合は、そのエントリを更新
+                $history[$key]['name'] = $currentPageName; // 名前を更新
+                $request->session()->put('history', $history); // 更新後にセッションに保存
+                return; // 処理を終了
+            }
+        }
+    
+        // 古い履歴を削除するロジック
+        if (count($history) >= 5) {
+            array_shift($history); // 最初の履歴を削除
+        }
+
+        // 新しい履歴を追加
+        $history[] = [
+            'url' => $currentUrl,
+            'name' => $currentPageName
+        ];
+
+        $request->session()->put('history', $history); // 更新後にセッションに保存
     }
 }
 

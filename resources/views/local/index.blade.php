@@ -9,19 +9,6 @@
         @endif
       </h1>
 
-      <!-- 検索バー -->
-      <div class="flex justify-center mb-6">
-        <form action="{{ request()->url() }}" method="GET" class="flex items-center">
-          <input type="text" name="search" placeholder="探したいキーワード" 
-                 class="border border-gray-300 rounded-md p-2 w-1/2"
-                 value="{{ request()->input('search') }}">
-          <button type="submit" class="ml-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
-            検索
-          </button>
-          <a href="{{ request()->url() }}" class="ml-2 px-4 py-2 text-blue-500 hover:underline">リセット</a>
-        </form>
-      </div>
-
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <div class="col-span-2">
           @forelse($spots as $spot)
@@ -61,26 +48,9 @@
       </div>
       
       <!-- ページネーション -->
-      <div class="flex justify-center mt-8">
-        {{ $spots->links() }} <!-- Laravelのページネーションを表示 -->
+      <div class="mt-8">
+        <x-pagination :paginator="$spots" />
       </div>
     </div>
   </div>
-  
-  <script type="module">
-    document.addEventListener('DOMContentLoaded', function() {
-      const searchInput = document.querySelector('input[name="search"]');
-      
-      searchInput.addEventListener('input', function() {
-        const query = this.value;
-        
-        fetch(`{{ request()->url() }}?search=${query}`)
-          .then(response => response.text())
-          .then(html => {
-            // 検索結果の部分を更新する処理
-            document.querySelector('.col-span-2').innerHTML = html; // 適切な場所に更新
-          });
-      });
-    });
-  </script>
 </x-app-layout>
