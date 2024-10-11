@@ -53,32 +53,41 @@ class DashboardController extends Controller
 
     private function getSpotsWithLikes()
 {
-    return Spot::select('spots.*') // spotsテーブルのすべてのカラムを選択
-        ->leftJoin('spotlikes', 'spots.id', '=', 'spotlikes.spot_id') // likesのテーブルと左結合
-        ->groupBy('spots.id', 'spots.name', 'spots.body', 'spots.address', 'spots.opendate', 'spots.closedate', 'spots.access', 'spots.price', 'spots.site', 'spots.lat', 'spots.long', 'spots.created_at', 'spots.updated_at', 'spots.deleted_at', 'spots.local_id', 'spots.category_ids', 'spots.season_ids', 'spots.month_ids') // 必要なカラムをすべてグループ化
-        ->havingRaw('COUNT(spotlikes.id) > 0') // likesのカウントが0より大きいことを確認
-        ->orderByRaw('COUNT(spotlikes.id) DESC') // likesのカウントでソート
+    return Spot::select('spots.*')
+        ->join('majorspots', 'spots.id', '=', 'majorspots.spot_id')
+        ->where(function ($query) {
+            $query->selectRaw('count(*)')
+                ->from('spotlikes')
+                ->whereColumn('spotlikes.spot_id', 'spots.id');
+        }, '>', 0)  // likes_count をWHEREでフィルタ
+        ->orderByRaw('(select count(*) from spotlikes where spotlikes.spot_id = spots.id) desc') // likes_count をORDER BYで指定
         ->get();
 }
 
 private function getSpotsWithReviews()
 {
-    return Spot::select('spots.*') // spotsテーブルのすべてのカラムを選択
-        ->leftJoin('review_spots', 'spots.id', '=', 'review_spots.spot_id') // reviewsのテーブルと左結合
-        ->groupBy('spots.id', 'spots.name', 'spots.body', 'spots.address', 'spots.opendate', 'spots.closedate', 'spots.access', 'spots.price', 'spots.site', 'spots.lat', 'spots.long', 'spots.created_at', 'spots.updated_at', 'spots.deleted_at', 'spots.local_id', 'spots.category_ids', 'spots.season_ids', 'spots.month_ids') // 必要なカラムをすべてグループ化
-        ->havingRaw('COUNT(review_spots.id) > 0') // reviewsのカウントが0より大きいことを確認
-        ->orderByRaw('COUNT(review_spots.id) DESC') // reviewsのカウントでソート
+    return Spot::select('spots.*')
+        ->join('review_spots', 'spots.id', '=', 'review_spots.spot_id')
+        ->where(function ($query) {
+            $query->selectRaw('count(*)')
+                ->from('reviews')
+                ->whereColumn('reviews.spot_id', 'spots.id');
+        }, '>', 0)  // reviews_count をWHEREでフィルタ
+        ->orderByRaw('(select count(*) from reviews where reviews.spot_id = spots.id) desc') // reviews_count をORDER BYで指定
         ->get();
 }
 
 private function getSeasonSpots()
 {
-    return Spot::select('spots.*') // spotsテーブルのすべてのカラムを選択
-        ->leftJoin('spotlikes', 'spots.id', '=', 'spotlikes.spot_id') // likesのテーブルと左結合
-        ->groupBy('spots.id', 'spots.name', 'spots.body', 'spots.address', 'spots.opendate', 'spots.closedate', 'spots.access', 'spots.price', 'spots.site', 'spots.lat', 'spots.long', 'spots.created_at', 'spots.updated_at', 'spots.deleted_at', 'spots.local_id', 'spots.category_ids', 'spots.season_ids', 'spots.month_ids') // 必要なカラムをすべてグループ化
-        ->havingRaw('COUNT(spotlikes.id) > 0') // likesのカウントが0より大きいことを確認
-        ->orderByRaw('COUNT(spotlikes.id) DESC') // likesのカウントでソート
-        ->take(10) // 最大10件を取得
+    return Spot::select('spots.*')
+        ->join('season_spots', 'spots.id', '=', 'season_spots.spot_id')
+        ->where(function ($query) {
+            $query->selectRaw('count(*)')
+                ->from('spotlikes')
+                ->whereColumn('spotlikes.spot_id', 'spots.id');
+        }, '>', 0)  // likes_count をWHEREでフィルタ
+        ->orderByRaw('(select count(*) from spotlikes where spotlikes.spot_id = spots.id) desc') // likes_count をORDER BYで指定
+        ->take(10)
         ->get();
 }
 
