@@ -140,6 +140,17 @@
               口コミを投稿する
             </button>
             @endauth
+            
+            <!-- エラーメッセージの表示 -->
+              @if ($errors->any())
+                <div class="mb-4 text-red-600">
+                  <ul>
+                    @foreach ($errors->all() as $error)
+                      <li>{{ $error }}</li>
+                    @endforeach
+                  </ul>
+                </div>
+              @endif
           </div>
 
           <!-- 口コミ投稿のポップアップ -->
@@ -151,16 +162,6 @@
               <x-review-form :spotId="$spot->id" />
             </div>
           </div>
-          <!-- エラーメッセージの表示 -->
-              @if ($errors->any())
-                <div class="mb-4 text-red-600">
-                  <ul>
-                    @foreach ($errors->all() as $error)
-                      <li>{{ $error }}</li>
-                    @endforeach
-                  </ul>
-                </div>
-              @endif
 
           <!--口コミの表示-->
           @if($reviews->isEmpty())
