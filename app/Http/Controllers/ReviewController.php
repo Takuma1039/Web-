@@ -54,6 +54,8 @@ class ReviewController extends Controller
     
     public function store(ReviewRequest $request, $spotId)
 {
+    \DB::beginTransaction();
+
     try {
         // 口コミの保存
         $review = new Review();
@@ -65,30 +67,33 @@ class ReviewController extends Controller
         $review->is_anonymous = $request->has('is_anonymous');
         $review->save();
 
-        // Cloudinaryに画像をアップロードしてReview_imageに保存
+        // Cloudinaryに画像をアップロードしてReviewImageに保存
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $index => $image) {
                 try {
                     $uploadResult = Cloudinary::upload($image->getRealPath());
-                    $reviewImage = new ReviewImage(); // Review_imageモデルを使用
+                    $reviewImage = new ReviewImage();
                     $reviewImage->review_id = $review->id;
                     $reviewImage->image_path = $uploadResult->getSecurePath();
-                    $reviewImage->name = $request->input('new_image_names')[$index] ?? 'Image'; // 名前が入力されていない場合、'Image'とする
+                    $reviewImage->name = $request->input('new_image_names')[$index] ?? 'Image';
                     $reviewImage->public_id = $uploadResult->getPublicId();
                     $reviewImage->save();
                 } catch (\Exception $e) {
                     \Log::error('Error uploading image to Cloudinary: ' . $e->getMessage());
+                    throw $e; // トランザクション全体を中止するために例外を再スロー
                 }
             }
         }
-        
+
+        \DB::commit();
+
         return redirect()->route('spots.show', $spotId)->with('success', '口コミが投稿されました。');
     } catch (\Exception $e) {
+        \DB::rollBack();
         \Log::error('Error storing review: ' . $e->getMessage());
         return redirect()->route('spots.show', $spotId)->with('error', '口コミ投稿中にエラーが発生しました。');
     }
 }
-
 
     public function edit($id)
     {
