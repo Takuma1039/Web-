@@ -55,18 +55,20 @@ class DashboardController extends Controller
 {
     return Spot::withCount('likes')
         ->join('majorspots', 'spots.id', '=', 'majorspots.spot_id')
-        ->having('likes_count', '>', 0)
+        ->groupBy('spots.id') // スポットIDでグループ化
+        ->having('likes_count', '>', 0) // likes_countが0より大きいものをフィルタリング
         ->orderBy('likes_count', 'desc')
-        ->get(['spots.*']);
+        ->get(['spots.*']); // すべてのスポットカラムを取得
 }
 
 private function getSpotsWithReviews()
 {
     return Spot::withCount('reviews')
         ->join('review_spots', 'spots.id', '=', 'review_spots.spot_id')
-        ->having('reviews_count', '>', 0)
+        ->groupBy('spots.id') // スポットIDでグループ化
+        ->having('reviews_count', '>', 0) // reviews_countが0より大きいものをフィルタリング
         ->orderBy('reviews_count', 'desc')
-        ->get();
+        ->get(['spots.*']); // すべてのスポットカラムを取得
 }
 
 private function getSeasonSpots()
@@ -74,11 +76,13 @@ private function getSeasonSpots()
     return Spot::withCount('likes')
         ->with('months')
         ->join('season_spots', 'spots.id', '=', 'season_spots.spot_id')
-        ->having('likes_count', '>', 0)
+        ->groupBy('spots.id') // スポットIDでグループ化
+        ->having('likes_count', '>', 0) // likes_countが0より大きいものをフィルタリング
         ->orderBy('likes_count', 'desc')
         ->take(10)
-        ->get();
+        ->get(['spots.*']); // すべてのスポットカラムを取得
 }
+
 
 private function getSlideImages($majorspots)
 {
