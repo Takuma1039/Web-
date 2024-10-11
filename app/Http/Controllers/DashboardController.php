@@ -53,36 +53,37 @@ class DashboardController extends Controller
 
     private function getSpotsWithLikes()
 {
-    return Spot::withCount('likes')
+    return Spot::select('spots.*') // spotsテーブルのすべてのカラムを選択
+        ->withCount('likes')
         ->join('majorspots', 'spots.id', '=', 'majorspots.spot_id')
-        ->groupBy('spots.id') // スポットIDでグループ化
-        ->having('likes_count', '>', 0) // likes_countが0より大きいものをフィルタリング
+        ->groupBy('spots.id', 'spots.name', 'spots.body', 'spots.address', 'spots.opendate', 'spots.closedate', 'spots.access', 'spots.price', 'spots.site', 'spots.lat', 'spots.long', 'spots.created_at', 'spots.updated_at', 'spots.deleted_at', 'spots.local_id', 'spots.category_ids', 'spots.season_ids', 'spots.month_ids') // 必要なカラムをすべてグループ化
+        ->having('likes_count', '>', 0)
         ->orderBy('likes_count', 'desc')
-        ->get(['spots.*']); // すべてのスポットカラムを取得
+        ->get();
 }
 
 private function getSpotsWithReviews()
 {
-    return Spot::withCount('reviews')
+    return Spot::select('spots.*') // spotsテーブルのすべてのカラムを選択
+        ->withCount('reviews')
         ->join('review_spots', 'spots.id', '=', 'review_spots.spot_id')
-        ->groupBy('spots.id') // スポットIDでグループ化
-        ->having('reviews_count', '>', 0) // reviews_countが0より大きいものをフィルタリング
+        ->groupBy('spots.id', 'spots.name', 'spots.body', 'spots.address', 'spots.opendate', 'spots.closedate', 'spots.access', 'spots.price', 'spots.site', 'spots.lat', 'spots.long', 'spots.created_at', 'spots.updated_at', 'spots.deleted_at', 'spots.local_id', 'spots.category_ids', 'spots.season_ids', 'spots.month_ids') // 必要なカラムをすべてグループ化
+        ->having('reviews_count', '>', 0)
         ->orderBy('reviews_count', 'desc')
-        ->get(['spots.*']); // すべてのスポットカラムを取得
+        ->get();
 }
 
 private function getSeasonSpots()
 {
-    return Spot::withCount('likes')
-        ->with('months')
+    return Spot::select('spots.*') // spotsテーブルのすべてのカラムを選択
+        ->withCount('likes')
         ->join('season_spots', 'spots.id', '=', 'season_spots.spot_id')
-        ->groupBy('spots.id') // スポットIDでグループ化
-        ->having('likes_count', '>', 0) // likes_countが0より大きいものをフィルタリング
+        ->groupBy('spots.id', 'spots.name', 'spots.body', 'spots.address', 'spots.opendate', 'spots.closedate', 'spots.access', 'spots.price', 'spots.site', 'spots.lat', 'spots.long', 'spots.created_at', 'spots.updated_at', 'spots.deleted_at', 'spots.local_id', 'spots.category_ids', 'spots.season_ids', 'spots.month_ids') // 必要なカラムをすべてグループ化
+        ->having('likes_count', '>', 0)
         ->orderBy('likes_count', 'desc')
         ->take(10)
-        ->get(['spots.*']); // すべてのスポットカラムを取得
+        ->get();
 }
-
 
 private function getSlideImages($majorspots)
 {
