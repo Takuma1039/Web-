@@ -187,4 +187,6 @@ return [
     ])->toArray(),
 
     'google_maps_api_key' => env('GOOGLE_MAPS_API_KEY'),
+    
+    'navitime_api_key' => env('NAVITIME_RAPIDAPI_KEY'),
 ];

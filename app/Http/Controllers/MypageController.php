@@ -3,24 +3,73 @@
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use App\Models\Spot_image;
+use App\Models\Review;
+use Carbon\Carbon;
 
 class MypageController extends Controller
 {
-    public function index()
-    {
-      // 現在のURLを取得
-      $currentUrl = url()->current();
-      $currentPageName = 'マイページ';
+    public function index(Request $request)
+{
+    // 現在のURLを取得
+    $currentUrl = url()->current();
+    $currentPageName = 'マイページ';
 
-      // 履歴の管理
-      $this->updateHistory($request, $currentUrl, $currentPageName);
-        
-      $user = Auth::user();
-      $likedSpots = $user->spotlikes()->with('spot')->get()->pluck('spot');
-
-      return view('mypage.index', compact('likedSpots'));
-    }
+    // 履歴の管理
+    $this->updateHistory($request, $currentUrl, $currentPageName);
     
+    $user = Auth::user();
+    
+    $plans = $user->plans()->with('destinations')->get();
+    
+    foreach ($plans as $plan) {
+            // start_dateが文字列であるかどうかを確認
+            if (is_string($plan->start_date)) {
+                // Carbonインスタンスに変換
+                $plan->start_date = Carbon::createFromFormat('Y-m-d', $plan->start_date);
+            }
+            
+            if (is_string($plan->start_time)) {
+                $plan->start_time = Carbon::createFromFormat('H:i:s', $plan->start_time);
+            }
+        }
+        
+    // お気に入りのスポットを取得
+    $likedSpots = $user->spotlikes()->with('spot.spotimages')->get();
+
+    // スポットデータを処理
+    $this->processSpotData($likedSpots->pluck('spot'));
+
+    return view('mypage.index', compact('likedSpots', 'plans'));
+}
+
+private function processSpotData($spots)
+{
+    // 事前に関連データを取得
+    $spotIds = $spots->pluck('id'); // スポットIDを取得
+
+    $images = Spot_Image::whereIn('spot_id', $spotIds)->get()->groupBy('spot_id');
+    $reviews = Review::whereIn('spot_id', $spotIds)->get()->groupBy('spot_id');
+
+    foreach ($spots as $spot) {
+        // トランケート処理
+        $spot->truncated_body = $this->truncateAtPunctuation($spot->body, 70);
+        
+        // 画像を取得
+        $spot->images = $images[$spot->id] ?? collect(); // 画像を関連付け
+        
+        // 口コミの取得
+        $spot->reviews = $reviews[$spot->id] ?? collect(); // 口コミを関連付け
+        
+        // 総合評価の計算
+        $totalReviews = $spot->reviews->count();
+        $averageRating = $totalReviews > 0 ? $spot->reviews->sum('review') / $totalReviews : 0;
+        
+        // 各スポットに評価を追加
+        $spot->average_rating = number_format($averageRating, 2);
+    }
+}
+
     // 履歴を更新するメソッド
     private function updateHistory(Request $request, $currentUrl, $currentPageName)
     {

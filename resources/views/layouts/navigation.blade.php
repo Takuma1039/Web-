@@ -85,6 +85,7 @@
                                 <i class="fas fa-plus-circle" style="margin-right: 8px;"></i>
                                     旅行プラン作成
                             </a>
+                        @endif
                             <a href="/favorites" class="flex items-center px-4 py-2 mt-2 text-gray-100 hover:bg-gray-400 hover:bg-opacity-25 rounded-2xl" aria-label="Favorites">
                                 <i class="fas fa-people-group" style="margin-right: 8px;"></i>
                                     みんなの旅行計画
@@ -93,7 +94,6 @@
                                 <i class="fas fa-comment-dots" style="margin-right: 8px;"></i>
                                     口コミ投稿一覧
                             </a>
-                        @endif
                         <a href="#" class="flex items-center px-4 py-2 mt-2 text-gray-100 hover:bg-gray-400 hover:bg-opacity-25 rounded-2xl" aria-label="Settings">
                             <i class="fas fa-cog" style="margin-right: 8px;"></i>
                                 設定

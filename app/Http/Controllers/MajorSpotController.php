@@ -24,8 +24,7 @@ class MajorSpotController extends Controller
     $majorranking = Spot::withCount('likes') // いいね数をカウントして取得
         ->having('likes_count', '>', 0) // いいね数が0より大きいスポットだけを取得
         ->orderBy('likes_count', 'desc') // いいね数で降順に並び替え
-        ->take(10) // 上位10件を取得
-        ->get();
+        ->paginate(10);
     
     // 各スポットのbodyを切り捨てる
     foreach ($majorranking as $spot) {

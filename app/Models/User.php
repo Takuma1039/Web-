@@ -67,6 +67,11 @@ class User extends Authenticatable
     {
         return $this->hasMany(Review::class);
     }
+    //旅行計画
+    public function plans()
+    {
+        return $this->hasMany(Plan::class); // Planモデルとのリレーションを定義
+    }
     
     //オンライン・オフライン表示
     public function isOnline()

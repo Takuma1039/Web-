@@ -29,7 +29,7 @@ class ReviewController extends Controller
     $spots = Spot::with('spotimages', 'reviews.user', 'reviews.images') // 口コミのユーザーと画像も一緒に取得
                  ->withCount('reviews') // review数を取得
                  ->orderBy('name', 'asc')
-                 ->paginate(10);
+                 ->paginate(5);
     
     // 各スポットの概要を取得
     foreach ($spots as $spot) {

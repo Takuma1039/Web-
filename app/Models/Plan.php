@@ -12,13 +12,16 @@ class Plan extends Model
     protected $fillable = [
         'user_id', 
         'title', 
-        'start_date'
+        'memo',
+        'start_date',
+        'start_time',
+        'initial_position',
     ];
     
     public function destinations()
     {
         return $this->belongsToMany(Spot::class, 'plan_destinations')
                     ->withPivot('order')
-                    ->orderBy('order'); //目的地を指定された順序で取得
+                    ->orderBy('pivot_order');
     }
 }

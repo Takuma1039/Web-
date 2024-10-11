@@ -82,12 +82,9 @@
 @else
     <p class="text-sm text-gray-500 mt-2">口コミはまだありません。</p>
 @endif
-
-        </div>
-    @endforeach
-
-    <div class="mt-6">
-        {{ $spots->links() }}
-    </div>
+</div>
+@endforeach
+<!-- ページネーションの表示 -->
+<x-pagination :paginator="$spots" />
 </div>
 </x-app-layout>

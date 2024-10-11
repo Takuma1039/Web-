@@ -59,10 +59,6 @@
         </div>
       </div>
 
-      <div class="mt-6 text-center">
-          <a href="javascript:history.back();" class="text-indigo-600 hover:underline">戻る</a>
-        </div>
-
       <div class="flex justify-center mt-8">
         {{ $spots->links() }}
       </div>

@@ -52,8 +52,8 @@
         <div id="swipe-container" class="overflow-x-scroll scrollbar-hide mb-4 relative px-0.5" style="overflow-y: hidden;">
           <div id="swipe-content" class="flex snap-x snap-mandatory gap-4" style="width: max-content;">
             <!-- 各カードのループ -->
-            @foreach ($majorspots as $spot)
-              <x-spot-card :spot="$spot" />
+            @foreach ($majorspots as $index => $spot)
+              <x-spot-card :spot="$spot" :ranking="$index + 1"/>
             @endforeach
           </div>
         </div>
@@ -70,8 +70,8 @@
         <div id="swipe-container" class="overflow-x-scroll scrollbar-hide mb-4 relative px-0.5" style="overflow-y: hidden;">
           <div id="swipe-content" class="flex snap-x snap-mandatory gap-4" style="width: max-content;">
             <!-- 各カードのループ -->
-            @foreach ($reviewspots as $spot)
-              <x-spot-card :spot="$spot" />
+            @foreach ($reviewspots as $index => $spot)
+              <x-spot-card :spot="$spot" :ranking="$index + 1"/>
             @endforeach
           </div>
         </div>
@@ -85,8 +85,8 @@
         <div id="swipe-container" class="overflow-x-scroll scrollbar-hide mb-4 relative px-0.5" style="overflow-y: hidden;">
           <div id="swipe-content" class="flex snap-x snap-mandatory gap-4" style="width: max-content;">
             <!-- 各カードのループ -->
-            @foreach ($seasonspots as $spot)
-              <x-spot-card :spot="$spot" />
+            @foreach ($seasonspots as $index => $spot)
+              <x-spot-card :spot="$spot" :ranking="$index + 1"/>
             @endforeach
           </div>
         </div>

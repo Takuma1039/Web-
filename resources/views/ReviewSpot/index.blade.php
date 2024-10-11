@@ -55,11 +55,15 @@
                 <div class="w-1/2 pl-2">
                   <!-- 画像を表示 -->
                   @if ($spot->spotimages->isNotEmpty())
-                    <img src="{{ $spot->spotimages->first()->image_path }}" alt="{{ $spot->name }}" class="w-full h-48 object-cover rounded-lg">
+                    <a onclick="openModal('{{ $spot->spotimages->first()->image_path ?? asset('images/default-image.jpg') }}')">
+                      <img src="{{ $spot->spotimages->first()->image_path }}" alt="{{ $spot->name }}" class="w-full h-48 object-cover rounded-lg">
+                    </a>
                   @else
                     <img src="/images/no_image_available.png" alt="No image" class="w-full h-48 object-cover rounded-lg">
                   @endif
                 </div>
+                <!-- モーダルコンポーネント -->
+                <x-modal-window />
               </div>
             </div>
           @empty
@@ -67,17 +71,10 @@
           @endforelse
         </div>
       </div>
-      <div class="footer mt-6">
-        <a href="javascript:history.back();" class="text-blue-500 hover:underline">戻る</a>
-      </div>
-      <!-- ページネーション -->
-      <div class="flex justify-center mt-8">
-        <button class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">Previous</button>
-        <button class="px-4 py-2 mx-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">1</button>
-        <button class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">2</button>
-        <button class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">3</button>
-        <button class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">Next</button>
-      </div>
+
+        <!-- ページネーションの表示 -->
+<x-pagination :paginator="$reviewranking" />
+        
     </div>
   </div>
 </x-app-layout>

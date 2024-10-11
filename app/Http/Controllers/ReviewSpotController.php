@@ -25,8 +25,7 @@ class ReviewSpotController extends Controller
     $reviewranking = Spot::withCount('reviews') // reviewsはリレーション名
         ->having('reviews_count', '>', 0)      // review数が0より大きいスポットだけを取得
         ->orderBy('reviews_count', 'desc')  // review数で降順に並び替え
-        ->take(10)  // 上位10件を取得
-        ->get();
+        ->paginate(10);
 
     // 各スポットのbodyを切り捨てる
     foreach ($reviewranking as $spot) {
