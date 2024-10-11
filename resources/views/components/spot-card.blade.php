@@ -8,17 +8,17 @@
                 @if ($ranking == 1)
                     <!-- 1位の画像アイコン -->
                     <div class="absolute top-2 px-3 py-1">
-                        <img src="{{ asset('storage/image/gold-medal.png') }}" alt="1st place" class="w-10 h-10">
+                        <img src="{{ cloudinary_url('gold-medal_duja3h.png') }}" alt="1st place" class="w-10 h-10">
                     </div>
                 @elseif ($ranking == 2)
                     <!-- 2位の画像アイコン -->
                     <div class="absolute top-2 px-3 py-1">
-                        <img src="{{ asset('storage/image/silver-medal.png') }}" alt="2nd place" class="w-10 h-10">
+                        <img src="{{ cloudinary_url('silver-medal_p8dxig.png') }}" alt="2nd place" class="w-10 h-10">
                     </div>
                 @elseif ($ranking == 3)
                     <!-- 3位の画像アイコン -->
                     <div class="absolute top-2 px-3 py-1">
-                        <img src="{{ asset('storage/image/bronze-medal.png') }}" alt="3rd place" class="w-10 h-10">
+                        <img src="{{ cloudinary_url('bronze-medal_gbru8n.png') }}" alt="3rd place" class="w-10 h-10">
                     </div>
                 @endif
             @endif
