@@ -147,7 +147,11 @@
             <div class="bg-white rounded-lg shadow-lg p-6 max-w-md w-full transition-transform transform scale-95 hover:scale-100">
               <h3 class="text-xl font-bold mb-4 text-center text-blue-600">口コミを投稿</h3>
 
-              <!-- エラーメッセージの表示 -->
+              <!-- 口コミ投稿フォーム -->
+              <x-review-form :spotId="$spot->id" />
+            </div>
+          </div>
+          <!-- エラーメッセージの表示 -->
               @if ($errors->any())
                 <div class="mb-4 text-red-600">
                   <ul>
@@ -157,10 +161,6 @@
                   </ul>
                 </div>
               @endif
-              <!-- 口コミ投稿フォーム -->
-              <x-review-form :spotId="$spot->id" />
-            </div>
-          </div>
 
           <!--口コミの表示-->
           @if($reviews->isEmpty())
