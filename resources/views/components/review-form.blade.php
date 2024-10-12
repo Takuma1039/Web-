@@ -2,7 +2,7 @@
     @csrf
     <div class="mb-4">
         <label for="title" class="block mb-2 text-gray-700 font-semibold">タイトル:</label>
-        <input type="text" id="title" name="title" required maxlength="50" 
+        <input type="text" id="title" name="title" value="{{ old('title') }}" required maxlength="50" 
             class="block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2 transition duration-150 ease-in-out">
         @error('title')
             <span class="text-red-500 text-sm">{{ $message }}</span>
@@ -11,7 +11,7 @@
 
     <div class="mb-4">
         <label for="review" class="block mb-2 text-gray-700 font-semibold">評価:</label>
-        <input type="number" id="review" name="review" required step="0.1" min="1.0" max="5.0" 
+        <input type="number" id="review" name="review" value="{{ old('review') }}" required step="0.1" min="1.0" max="5.0" 
             class="block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2 transition duration-150 ease-in-out" 
             placeholder="1.0 - 5.0の範囲で入力">
         @error('review')
@@ -22,7 +22,7 @@
     <div class="mb-4">
         <label for="comment" class="block mb-2 text-gray-700 font-semibold">口コミ:</label>
         <textarea id="comment" name="comment" rows="4" required 
-            class="block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2 transition duration-150 ease-in-out"></textarea>
+            class="block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2 transition duration-150 ease-in-out">{{ old('comment') }}</textarea>
         @error('comment')
             <span class="text-red-500 text-sm">{{ $message }}</span>
         @enderror
@@ -31,6 +31,9 @@
     <div>
         <!--画像のプレビューコンポーネント追加-->
         <x-image-preview input-name="images[]" />
+        @error('images')
+            <span class="text-red-500 text-sm">{{ $message }}</span>
+        @enderror
     </div>
     
     <!-- 匿名選択用チェックボックス -->
@@ -44,16 +47,17 @@
         <button type="submit" class="bg-blue-600 text-white rounded-lg px-4 py-2 hover:bg-blue-700 transition">送信</button>
         <button type="button" id="closeModal" class="ml-2 bg-gray-300 rounded-lg px-4 py-2 hover:bg-gray-400 transition">キャンセル</button>
     </div>
+
     <!-- エラーメッセージの表示 -->
-              @if ($errors->any())
-                <div class="mb-4 text-red-600">
-                  <ul>
-                    @foreach ($errors->all() as $error)
-                      <li>{{ $error }}</li>
-                    @endforeach
-                  </ul>
-                </div>
-              @endif
+    @if ($errors->any())
+        <div class="mb-4 text-red-600 bg-red-100 p-3 rounded-md">
+            <ul class="list-disc list-inside">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 </form>
 <script>
     //口コミ投稿メッセージ表示用
