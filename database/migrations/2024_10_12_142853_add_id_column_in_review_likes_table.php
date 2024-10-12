@@ -18,6 +18,8 @@ return new class extends Migration
             // ただし、通常は以下のように制約を削除します
             $table->dropForeign(['user_id']);
             $table->dropForeign(['review_id']);
+            
+            $table->dropPrimary(['user_id', 'review_id']);
         });
 
         // 次に、idカラムを追加し、それをプライマリーキーとして設定
