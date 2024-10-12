@@ -9,6 +9,8 @@ class ReviewLike extends Model
 {
     use HasFactory;
     
+    public $incrementing = false;
+    
     protected $fillable = ['user_id', 'review_id'];
 
     public function user()
