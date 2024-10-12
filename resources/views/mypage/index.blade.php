@@ -11,11 +11,13 @@
         @if($likedSpots->isEmpty())
         <p>まだお気に入り登録したスポットはありません。</p>
       @else
-        <div id="swipe-container" class="overflow-x-scroll scrollbar-hide mb-4 relative px-0.5" style="overflow-y: hidden;">
-          <div id="swipe-content" class="flex snap-x snap-mandatory gap-4" style="width: max-content;">
+        <div id="swipe-container" class="overflow-x-scroll scrollbar-hide mb-4 relative px-2 sm:px-4">
+          <div id="swipe-content" class="flex snap-x snap-mandatory gap-4 w-max">
             <!-- 各カードのループ -->
             @foreach ($likedSpots as $likedSpot)
-              <x-spot-card :spot="$likedSpot->spot" />
+              <div class="w-full sm:w-48 md:w-64 lg:w-72">
+                <x-spot-card :spot="$likedSpot->spot" />
+              </div>
             @endforeach
           </div>
         </div>
@@ -26,76 +28,75 @@
 
 
     <!-- 作成した旅行計画セクション -->
-    <div class="mb-8">
-        <div class="flex items-center mt-4 mb-2">
-          <h1 class="text-xl md:text-2xl font-semibold mr-2">作成した旅行計画</h1>
-          <x-view-more-button route="plans.index" />
-        </div>
-        @if($likedSpots->isEmpty())
-          <p>まだ作成した旅行計画はありません。</p>
-        @else
+<div class="mb-8">
+    <div class="flex items-center mt-4 mb-2">
+        <h1 class="text-xl md:text-2xl font-semibold mr-2">作成した旅行計画</h1>
+        <x-view-more-button route="plans.index" />
+    </div>
+    @if($plans->isEmpty())
+        <p>まだ作成した旅行計画はありません。</p>
+    @else
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        @foreach ($plans as $plan)
-          <div class="p-6 max-w-sm bg-white rounded-lg border border-gray-200 shadow-md hover:shadow-lg transition duration-300">
-            <h2 class="text-xl font-bold mb-4">{{ $plan->title }}</h2>
-            <p class="text-gray-700 mb-2">旅行日: {{ $plan->start_date->format('Y年m月d日') }} {{ $plan->start_time->format('H時i分') }}</p>
-            <ul class="list-disc pl-5">
-              @foreach ($plan->destinations as $destination)
-                <li>{{ $destination->name }}</li>
-               @endforeach
-            </ul>
-            <div class="mt-4 flex justify-between">
-              <a href="{{ route('plans.show', $plan->id) }}" class="text-blue-600 hover:underline">
-                詳細を見る
-              </a>
-              <form action="{{ route('plans.destroy', $plan->id) }}" method="POST" onsubmit="return confirm('本当に削除しますか？');">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="text-red-600 hover:underline">削除</button>
-              </form>
-            </div>
-          </div>
-        @endforeach
+            @foreach ($plans as $plan)
+                <div class="p-6 max-w-sm bg-white rounded-lg border border-gray-200 shadow-md hover:shadow-lg transition duration-300">
+                    <h2 class="text-xl font-bold mb-4">{{ $plan->title }}</h2>
+                    <p class="text-gray-700 mb-2">旅行日: {{ $plan->start_date->format('Y年m月d日') }} {{ $plan->start_time->format('H時i分') }}</p>
+                    <ul class="list-disc pl-5">
+                        @foreach ($plan->destinations as $destination)
+                            <li>{{ $destination->name }}</li>
+                        @endforeach
+                    </ul>
+                    <div class="mt-4 flex justify-between items-center">
+                        <a href="{{ route('plans.show', $plan->id) }}" class="text-blue-600 hover:underline">
+                            詳細を見る
+                        </a>
+                        <form action="{{ route('plans.destroy', $plan->id) }}" method="POST" onsubmit="return confirm('本当に削除しますか？');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="text-red-600 hover:underline">削除</button>
+                        </form>
+                    </div>
+                </div>
+            @endforeach
         </div>
-        @endif
-      </div>
+    @endif
+</div>
 
-    <!-- いいねした旅行計画一覧セクション -->
-    <div class="mb-8">
-        <div class="flex items-center mt-4 mb-2">
-          <h1 class="text-xl md:text-2xl font-semibold mr-2">いいねした旅行計画</h1>
-          <x-view-more-button route="plans.index" />
-        </div>
-        @if($likedSpots->isEmpty())
-          <p>まだいいねした旅行計画はありません。</p>
-        @else
+<!-- いいねした旅行計画一覧セクション -->
+<div class="mb-8">
+    <div class="flex items-center mt-4 mb-2">
+        <h1 class="text-xl md:text-2xl font-semibold mr-2">いいねした旅行計画</h1>
+        <x-view-more-button route="plans.index" />
+    </div>
+    @if($likedSpots->isEmpty())
+        <p>まだいいねした旅行計画はありません。</p>
+    @else
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        @foreach ($plans as $plan)
-          <div class="p-6 max-w-sm bg-white rounded-lg border border-gray-200 shadow-md hover:shadow-lg transition duration-300">
-            <h2 class="text-xl font-bold mb-4">{{ $plan->title }}</h2>
-            <p class="text-gray-700 mb-2">旅行日: {{ $plan->start_date->format('Y年m月d日') }} {{ $plan->start_time->format('H時i分') }}</p>
-            <ul class="list-disc pl-5">
-              @foreach ($plan->destinations as $destination)
-                <li>{{ $destination->name }}</li>
-               @endforeach
-            </ul>
-            <div class="mt-4 flex justify-between">
-              <a href="{{ route('plans.show', $plan->id) }}" class="text-blue-600 hover:underline">
-                詳細を見る
-              </a>
-              <form action="{{ route('plans.destroy', $plan->id) }}" method="POST" onsubmit="return confirm('本当に削除しますか？');">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="text-red-600 hover:underline">削除</button>
-              </form>
-            </div>
-          </div>
-        @endforeach
+            @foreach ($plans as $plan)
+                <div class="p-6 max-w-sm bg-white rounded-lg border border-gray-200 shadow-md hover:shadow-lg transition duration-300">
+                    <h2 class="text-xl font-bold mb-4">{{ $plan->title }}</h2>
+                    <p class="text-gray-700 mb-2">旅行日: {{ $plan->start_date->format('Y年m月d日') }} {{ $plan->start_time->format('H時i分') }}</p>
+                    <ul class="list-disc pl-5">
+                        @foreach ($plan->destinations as $destination)
+                            <li>{{ $destination->name }}</li>
+                        @endforeach
+                    </ul>
+                    <div class="mt-4 flex justify-between items-center">
+                        <a href="{{ route('plans.show', $plan->id) }}" class="text-blue-600 hover:underline">
+                            詳細を見る
+                        </a>
+                        <form action="{{ route('plans.destroy', $plan->id) }}" method="POST" onsubmit="return confirm('本当に削除しますか？');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="text-red-600 hover:underline">削除</button>
+                        </form>
+                    </div>
+                </div>
+            @endforeach
         </div>
-        @endif
-      </div>
+    @endif
+</div>
 
-  </div>
 
   <script>
     // スワイプ操作の実装

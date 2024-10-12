@@ -64,4 +64,31 @@
 #dialog {
     display: none; /* デフォルトで非表示 */
 }
+/* スマホサイズ (最大幅 640px) */
+@media (max-width: 640px) {
+  #swipe-content {
+    width: 100%;
+  }
+}
+
+/* タブレットサイズ (641px 〜 768px) */
+@media (min-width: 641px) and (max-width: 768px) {
+  #swipe-content {
+    width: 75%;
+  }
+}
+
+/* 小型デスクトップ (769px 〜 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  #swipe-content {
+    width: 60%;
+  }
+}
+
+/* 大型デスクトップ (1025px以上) */
+@media (min-width: 1025px) {
+  #swipe-content {
+    width: 50%;
+  }
+}
 

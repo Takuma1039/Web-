@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div class="container mx-auto">
+    <div class="container mx-auto ">
         <h1 class="text-4xl font-extrabold text-gray-800 text-center">旅行計画を作成</h1>
 
         <form action="{{ route('plans.store') }}" method="POST" class="bg-white p-8 rounded-lg shadow-lg space-y-6">

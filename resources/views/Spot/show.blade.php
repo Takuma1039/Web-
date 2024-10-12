@@ -4,7 +4,7 @@
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
         <div class="flex items-center justify-between mb-4">
           <div class="flex items-center">
-            <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white flex items-center">
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white flex items-center">
               {{ $spot->name }}
               @auth
                 <div class="ml-4">
@@ -134,6 +134,16 @@
         <div class="reviews mt-8">
           <div class="flex items-center justify-between mb-6">
             <h3 class="text-2xl font-bold text-gray-900 dark:text-white">口コミ一覧</h3>
+            <!-- エラーメッセージの表示 -->
+              @if ($errors->any())
+                <div class="mb-4 text-red-600">
+                  <ul>
+                    @foreach ($errors->all() as $error)
+                      <li>{{ $error }}</li>
+                    @endforeach
+                  </ul>
+                </div>
+              @endif
             @auth
             <!-- 口コミ投稿のボタン -->
             <button id="reviewBtn" class="inline-block rounded-lg border border-blue-600 bg-blue-600 text-white hover:bg-blue-700 hover:border-blue-700 transition px-4 py-2 shadow-md">
@@ -158,23 +168,20 @@
           @else
             @foreach($reviews as $review)
               <div class="review bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg mb-4 transition-transform transform">
-                <div class="flex items-center justify-between mb-2">
+                <div class="flex flex-col sm:flex-row justify-between mb-2">
                   <div class="flex items-center">
+                    <!-- 星評価部分 -->
                     @for ($i = 0; $i < 5; $i++)
                       @php
-                        $currentValue = $i + 1; // 現在の星の値（1〜5）
-                        $reviewValue = floatval($review->review); // 評価をfloat型に変換
-
-                        // 星の状態を判定
-                        $fullStar = $reviewValue >= $currentValue; // 完全な星の表示
-                        $partialStar = !$fullStar && $reviewValue > $currentValue - 1 && $reviewValue < $currentValue; // 部分的な星の表示
-                        $fillPercentage = $partialStar ? ($reviewValue - ($currentValue - 1)) * 100 : 0; // 部分的な星の塗り
+                        $currentValue = $i + 1;
+                        $reviewValue = floatval($review->review);
+                        $fullStar = $reviewValue >= $currentValue;
+                        $partialStar = !$fullStar && $reviewValue > $currentValue - 1 && $reviewValue < $currentValue;
+                        $fillPercentage = $partialStar ? ($reviewValue - ($currentValue - 1)) * 100 : 0;
                       @endphp
 
                       <div class="relative inline-block">
-                        <!-- 空の星のベースを描画 -->
                         <i class="fa-solid fa-star text-gray-300 text-xl"></i>
-                        <!-- 星の色塗り判定 -->
                         @if ($fullStar)
                           <i class="fa-solid fa-star text-yellow-500 text-xl absolute top-0 left-0"></i>
                         @elseif ($partialStar)
@@ -186,19 +193,12 @@
                     @endfor
 
                     <span class="text-gray-600 ml-2 font-semibold">{{ number_format($reviewValue, 1) }}</span>
-                    <span class="ml-2 text-gray-700 font-semibold">
-                      投稿者: 
-                      @if ($review->is_anonymous)
-                        匿名
-                      @else
-                        {{ $review->user->name }}
-                      @endif
-                    </span>
+                    <span class="ml-2 text-gray-700 font-semibold">投稿者: {{ $review->is_anonymous ? '匿名' : $review->user->name }}</span>
                   </div>
 
                   @auth
                     @if (Auth::id() === $review->user_id)
-                      <div class="flex space-x-2">
+                      <div class="flex space-x-2 mt-2 sm:mt-0">
                         <a href="{{ route('reviews.edit', $review->id) }}" class="text-blue-600 hover:underline">編集</a>
                         <form action="{{ route('reviews.destroy', $review->id) }}" method="POST" onsubmit="return confirm('本当に削除しますか？');">
                           @csrf
@@ -223,16 +223,15 @@
                     <span id="like-message-{{ $review->id }}" class="ml-2 text-pink-600 hidden text-sm font-semibold bg-pink-100 px-2 py-1 rounded-md transition duration-300"></span> <!-- メッセージ表示用 -->
                   </div>
                 @endauth
-                <p class="text-gray-700 font-semibold text-lg mt-1 transition-colors duration-200 ease-in-out">
-                  {{ $review->title }}
-                </p>
+
+                <p class="text-gray-700 font-semibold text-lg mt-1">{{ $review->title }}</p>
                 <p class="text-gray-700 mt-2">{{ $review->comment }}</p>
 
                 <!-- 画像ギャラリー -->
-                <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-6 xl:gap-8 mt-4">
-                  @foreach($reviewImages[$review->id] as $index => $review_img)
-                    <a class="group relative flex h-32 items-end overflow-hidden rounded-lg shadow-lg transition-transform duration-300 transform hover:scale-105" onclick="openModal('{{ $review_img->image_path }}')">
-                      <img src="{{ $review_img->image_path }}" loading="lazy" alt="Image" class="absolute inset-0 h-full w-full object-cover object-center transition duration-200 group-hover:opacity-90" />
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-4"> <!-- レスポンシブグリッド -->
+                  @foreach($reviewImages[$review->id] as $review_img)
+                    <a class="group relative flex h-32 items-end overflow-hidden rounded-lg shadow-lg transition-transform transform hover:scale-105" onclick="openModal('{{ $review_img->image_path }}')">
+                      <img src="{{ $review_img->image_path }}" loading="lazy" alt="Image" class="absolute inset-0 h-full w-full object-cover transition duration-200 group-hover:opacity-90" />
                       <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-gray-800 via-transparent to-transparent opacity-40"></div>
                       <span class="relative ml-4 mb-3 inline-block text-sm text-white">{{ $review_img->name }}</span>
                     </a>
@@ -243,18 +242,15 @@
           @endif
         </div>
       </div>
-
       @php
         $yourDeveloperId = 1; // 開発者のIDを指定
       @endphp
-      @auth
+      @if (auth()->user()->id === $yourDeveloperId)
         <div class="mt-4 text-right">
           <p>ログインユーザー: {{ Auth::user()->name }}</p>
-          @if (auth()->user()->id === $yourDeveloperId)
           <a href="/spots/{{ $spot->id }}/edit" class="text-indigo-600 hover:underline">編集</a>
-          @endif
         </div>
-      @endauth
+      @endif
     </div>
   </div>
   <script>

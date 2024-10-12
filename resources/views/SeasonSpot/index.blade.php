@@ -1,6 +1,6 @@
 <x-app-layout>
   <div class="bg-gray-100 min-h-screen">
-    <div class="container mx-auto py-8">
+    <div class="container mx-auto px-1 py-8">
       <!-- タイトル -->
       <h1 class="text-3xl font-bold text-gray-800 text-center mb-6">
         今の時期におすすめなスポットランキング({{ $currentMonth }}月)
@@ -15,25 +15,20 @@
           @php
             $currentRank = 1;  // 現在の順位
             $previousLikeCount = null;  // 前のいいね数を保存するための変数
-            $skipCount = 0;  // 同じ順位が連続した場合にスキップするための変数
           @endphp
 
           @forelse($seasonranking as $index => $spot)
             @php
               // 現在のスポットのいいね数と前のスポットのいいね数を比較
               if ($previousLikeCount === null || $previousLikeCount !== $spot->likes_count) {
-                // 前のスポットといいね数が異なる場合は、順位を更新
-                $currentRank += $skipCount;  // スキップしていた分を順位に加算
-                $skipCount = 1;  // スキップ数をリセット
-              } else {
-                // 同じいいね数ならスキップ数を増やす
-                $skipCount++;
+                // いいね数が異なる場合は、現在の順位をインクリメント
+                $currentRank = $index + 1;  // 順位を更新
               }
               $previousLikeCount = $spot->likes_count;  // 現在のいいね数を前のいいね数に更新
             @endphp
-            <div class="p-4 bg-white rounded-lg shadow-md mb-4">
+            <div class="p-4 bg-white rounded-lg shadow-lg mb-4 border border-gray-300 hover:shadow-xl transition-shadow duration-300">
               <div class="flex items-center mb-2">
-                <span class="text-xl font-semibold text-blue-500">第{{ $index + 1 }}位</span>
+                <span class="text-xl font-semibold text-blue-500">第{{ $currentRank }}位</span>
                 <a href="/spots/{{ $spot->id }}" class="ml-4 text-xl font-bold text-indigo-600 hover:underline">
                   {{ $spot->name }}
                 </a>
@@ -45,8 +40,8 @@
                 @endauth
               </div>
           
-              <div class="flex mb-2">
-                <div class="w-full sm:w-1/2 pr-0 sm:pr-2">
+              <div class="flex flex-col lg:flex-row mb-2">
+                <div class="w-full lg:w-1/2 pr-2">
                   <p class="text-gray-600 mb-2">
                     {{ $spot->truncated_body }} <!-- 切り捨てた本文を表示 -->
                   </p>
@@ -58,7 +53,7 @@
                   @endif
                 </div>
                 
-                <div class="w-full sm:w-1/2 pl-0 sm:pl-2">
+                <div class="w-full lg:w-1/2 pl-2">
                   <!-- 画像を表示 -->
                   @if ($spot->spotimages->isNotEmpty())
                     <a onclick="openModal('{{ $spot->spotimages->first()->image_path ?? asset('images/default-image.jpg') }}')">
