@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('review_likes', function (Blueprint $table) {
             $table->id();
+            // いいねしたユーザーのid
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            // いいねされた口コミのid
+            $table->foreignId('review_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }
