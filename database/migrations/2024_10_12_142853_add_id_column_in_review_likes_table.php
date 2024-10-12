@@ -13,20 +13,16 @@ return new class extends Migration
     {
         // まず、既存のプライマリーキーを削除
         Schema::table('review_likes', function (Blueprint $table) {
-            // idカラムが存在しない場合は追加
-            if (!Schema::hasColumn('review_likes', 'id')) {
-                $table->bigIncrements('id')->first(); // auto-incrementing primary key
-            }
-
+            
             // 既存のプライマリーキーを削除
             $table->dropPrimary(['user_id', 'review_id']);
             // 外部キーを削除
             $table->dropForeign(['user_id']);
             $table->dropForeign(['review_id']);
 
-            // 再度外部キー制約を追加
-            $table->foreignId('user_id')->constrained()->onDelete('cascade')->change();
-            $table->foreignId('review_id')->constrained()->onDelete('cascade')->change();
+            $table->id()->first(); // 既存のカラムの最初に追加
+            // 新しい主キーを設定
+            $table->primary(['id']);
         });
     }
 
