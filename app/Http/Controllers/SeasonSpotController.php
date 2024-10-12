@@ -36,13 +36,8 @@ class SeasonSpotController extends Controller
     })->with('months')->withCount('likes');
 
     // ページネーションとソートを適用
-    $seasonranking = $spots->where(function($query) {
-        $query->selectRaw('count(*)')
-            ->from('spotlikes')
-            ->whereColumn('spotlikes.spot_id', 'spots.id');
-    }, '>', 0) // サブクエリを使っていいね数が0より大きいものだけを取得
-    ->orderByRaw('(select count(*) from spotlikes where spotlikes.spot_id = spots.id) desc') // いいね数で降順に並び替え
-    ->paginate(10);
+    $seasonranking = $spots->orderByRaw('(select count(*) from spotlikes where spotlikes.spot_id = spots.id) desc') // いいね数で降順に並び替え
+        ->paginate(10);
     
     // 各スポットのbodyを切り捨てる
     foreach ($seasonranking as $spot) {

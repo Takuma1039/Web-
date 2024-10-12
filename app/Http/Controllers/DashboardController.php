@@ -81,16 +81,10 @@ private function getSeasonSpots()
 {
     return Spot::select('spots.*')
         ->join('season_spots', 'spots.id', '=', 'season_spots.spot_id')
-        ->where(function ($query) {
-            $query->selectRaw('count(*)')
-                ->from('spotlikes')
-                ->whereColumn('spotlikes.spot_id', 'spots.id');
-        }, '>', 0)  // likes_count をWHEREでフィルタ
         ->orderByRaw('(select count(*) from spotlikes where spotlikes.spot_id = spots.id) desc') // likes_count をORDER BYで指定
         ->take(10)
         ->get();
 }
-
 
 private function getSlideImages($majorspots)
 {
