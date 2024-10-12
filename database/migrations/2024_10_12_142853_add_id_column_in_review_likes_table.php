@@ -16,9 +16,6 @@ return new class extends Migration
             
             // 既存のプライマリーキーを削除
             $table->dropPrimary(['user_id', 'review_id']);
-            // 外部キーを削除
-            $table->dropForeign(['user_id']);
-            $table->dropForeign(['review_id']);
 
             $table->id()->first(); // 既存のカラムの最初に追加
             // 新しい主キーを設定
