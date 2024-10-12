@@ -54,6 +54,7 @@ class ReviewController extends Controller
     
     public function store(ReviewRequest $request, $spotId)
 {
+    \Log::info('Request Payload:', $request->all());
     \DB::beginTransaction();
 
     try {
