@@ -19,8 +19,8 @@
         <h2 class="text-xl font-semibold leading-tight">{{ $spot->name }}</h2>
     </a>
     <div class="flex items-center ml-4">
-        <x-rating :average-rating="$averageRating" class="h-6" />
-        <span class="text-gray-600 ml-2 font-semibold leading-tight">総合評価: {{ number_format($averageRating, 2) }}</span>
+        <x-rating :average-rating="$spot->average_rating" class="h-6" />
+        <span class="text-gray-600 ml-2 font-semibold leading-tight">総合評価: {{ number_format($spot->average_rating, 2) }}</span>
     </div>
 </div>
             

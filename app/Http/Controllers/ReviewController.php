@@ -34,12 +34,10 @@ class ReviewController extends Controller
     // 各スポットの概要を取得
     foreach ($spots as $spot) {
         $spot->truncated_body = $this->truncateAtPunctuation($spot->body, 150);
+        
+        // 各スポットの総合評価を計算
+        $spot->average_rating = $spot->reviews->avg('review') ?? 0; // 各スポットのレビューの平均を取得
     }
-
-    // 総合評価の計算
-    $averageRating = $spots->flatMap(function ($spot) {
-        return $spot->reviews;
-    })->avg('review') ?? 0;
 
     return view('reviews.index')->with([
         'spots' => $spots,
@@ -47,7 +45,6 @@ class ReviewController extends Controller
         'locals' => $local->get(),
         'seasons' => $season->get(),
         'months' => $month->get(),
-        'averageRating' => $averageRating,
     ]);
 }
 
