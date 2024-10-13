@@ -18,7 +18,7 @@
             $rankings = [];
 
             // いいね数で順位を計算
-            $currentRank = 0; // 現在の順位
+            $currentRank = ($seasonranking->currentPage() - 1) * $seasonranking->perPage();  // 現在の順位
             $previousLikeCount = null; // 前のスポットのいいね数を保存
 
             foreach ($allSpots as $spot) {
