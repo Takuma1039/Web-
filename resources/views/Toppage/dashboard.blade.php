@@ -1,5 +1,5 @@
 <x-app-layout>
-  <div class="mx-auto max-w-screen-xl bg-gray-100">
+  <div class="mx-auto max-w-screen-xl bg-white">
     <div class="overflow-hidden">
       <div class="flex-1 overflow-auto py-1">
         <!-- 検索バーコンポーネント -->
@@ -42,7 +42,7 @@
         </div>
                 
         <!-- 人気スポットランキング -->
-        <div class="bg-gray-100 border border-gray-300 p-2 mt-2 mb-2"> 
+        <div class="bg-white border border-gray-300 p-2 mt-2 mb-2"> 
           <div class="flex items-center mb-2">
             <h1 class="text-base sm:text-lg md:text-xl font-semibold mr-1">人気スポットランキング</h1>
             <x-view-more-button route="major.ranking" />
@@ -58,9 +58,11 @@
             </div>
           </div>
         </div>
+        
+        <x-modal-window />
 
         <!-- 口コミスポットランキング -->
-        <div class="bg-gray-100 border border-gray-300 p-2 mt-2 mb-2"> 
+        <div class="bg-white border border-gray-300 p-2 mt-2 mb-2"> 
           <div class="flex items-center mb-2">
             <h1 class="text-base sm:text-lg md:text-xl font-semibold mr-1">口コミスポットランキング</h1>
             <x-view-more-button route="review.ranking" />
@@ -78,7 +80,7 @@
         </div>
 
 <!-- 今の時期におすすめなスポットランキング -->
-<div class="bg-gray-100 border border-gray-300 p-2 mt-2 mb-2"> 
+<div class="bg-white border border-gray-300 p-2 mt-2 mb-2"> 
     <div class="flex items-center mb-2">
         <h1 class="text-base sm:text-lg md:text-xl font-semibold mr-1">今の時期におすすめなスポットランキング</h1>
         <x-view-more-button route="season.ranking" />
@@ -96,7 +98,7 @@
 </div>
 
 <!-- スポット一覧 -->
-<div class="bg-gray-100 border border-gray-300 p-2 mt-2 mb-2"> 
+<div class="bg-white border border-gray-300 p-2 mt-2 mb-2"> 
     <div class="flex items-center mb-2">
         <h1 class="text-base sm:text-lg md:text-xl font-semibold mr-1">スポット一覧</h1>
         <x-view-more-button route="spots.index" />

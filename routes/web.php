@@ -84,7 +84,7 @@ Route::middleware('auth', 'activity')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::controller(PlanController::class)->middleware(['auth'])->group(function(){
+Route::controller(PlanController::class)->middleware(['activity'])->group(function(){
     Route::get('/plans', 'index')->name('plans.index'); //旅行計画一覧
     Route::get('/plans/create', 'create')->name('plans.create'); //旅行計画の作成
     Route::get('/plans/{plan}', 'show')->name('plans.show'); //旅行計画の詳細

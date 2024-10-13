@@ -1,5 +1,5 @@
 <x-app-layout>
-<div class="container mx-auto mt-10">
+<div class="container mx-auto p-1">
     <h1 class="text-4xl font-extrabold text-gray-800 text-center mb-8">口コミ投稿一覧</h1>
     
     <!-- おしゃれなメッセージボックス -->
