@@ -82,7 +82,6 @@ private function getSeasonSpots()
     return Spot::select('spots.*')
         ->join('season_spots', 'spots.id', '=', 'season_spots.spot_id')
         ->orderByRaw('(select count(*) from spotlikes where spotlikes.spot_id = spots.id) desc') // likes_count をORDER BYで指定
-        ->take(10)
         ->get();
 }
 
