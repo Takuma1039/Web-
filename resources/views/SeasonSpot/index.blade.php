@@ -13,14 +13,14 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div class="col-span-2">
           @php
-            $currentRank = 0;  // 現在の順位
+            $currentRank = ($seasonranking->currentPage() - 1) * $seasonranking->perPage(); // 前のページのランキングを引き継ぎ
           @endphp
 
           @forelse($seasonranking as $index => $spot)
             @php
               // いいね数に基づいて順位を設定
               if ($index === 0 || $spot->likes_count !== $seasonranking[$index - 1]->likes_count) {
-                $currentRank = $index + 1;  // 順位を更新
+                $currentRank++;  // 順位を更新
               }
             @endphp
             <div class="p-4 bg-white rounded-lg shadow-lg mb-4 border border-gray-300 hover:shadow-xl transition-shadow duration-300">
