@@ -13,21 +13,27 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div class="col-span-2">
           @php
-            $currentRank = ($seasonranking->currentPage() - 1) * $seasonranking->perPage(); // 前のページのランキングを引き継ぎ
-            $previousLikeCount = null;
-          @endphp
+            // 全体のスポットを取得していいね数でソート
+            $allSpots = $seasonranking->sortByDesc('likes_count');
+            $rankings = [];
 
-          @forelse($seasonranking as $index => $spot)
-            @php
-              // 現在の順位を更新
-              if ($index === 0 || $spot->likes_count !== $previousLikeCount) {
+            // いいね数で順位を計算
+            $currentRank = 0; // 現在の順位
+            $previousLikeCount = null; // 前のスポットのいいね数を保存
+
+            foreach ($allSpots as $spot) {
+              if ($previousLikeCount === null || $spot->likes_count !== $previousLikeCount) {
                 $currentRank++; // 順位をインクリメント
               }
-              $previousLikeCount = $spot->likes_count; // 現在のいいね数を保存
-            @endphp
+              $rankings[$spot->id] = $currentRank; // スポットIDをキーにして順位を保存
+              $previousLikeCount = $spot->likes_count; // 現在のいいね数を前の数に更新
+            }
+          @endphp
+
+          @forelse($seasonranking as $spot)
             <div class="p-4 bg-white rounded-lg shadow-lg mb-4 border border-gray-300 hover:shadow-xl transition-shadow duration-300">
               <div class="flex items-center mb-2">
-                <span class="text-xl font-semibold text-blue-500">第{{ $currentRank }}位</span>
+                <span class="text-xl font-semibold text-blue-500">第{{ $rankings[$spot->id] }}位</span>
                 <a href="/spots/{{ $spot->id }}" class="ml-4 text-xl font-bold text-indigo-600 hover:underline">
                   {{ $spot->name }}
                 </a>
