@@ -245,12 +245,14 @@
       @php
         $yourDeveloperId = 1; // 開発者のIDを指定
       @endphp
-      @if (auth()->user()->id === $yourDeveloperId)
+      @auth
         <div class="mt-4 text-right">
           <p>ログインユーザー: {{ Auth::user()->name }}</p>
+          @if (auth()->user()->id === $yourDeveloperId)
           <a href="/spots/{{ $spot->id }}/edit" class="text-indigo-600 hover:underline">編集</a>
+          @endif
         </div>
-      @endif
+      @endauth
     </div>
   </div>
   <script>
