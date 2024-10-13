@@ -13,18 +13,15 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div class="col-span-2">
           @php
-            $currentRank = 1;  // 現在の順位
-            $previousLikeCount = null;  // 前のいいね数を保存するための変数
+            $currentRank = 0;  // 現在の順位
           @endphp
 
           @forelse($seasonranking as $index => $spot)
             @php
-              // 現在のスポットのいいね数と前のスポットのいいね数を比較
-              if ($previousLikeCount === null || $previousLikeCount !== $spot->likes_count) {
-                // いいね数が異なる場合は、現在の順位をインクリメント
+              // いいね数に基づいて順位を設定
+              if ($index === 0 || $spot->likes_count !== $seasonranking[$index - 1]->likes_count) {
                 $currentRank = $index + 1;  // 順位を更新
               }
-              $previousLikeCount = $spot->likes_count;  // 現在のいいね数を前のいいね数に更新
             @endphp
             <div class="p-4 bg-white rounded-lg shadow-lg mb-4 border border-gray-300 hover:shadow-xl transition-shadow duration-300">
               <div class="flex items-center mb-2">
