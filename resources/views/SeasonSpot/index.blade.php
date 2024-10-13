@@ -14,14 +14,16 @@
         <div class="col-span-2">
           @php
             $currentRank = ($seasonranking->currentPage() - 1) * $seasonranking->perPage(); // 前のページのランキングを引き継ぎ
+            $previousLikeCount = null;
           @endphp
 
           @forelse($seasonranking as $index => $spot)
             @php
-              // いいね数に基づいて順位を設定
-              if ($index === 0 || $spot->likes_count !== $seasonranking[$index - 1]->likes_count) {
-                $currentRank++;  // 順位を更新
+              // 現在の順位を更新
+              if ($index === 0 || $spot->likes_count !== $previousLikeCount) {
+                $currentRank++; // 順位をインクリメント
               }
+              $previousLikeCount = $spot->likes_count; // 現在のいいね数を保存
             @endphp
             <div class="p-4 bg-white rounded-lg shadow-lg mb-4 border border-gray-300 hover:shadow-xl transition-shadow duration-300">
               <div class="flex items-center mb-2">
