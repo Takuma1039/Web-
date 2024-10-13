@@ -17,7 +17,8 @@ class DatabaseSeeder extends Seeder
             // MonthSeeder::class,
             // LocalSeeder::class,
             // CategorySeeder::class,
-            AddCategorySeeder::class
+            //AddCategorySeeder::class,
+            RemoveCategorySeeder::class
         ]);
         // \App\Models\User::factory(10)->create();
 

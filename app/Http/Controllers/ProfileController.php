@@ -88,7 +88,7 @@ private function updateHistory(Request $request, $currentUrl, $currentPageName)
 {
     \Log::info('updateIcon called');
     $request->validate([
-        'image_path' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+        'image_path' => 'required|image|mimes:jpg,jpeg,png,gif,webp,AVIF,avif|max:2048',
     ]);
 
     $user = Auth::user();
