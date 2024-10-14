@@ -3,7 +3,7 @@
     <div class="container mx-auto">
       <!-- タイトル -->
       <h1 class="text-4xl font-extrabold text-gray-800 text-center mb-8">
-        検索結果
+        検索結果(キーワード: {{ $query }})
       </h1>
       
       <div class="text-center mb-8">

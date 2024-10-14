@@ -8,52 +8,52 @@
 
 <!-- モーダル -->
 <div id="searchModal" class="fixed inset-0 hidden z-50 flex items-center justify-center bg-black bg-opacity-50 px-2">
-    <div class="bg-white p-3 rounded-lg shadow-lg max-w-xs w-full sm:max-w-sm md:max-w-sm lg:max-w-md">
-        <h2 class="text-lg font-semibold mb-2 text-blue-500 text-sm">Search for a Spot</h2>
+    <div class="bg-white p-3 rounded-lg shadow-lg max-w-xs w-full sm:max-w-sm md:max-w-md lg:max-w-lg">
+        <h2 class="text-lg font-semibold mb-2 text-blue-500 text-sm sm:text-sm md:text-md lg:text-lg">Search for a Spot</h2>
         <form action="/search" method="GET">
             <input type="text" name="query" class="w-full border border-gray-300 p-1 rounded-md mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" placeholder="探したいキーワード">
             
-            <h3 class="mb-1 font-semibold text-xs">スポットカテゴリー:</h3>
+            <h3 class="mb-1 font-semibold text-xs sm:text-sm md:text-md lg:text-lg">スポットカテゴリー:</h3>
             <div class="flex flex-wrap mb-2">
                 @foreach($spotcategories as $spotcategory)
-                    <label class="flex items-center mr-2 mb-1 text-xs">
+                    <label class="flex items-center mr-2 mb-1 text-xs sm:text-sm md:text-md lg:text-lg">
                         <input type="checkbox" name="spot[spot_category_ids][]" value="{{ $spotcategory->id }}" class="mr-1">
                         {{ $spotcategory->name }}
                     </label>
                 @endforeach
             </div>
 
-            <h3 class="mb-1 font-semibold text-xs">地域:</h3>
+            <h3 class="mb-1 font-semibold text-xs sm:text-sm md:text-md lg:text-lg">地域:</h3>
             <div class="flex flex-wrap mb-2">
                 @foreach($locals as $local)
-                    <label class="flex items-center mr-2 mb-1 text-xs">
+                    <label class="flex items-center mr-2 mb-1 text-xs sm:text-sm md:text-md lg:text-lg">
                         <input type="checkbox" name="spot[local_ids][]" value="{{ $local->id }}" class="mr-1">
                         {{ $local->name }}
                     </label>
                 @endforeach
             </div>
 
-            <h3 class="mb-1 font-semibold text-xs">季節:</h3>
+            <h3 class="mb-1 font-semibold text-xs sm:text-sm md:text-md lg:text-lg">季節:</h3>
             <div class="flex flex-wrap mb-2">
                 @foreach($seasons as $season)
-                    <label class="flex items-center mr-2 mb-1 text-xs">
+                    <label class="flex items-center mr-2 mb-1 text-xs sm:text-sm md:text-md lg:text-lg">
                         <input type="checkbox" name="spot[season_ids][]" value="{{ $season->id }}" class="mr-1">
                         {{ $season->name }}
                     </label>
                 @endforeach
             </div>
 
-            <h3 class="mb-1 font-semibold text-xs">月:</h3>
+            <h3 class="mb-1 font-semibold text-xs sm:text-sm md:text-md lg:text-lg">月:</h3>
             <div class="flex flex-wrap mb-2">
                 @foreach($months as $month)
-                    <label class="flex items-center mr-2 mb-1 text-xs">
+                    <label class="flex items-center mr-2 mb-1 text-xs sm:text-sm md:text-md lg:text-lg">
                         <input type="checkbox" name="spot[month_ids][]" value="{{ $month->id }}" class="mr-1">
                         {{ $month->name }}
                     </label>
                 @endforeach
             </div>
 
-            <button type="submit" class="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 transition duration-200 w-full text-sm">検索</button>
+            <button type="submit" class="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 transition duration-200 w-full text-sm sm:text-md md:text-lg lg:text-xl">検索</button>
         </form>
     </div>
 </div>
