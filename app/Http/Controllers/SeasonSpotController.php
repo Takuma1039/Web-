@@ -36,14 +36,31 @@ class SeasonSpotController extends Controller
     })->with('months')->withCount('likes')->orderByRaw('(select count(*) from spotlikes where spotlikes.spot_id = spots.id) desc')
     ->get();
 
+    // 現在の月に関連していないスポットを削除
+    $spotIdsInSeason = SeasonSpot::pluck('spot_id')->toArray(); // 現在season_spotsに保存されているスポットIDを取得
+    $validSpotIds = $spots->pluck('id')->toArray(); // 現在の月に合ったスポットのIDを取得
+
+    // 月に合わないスポットを削除
+    SeasonSpot::whereNotIn('spot_id', $validSpotIds)
+        ->orWhereNotIn('spot_id', $spotIdsInSeason)
+        ->delete();
+        
+    // season_spotsテーブルにスポットIDを保存
+    foreach ($spots as $spot) {
+        SeasonSpot::updateOrCreate(
+            ['spot_id' => $spot->id], // すでに存在する場合は更新
+            ['created_at' => now()], 
+        );
+    }
+    
     // ページネーションの適用
-    $perPage = 10; // 1ページあたりの表示件数
+    $paginate = 10; // 1ページあたりの表示件数
     $currentPage = $request->input('page', 1); // 現在のページ
-    $offset = ($currentPage - 1) * $perPage; // ページネーションのオフセット
+    $offset = ($currentPage - 1) * $paginate; // 取得するスポットの開始位置を指定
     $seasonranking = new \Illuminate\Pagination\LengthAwarePaginator(
-        $spots->slice($offset, $perPage), // 現在のページのスポットを取得
+        $spots->slice($offset, $paginate), // 現在のページのスポットを取得
         $spots->count(), // 全体のスポット数
-        $perPage, // 1ページあたりのアイテム数
+        $paginate, // 1ページあたりの表示件数
         $currentPage, // 現在のページ番号
         ['path' => $request->url(), 'query' => $request->query()] // ページネーションリンクの生成
     );
@@ -73,22 +90,6 @@ class SeasonSpotController extends Controller
         $spot->truncated_body = $this->truncateAtPunctuation($spot->body, 200);
     }
     
-    // 現在の月に関連していないスポットを削除
-    $spotIdsInSeason = SeasonSpot::pluck('spot_id')->toArray(); // 現在season_spotsに保存されているスポットIDを取得
-    $validSpotIds = $seasonranking->pluck('id')->toArray(); // 現在の月に合ったスポットのIDを取得
-
-    // 月に合わないスポットを削除
-    SeasonSpot::whereNotIn('spot_id', $validSpotIds)
-        ->orWhereNotIn('spot_id', $spotIdsInSeason)
-        ->delete();
-        
-    // season_spotsテーブルにスポットIDを保存
-    foreach ($seasonranking as $spot) {
-        SeasonSpot::updateOrCreate(
-            ['spot_id' => $spot->id], // すでに存在する場合は更新
-            ['created_at' => now()], 
-        );
-    }
 
     // ランキングページのビューにデータを渡す        
     return view('SeasonSpot.index')->with([

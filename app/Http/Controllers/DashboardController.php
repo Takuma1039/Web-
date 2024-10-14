@@ -72,7 +72,7 @@ private function getSpotsWithReviews()
             $query->selectRaw('count(*)')
                 ->from('reviews')
                 ->whereColumn('reviews.spot_id', 'spots.id');
-        }, '>', 0)  // reviews_count をWHEREでフィルタ
+        }, '>', 0) 
         ->orderByRaw('(select count(*) from reviews where reviews.spot_id = spots.id) desc') 
         ->get();
 }
