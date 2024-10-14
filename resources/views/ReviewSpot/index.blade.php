@@ -11,23 +11,10 @@
       
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <div class="col-span-2">
-          @php
-            $currentRank = 1;  // 現在の順位
-            $previousReviewCount = null;  // 前のいいね数を保存するための変数
-          @endphp
-
           @forelse($reviewranking as $index => $spot)
-            @php
-              // 現在のスポットのレビュー数と前のスポットのレビュー数を比較
-              if ($previousReviewCount === null || $previousReviewCount !== $spot->reviews_count) {
-                // 前のスポットとレビュー数が異なる場合は、順位を更新
-                $currentRank = $index + 1;  // 順位を更新
-              }
-              $previousReviewCount = $spot->reviews_count;  // 現在のレビュー数を前のレビュー数に更新
-            @endphp
             <div class="p-4 bg-white rounded-lg shadow-lg mb-4 border border-gray-300 hover:shadow-xl transition-shadow duration-300">
               <div class="flex items-center mb-2">
-                <span class="text-xl font-semibold text-blue-500">第{{ $currentRank }}位</span>
+                <span class="text-xl font-semibold text-blue-500">第{{ $rankings[$spot->id] }}位</span>
                 <a href="/spots/{{ $spot->id }}" class="ml-4 text-xl font-bold text-indigo-600 hover:underline">
                   {{ $spot->name }}
                 </a>

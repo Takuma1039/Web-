@@ -92,6 +92,7 @@ class ReviewSpotController extends Controller
         'seasons' => $season->get(),
         'months' => $month->get(),
         'reviewranking' => $reviewranking,
+        'rankings' => $rankings
     ]);
 }
 

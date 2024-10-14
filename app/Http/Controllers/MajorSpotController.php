@@ -81,6 +81,7 @@ class MajorSpotController extends Controller
         'seasons' => $season->get(),
         'months' => $month->get(),
         'majorranking' => $majorranking,
+        'rankings' => $rankings
     ]);
 }
 
