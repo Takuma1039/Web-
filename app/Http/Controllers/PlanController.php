@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\DB;
 use App\Models\Plan;
 use App\Models\Spot;
+use App\Models\Planpost;
 use Illuminate\Http\Request;
 use App\Http\Requests\PlanRequest;
 use Carbon\Carbon;
@@ -102,9 +103,11 @@ class PlanController extends Controller
 }
 
     // 計画の表示
-public function show(Request $request, $id)
+public function show(Request $request, Planpost $planpost, $id)
 {
     $plan = Plan::with('destinations')->find($id);
+    
+    $planpost = Planpost::where('plan_id', $id)->first();
     
     // 現在のURLを取得
     $currentUrl = url()->current();
@@ -128,7 +131,7 @@ public function show(Request $request, $id)
     // Navitime APIキー
     $apikey = config('app.navitime_api_key');
         
-    return view('plans.show', compact('plan', 'api_key', 'apikey'));
+    return view('plans.show', compact('plan', 'api_key', 'apikey', 'planpost'));
 }
 
     

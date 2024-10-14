@@ -91,7 +91,7 @@
                                 旅行プラン作成
                         </a>
                     @endif
-                    <a href="/favorites" class="flex items-center px-4 py-2 mt-2 text-gray-100 hover:bg-gray-400 hover:bg-opacity-25 rounded-2xl" aria-label="Favorites">
+                    <a href="/planposts/index" class="flex items-center px-4 py-2 mt-2 text-gray-100 hover:bg-gray-400 hover:bg-opacity-25 rounded-2xl" aria-label="Favorites">
                         <i class="fas fa-people-group" style="margin-right: 8px;"></i>
                             みんなの旅行計画
                     </a>

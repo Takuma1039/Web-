@@ -24,6 +24,7 @@ use App\Http\Controllers\ReviewLikeController;
 use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\PlanController;
 use App\Http\Controllers\PlanpostController;
+use App\Http\Controllers\PlanLikeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -58,6 +59,12 @@ Route::middleware('auth', 'activity')->group(function () {
     Route::put('/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
     // 口コミの削除
     Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
+    //旅行計画関係
+    Route::get('/planposts/likesplan', [PlanpostController::class, 'likesplan'])->name('planposts.likesplan');
+    Route::get('/planposts/create', [PlanpostController::class, 'create'])->name('plans.post');
+    Route::post('/planposts/store', [PlanpostController::class, 'store'])->name('planposts.store'); //旅行計画投稿の保存
+    Route::post('/planpost/like', [PlanLikeController::class, 'likeplan']);
+    Route::delete('/planposts/{planpost}', [PlanpostController::class, 'destroy'])->name('planposts.destroy'); //投稿した旅行計画の削除
 
 
 });
@@ -75,6 +82,7 @@ Route::middleware('activity')->group(function () {
     Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews'); //口コミ
     Route::get('/spots/{spot}', [SpotController::class, 'show'])->name('spots.show'); //スポット詳細画面表示
     Route::get('/search', [SpotController::class, 'search'])->name('spot.search'); //検索
+    Route::get('/planposts/index', [PlanpostController::class, 'index'])->name('planposts.index');
 });
 //プロフィール
 Route::middleware('auth', 'activity')->group(function () {
@@ -94,7 +102,6 @@ Route::controller(PlanController::class)->middleware(['activity'])->group(functi
     Route::post('/plans/store', 'store')->name('plans.store'); //旅行計画の保存
 });
 
-Route::post('/plans/{plan}/posts', [PlanpostController::class, 'post'])->name('plans.post');
-//Route::get('/plancategories/{plancategory}', [PlancategoryController::class,'index'])->middleware("auth");
+//Route::get('/plantypes/{plantype}', [PlantypeController::class,'index'])->middleware("auth");
 
 require __DIR__.'/auth.php';

@@ -73,11 +73,20 @@ class User extends Authenticatable
         return $this->hasMany(Plan::class); // Planモデルとのリレーションを定義
     }
     
+    public function planposts()
+    {
+        return $this->hasMany(Planpost::class);
+    }
+    
+    public function planlikes()
+    {
+        return $this->hasMany(PlanLike::class);
+    }
+
+    
     //オンライン・オフライン表示
     public function isOnline()
     {
-        \Log::info('Current Time: ' . now());
-        \Log::info('Last Activity: ' . $this->last_activity);
         return $this->last_activity && now()->diffInMinutes($this->last_activity) < 5; // 5分以内にアクティブならオンライン
     }
 }

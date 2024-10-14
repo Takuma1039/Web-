@@ -24,4 +24,9 @@ class Plan extends Model
                     ->withPivot('order')
                     ->orderBy('pivot_order');
     }
+    
+    public function planpost()
+    {
+        return $this->belongsTo(Planpost::class);
+    }
 }

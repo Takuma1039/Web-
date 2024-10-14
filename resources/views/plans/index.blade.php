@@ -18,7 +18,7 @@
         
         <!-- 旅行計画の新規投稿ボタン -->
           <div class="text-right mb-4">
-            <a href="" class="bg-sky-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-emerald-700 transition duration-200 shadow-lg">
+            <a href="{{ route('plans.post') }}" class="bg-sky-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-emerald-700 transition duration-200 shadow-lg">
                 旅行計画の投稿
             </a>
         </div>

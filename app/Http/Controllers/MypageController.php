@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\Spot_image;
 use App\Models\Review;
@@ -18,9 +17,11 @@ class MypageController extends Controller
     // 履歴の管理
     $this->updateHistory($request, $currentUrl, $currentPageName);
     
-    $user = Auth::user();
+    $user = $request->user();
     
     $plans = $user->plans()->with('destinations')->get();
+    
+    $planposts = $user->planlikes()->with('planpost.planimages', 'planpost.plan')->get();
     
     foreach ($plans as $plan) {
             // start_dateが文字列であるかどうかを確認
@@ -33,14 +34,28 @@ class MypageController extends Controller
                 $plan->start_time = Carbon::createFromFormat('H:i:s', $plan->start_time);
             }
         }
-        
+    
+    foreach ($planposts as $planpost) {
+            $planpost->title = $planpost->planpost->title;
+            $planpost->comment = $this->truncateAtPunctuation($planpost->planpost->comment, 150);
+            // start_dateが文字列であるかどうかを確認
+            if (is_string($planpost->planpost->plan->start_date)) {
+                // Carbonインスタンスに変換
+                $planpost->start_date = Carbon::createFromFormat('Y-m-d', $planpost->planpost->plan->start_date);
+            }
+            
+            if (is_string($planpost->planpost->plan->start_time)) {
+                $planpost->start_time = Carbon::createFromFormat('H:i:s', $planpost->planpost->plan->start_time);
+            }
+        }
+    //dd($planposts);
     // お気に入りのスポットを取得
     $likedSpots = $user->spotlikes()->with('spot.spotimages')->get();
 
     // スポットデータを処理
     $this->processSpotData($likedSpots->pluck('spot'));
 
-    return view('mypage.index', compact('likedSpots', 'plans'));
+    return view('mypage.index', compact('likedSpots', 'plans', 'planposts'));
 }
 
 private function processSpotData($spots)

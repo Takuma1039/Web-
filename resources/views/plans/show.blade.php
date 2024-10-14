@@ -1,6 +1,13 @@
 <x-app-layout>
     <div class="container mx-auto px-4">
-        <h1 class="text-4xl font-extrabold text-gray-800 text-center">{{ $plan->title }}</h1>
+        <h1 class="text-4xl font-extrabold text-gray-800 text-center">
+            @if(Auth::id() === $plan->user_id)
+                {{ $plan->title }}
+            @else
+                {{ $planpost->title }}
+            @endif
+            </h1>
+        
         
         <div class="mt-6">
             <h2 class="text-2xl font-bold">旅行日程</h2>
@@ -35,11 +42,17 @@
               <div id="routes" class="space-y-4"></div>
             </div>
         </div>
-
+        
         <div class="mt-6">
-            <a href="{{ route('plans.index') }}" class="bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-indigo-700 transition-all duration-300 shadow-lg">
-                旅行計画一覧に戻る
-            </a>
+        　　@if(Auth::id() === $plan->user_id)
+                <a href="{{ route('plans.index') }}" class="bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-indigo-700 transition-all duration-300 shadow-lg">
+                    旅行計画一覧に戻る
+                </a>
+        　　@else
+            　　<a href="{{ route('planposts.index') }}" class="bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-indigo-700 transition-all duration-300 shadow-lg">
+                　　みんなの旅行計画へ
+            　　</a>
+        　　@endif
         </div>
     </div>
 

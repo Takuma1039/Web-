@@ -167,9 +167,6 @@
         </ul>
     </div>
 @endif
-    <div class="footer mt-6 text-center">
-        <a href="javascript:history.back();" class="text-blue-600 hover:underline">戻る</a>
-    </div>
 </x-app-layout>
 
 
