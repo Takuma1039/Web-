@@ -37,7 +37,7 @@ class SeasonSpotController extends Controller
     ->get();
 
     // ページネーションの適用
-    $perPage = 3; // 1ページあたりの表示件数
+    $perPage = 10; // 1ページあたりの表示件数
     $currentPage = $request->input('page', 1); // 現在のページ
     $offset = ($currentPage - 1) * $perPage; // ページネーションのオフセット
     $seasonranking = new \Illuminate\Pagination\LengthAwarePaginator(

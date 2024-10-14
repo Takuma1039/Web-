@@ -60,7 +60,7 @@ class DashboardController extends Controller
                 ->from('spotlikes')
                 ->whereColumn('spotlikes.spot_id', 'spots.id');
         }, '>', 0)  // likes_count をWHEREでフィルタ
-        ->orderByRaw('(select count(*) from spotlikes where spotlikes.spot_id = spots.id) desc') // likes_count をORDER BYで指定
+        ->orderByRaw('(select count(*) from spotlikes where spotlikes.spot_id = spots.id) desc')
         ->get();
 }
 
@@ -73,7 +73,7 @@ private function getSpotsWithReviews()
                 ->from('reviews')
                 ->whereColumn('reviews.spot_id', 'spots.id');
         }, '>', 0)  // reviews_count をWHEREでフィルタ
-        ->orderByRaw('(select count(*) from reviews where reviews.spot_id = spots.id) desc') // reviews_count をORDER BYで指定
+        ->orderByRaw('(select count(*) from reviews where reviews.spot_id = spots.id) desc') 
         ->get();
 }
 
@@ -81,7 +81,7 @@ private function getSeasonSpots()
 {
     return Spot::select('spots.*')
         ->join('season_spots', 'spots.id', '=', 'season_spots.spot_id')
-        ->orderByRaw('(select count(*) from spotlikes where spotlikes.spot_id = spots.id) desc') // likes_count をORDER BYで指定
+        ->orderByRaw('(select count(*) from spotlikes where spotlikes.spot_id = spots.id) desc')
         ->get();
 }
 
