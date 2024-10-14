@@ -1,6 +1,6 @@
 <!-- 検索バー -->
 <div class="flex justify-center mb-6" id="closeModal">
-    <input id="searchInput" type="text" placeholder="探したいキーワード" class="border border-gray-300 rounded-md p-2 w-1/2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+    <input id="searchInput" type="text" placeholder="探したいキーワード" class="border border-gray-300 rounded-md p-2 w-1/2 focus:outline-none focus:ring-2 focus:ring-blue-500" readonly>
     <button class="ml-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200">
         検索
     </button>
@@ -64,6 +64,7 @@
     const closedModal = document.getElementById("closeModal");
 
     searchInput.addEventListener("focus", () => {
+        event.preventDefault(); // デフォルトの動作を防ぐ
         searchModal.classList.remove("hidden");
     });
     
