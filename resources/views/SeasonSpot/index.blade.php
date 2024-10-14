@@ -12,24 +12,6 @@
       <!-- グリッドレイアウト -->
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div class="col-span-2">
-          @php
-            // 全体のスポットを取得していいね数でソート
-            $allSpots = $seasonranking->sortByDesc('likes_count');
-            $rankings = [];
-
-            // いいね数で順位を計算
-            $currentRank = ($seasonranking->currentPage() - 1) * $seasonranking->perPage();  // 現在の順位
-            $previousLikeCount = null; // 前のスポットのいいね数を保存
-
-            foreach ($allSpots as $spot) {
-              if ($previousLikeCount === null || $spot->likes_count !== $previousLikeCount) {
-                $currentRank++; // 順位をインクリメント
-              }
-              $rankings[$spot->id] = $currentRank; // スポットIDをキーにして順位を保存
-              $previousLikeCount = $spot->likes_count; // 現在のいいね数を前の数に更新
-            }
-          @endphp
-
           @forelse($seasonranking as $spot)
             <div class="p-4 bg-white rounded-lg shadow-lg mb-4 border border-gray-300 hover:shadow-xl transition-shadow duration-300">
               <div class="flex items-center mb-2">

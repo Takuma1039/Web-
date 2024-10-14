@@ -33,11 +33,40 @@ class SeasonSpotController extends Controller
     // スポット情報の取得
     $spots = Spot::whereHas('months', function ($query) use ($matchingMonth) {
         $query->where('months.id', $matchingMonth->id);
-    })->with('months')->withCount('likes');
+    })->with('months')->withCount('likes')->orderByRaw('(select count(*) from spotlikes where spotlikes.spot_id = spots.id) desc')
+    ->get();
 
-    // ページネーションとソートを適用
-    $seasonranking = $spots->orderByRaw('(select count(*) from spotlikes where spotlikes.spot_id = spots.id) desc') // いいね数で降順に並び替え
-        ->paginate(10);
+    // ページネーションの適用
+    $perPage = 3; // 1ページあたりの表示件数
+    $currentPage = $request->input('page', 1); // 現在のページ
+    $offset = ($currentPage - 1) * $perPage; // ページネーションのオフセット
+    $seasonranking = new \Illuminate\Pagination\LengthAwarePaginator(
+        $spots->slice($offset, $perPage), // 現在のページのスポットを取得
+        $spots->count(), // 全体のスポット数
+        $perPage, // 1ページあたりのアイテム数
+        $currentPage, // 現在のページ番号
+        ['path' => $request->url(), 'query' => $request->query()] // ページネーションリンクの生成
+    );
+        
+    // ランキングを計算するための配列
+    $rankings = [];
+    $currentRank = 0; // 現在の順位
+    $previousLikeCount = null; // 前のスポットのいいね数を保存
+    $samerankCount = 0; // 同じ順位のスポット数をカウント
+    
+    //同じ順位のもの(いいね数が同じもの)が複数ある場合に次の順位をスキップする
+    foreach ($spots as $spot) {
+        if ($previousLikeCount === null || $spot->likes_count !== $previousLikeCount) {
+            $currentRank += $samerankCount + 1; // 同じ順位のスポット数を加算して、順位を更新
+            $samerankCount = 0; // 同じ順位のスポット数のカウントをリセット
+        } else {
+            // 同じいいね数が続く場合はカウントを増やす
+            $samerankCount++;
+        }
+        
+        $rankings[$spot->id] = $currentRank; // スポットIDをキーにして順位を保存
+        $previousLikeCount = $spot->likes_count; // 現在のいいね数を前のスポットのいいね数に更新
+    }
     
     // 各スポットのbodyを切り捨てる
     foreach ($seasonranking as $spot) {
@@ -70,6 +99,7 @@ class SeasonSpotController extends Controller
         'seasonranking' => $seasonranking,
         'currentMonth' => $currentMonth,
         'matchingMonth' => $matchingMonth,
+        'rankings' => $rankings,
     ]);
 }
 
