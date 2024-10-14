@@ -1,5 +1,5 @@
 <x-app-layout>
-  <div class="bg-gray-50 dark:bg-gray-900 min-h-screen py-8">
+  <div class="bg-white dark:bg-gray-900 min-h-screen py-8">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
         <div class="flex items-center justify-between mb-4">
@@ -35,7 +35,7 @@
           </p>
         </div>
         <!-- カテゴリー、シーズン、月、地域の表示 -->
-        <div class="mb-4 p-4 bg-gray-100 rounded-lg shadow-md">
+        <div class="mb-4 p-4 bg-white rounded-lg shadow-md">
           <strong class="text-lg flex items-center">
             <i class="fa-solid fa-tags mr-2"></i>カテゴリー:
           </strong>
@@ -50,7 +50,7 @@
           </div>
         </div>
 
-        <div class="mb-4 p-4 bg-gray-100 rounded-lg shadow-md">
+        <div class="mb-4 p-4 bg-white rounded-lg shadow-md">
           <strong class="text-lg flex items-center">
             <i class="fa-solid fa-snowflake mr-2"></i>おすすめシーズン:
           </strong>
@@ -65,7 +65,7 @@
           @endif
         </div>
 
-        <div class="mb-4 p-4 bg-gray-100 rounded-lg shadow-md">
+        <div class="mb-4 p-4 bg-white rounded-lg shadow-md">
           <strong class="text-lg flex items-center">
             <i class="fa-solid fa-calendar-alt mr-2"></i>月:
           </strong>
@@ -80,7 +80,7 @@
           @endif
         </div>
 
-        <div class="mb-4 p-4 bg-gray-100 rounded-lg shadow-md">
+        <div class="mb-4 p-4 bg-white rounded-lg shadow-md">
           <strong class="text-lg flex items-center">
             <i class="fa-solid fa-map-marker-alt mr-2"></i>地域:
           </strong>

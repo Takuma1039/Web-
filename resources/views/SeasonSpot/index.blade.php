@@ -1,5 +1,5 @@
 <x-app-layout>
-  <div class="bg-gray-100 min-h-screen">
+  <div class="bg-white min-h-screen">
     <div class="container mx-auto px-1 py-8">
       <!-- タイトル -->
       <h1 class="text-3xl font-bold text-gray-800 text-center mb-6">

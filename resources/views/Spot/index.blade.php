@@ -1,5 +1,5 @@
 <x-app-layout>
-  <div class="bg-gray-100 min-h-screen py-8">
+  <div class="bg-white min-h-screen py-8">
     <div class="container mx-auto">
       <!-- タイトル -->
       <h1 class="text-4xl font-extrabold text-gray-800 text-center mb-8">スポット一覧</h1>

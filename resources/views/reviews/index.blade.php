@@ -3,7 +3,7 @@
     <h1 class="text-4xl font-extrabold text-gray-800 text-center mb-8">口コミ投稿一覧</h1>
     
     <!-- おしゃれなメッセージボックス -->
-    <div class="mb-6 p-4 bg-gray-100 border-l-4 border-indigo-600 rounded-lg shadow-md">
+    <div class="mb-6 p-4 bg-white border-l-4 border-indigo-600 rounded-lg shadow-md">
         <p class="text-lg font-semibold text-gray-800">
             各スポット詳細画面に行って口コミを投稿しよう！
         </p>

@@ -21,7 +21,7 @@
         <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet">
     </head>
     <body class="font-sans antialiased">
-        <div class="bg-gray-100">
+        <div class="bg-white">
             @include('layouts.navigation')
 
             <!-- Page Heading -->

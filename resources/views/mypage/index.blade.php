@@ -12,7 +12,7 @@
         <p>まだお気に入り登録したスポットはありません。</p>
       @else
         <div id="swipe-container" class="overflow-x-scroll scrollbar-hide mb-4 relative px-2 sm:px-4">
-          <div id="swipe-content" class="flex snap-x snap-mandatory gap-4 w-max">
+          <div id="swipe-content" class="flex snap-x snap-mandatory gap-1 w-max">
             <!-- 各カードのループ -->
             @foreach ($likedSpots as $likedSpot)
               <div class="w-full sm:w-48 md:w-64 lg:w-72">
