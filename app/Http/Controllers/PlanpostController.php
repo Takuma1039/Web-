@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\DB;
 
 class PlanpostController extends Controller
 {
-    public function index(Request $request){
+    public function index(Request $request, Plantype $plantype, Local $local, Season $season, Month $month){
         
         // 現在のURLを取得
         $currentUrl = url()->current();
@@ -27,7 +27,13 @@ class PlanpostController extends Controller
         
         $planposts = Planpost::with('planimages')->paginate(10);
         
-        return view('planposts.index')->with(['planposts'=>$planposts]);
+        return view('planposts.index')->with([
+            'planposts' => $planposts,
+            'plantypes' => $plantype->get(),
+            'locals' => $local->get(),
+            'seasons' => $season->get(),
+            'months' => $month->get(),
+        ]);
     }
     
     public function likesplan(Request $request){
@@ -224,5 +230,155 @@ class PlanpostController extends Controller
 
       // 句読点が見つからない場合は、指定した文字数で切り捨てる
       return mb_substr($truncated, 0, $maxLength);
+    }
+    
+    public function search(Request $request, Plantype $plantype, Local $local, Season $season, Month $month)
+    {
+        // 検索キーワード
+        $query = $request->input('query'); //検索したキーワードの取得
+
+        // 検索に使用するフィルター条件を取得
+        $filters = [
+            'plantypeIds' => $request->input('planpost.plantype_ids', []),
+            'localIds' => $request->input('planpost.local_ids', []),
+            'seasonIds' => $request->input('planpost.season_ids', []),
+            'monthIds' => $request->input('planpost.month_ids', []),
+        ];
+    
+        // 履歴表示用に検索条件を文字列に変換
+        $searchConditions = [];
+
+        if ($query) {
+            $searchConditions[] = "キーワード: " . $query;
+        }
+
+        if (!empty($filters['plantypeIds'])) {
+            $plantypeNames = Plantype::whereIn('id', $filters['plantypeIds'])->pluck('name')->toArray();
+            $searchConditions[] = "カテゴリー: " . implode(', ', $plantypeNames);
+        }
+
+        if (!empty($filters['localIds'])) {
+            $localNames = Local::whereIn('id', $filters['localIds'])->pluck('name')->toArray();
+            $searchConditions[] = "地域: " . implode(', ', $localNames);
+        }
+
+        if (!empty($filters['seasonIds'])) {
+            $seasonNames = Season::whereIn('id', $filters['seasonIds'])->pluck('name')->toArray();
+            $searchConditions[] = "季節: " . implode(', ', $seasonNames);
+        }
+
+        if (!empty($filters['monthIds'])) {
+            $monthNames = Month::whereIn('id', $filters['monthIds'])->pluck('name')->toArray();
+            $searchConditions[] = "月: " . implode(', ', $monthNames);
+        }
+
+        // 検索条件を結合
+        $currentPageName = '検索結果(' . implode(' / ', $searchConditions) . ')';
+
+        // URLを変更する
+        $currentUrl = url()->current() . '?' . http_build_query(array_filter([
+            'query' => $query,
+            'planpost[plantype_ids]' => $filters['plantypeIds'],
+            'planpost[local_ids]' => $filters['localIds'],
+            'planpost[season_ids]' => $filters['seasonIds'],
+            'planpost[month_ids]' => $filters['monthIds'],
+        ]));
+    
+        // 履歴の管理
+        $this->manageHistory($request, $currentUrl, $currentPageName, $filters);
+    
+        // 旅行計画を取得するためのクエリビルダーを初期化
+        $planposts = Planpost::query();
+        
+        // 検索キーワードが存在する場合(名前、カテゴリー、地域、シーズン、月に存在するキーワード)
+        if ($query) {
+            $planposts->where(function($q) use ($query) {
+                $q->where('title', 'LIKE', '%' . $query . '%')
+                  ->orWhere('comment', 'LIKE', '%' . $query . '%')
+                  ->orWhereHas('plantype', function($q) use ($query) {
+                        $q->where('name', 'LIKE', '%' . $query . '%');
+                    })
+                  ->orWhereHas('local', function($q) use ($query) {
+                        $q->where('name', 'LIKE', '%' . $query . '%');
+                    })
+                  ->orWhereHas('season', function($q) use ($query) {
+                        $q->where('name', 'LIKE', '%' . $query . '%');
+                    })
+                  ->orWhereHas('month', function($q) use ($query) {
+                        $q->where('name', 'LIKE', '%' . $query . '%');
+                    });
+            });
+        }
+
+        // キーワード以外の場合フィルタリングの適用
+        $relationships = [
+            'plantypeIds' => 'plantype',
+            'localIds' => 'local',
+            'seasonIds' => 'season',
+            'monthIds' => 'month',
+        ];
+        
+        //フィルタリングの適用
+        foreach ($filters as $key => $ids) {
+            if (!empty($ids)) {
+                $planposts->whereHas($relationships[$key], function($q) use ($ids) {
+                    $q->whereIn('id', $ids);
+                });
+            }
+        }
+
+        // 検索結果をページネーションで取得（1ページに12件表示）
+        $results = $planposts->paginate(12);
+
+        return view('planposts.search_results')->with([
+            'results' => $results,
+            'plantypes' => $plantype->get(),
+            'locals' => $local->get(),
+            'seasons' => $season->get(),
+            'months' => $month->get(),
+            'query' => $query,
+            'plantypeIds' => $filters['plantypeIds'], 
+            'localIds' => $filters['localIds'],  
+            'seasonIds' => $filters['seasonIds'], 
+            'monthIds' => $filters['monthIds'],  
+        ]);
+    }
+    
+    private function manageHistory(Request $request, $currentUrl, $currentPageName, $filters)
+    {
+        // 履歴の管理
+        $history = $request->session()->get('history', []);
+
+        // ユニークな履歴IDを作成
+        $historyId = md5($currentUrl . json_encode($filters));
+
+        // 履歴を確認して更新または追加
+        $found = false; // 履歴が見つかったかどうかを示すフラグを初期化
+
+        foreach ($history as &$item) {
+            // IDが一致するかを確認
+            if (isset($item['id']) && $item['id'] === $historyId) {
+                $item['name'] = $currentPageName; // 名前を更新
+                $found = true; // 履歴が見つかったのでフラグを更新
+                return;
+            }
+        }
+
+        // 最大履歴数を設定（例: 5件まで）
+        if (count($history) >= 5) {
+            array_shift($history); // 古い履歴を削除
+        }
+
+        // URLが新しい場合は履歴に追加
+        if (!$found) {
+            $history[] = [
+                'id' => $historyId,
+                'url' => $currentUrl,
+                'name' => $currentPageName,
+            ];
+        }
+
+        // セッションに履歴を保存
+        $request->session()->put('history', $history);
     }
 }

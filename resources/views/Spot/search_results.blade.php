@@ -128,8 +128,8 @@
       </div>
 
       <!-- ページネーション -->
-      <div class="mt-8">
-        {{ $results->links() }}
+      <div class='mt-8'>
+        <x-pagination :paginator="$results" />
       </div>
     </div>
   </div>

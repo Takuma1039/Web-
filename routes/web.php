@@ -83,6 +83,7 @@ Route::middleware('activity')->group(function () {
     Route::get('/spots/{spot}', [SpotController::class, 'show'])->name('spots.show'); //スポット詳細画面表示
     Route::get('/search', [SpotController::class, 'search'])->name('spot.search'); //検索
     Route::get('/planposts/index', [PlanpostController::class, 'index'])->name('planposts.index');
+    Route::get('/plansearch', [PlanpostController::class, 'search'])->name('planposts.search'); //検索
 });
 //プロフィール
 Route::middleware('auth', 'activity')->group(function () {

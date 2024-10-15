@@ -9,17 +9,17 @@
             </div>
         @endif
         
-        <div class="flex flex-row-reverse items-center gap-2">
+        <div class="flex flex-col md:flex-row-reverse items-center md:gap-2">
         <!-- 旅行計画の新規作成ボタン -->
         <div class="text-right mb-4">
-            <a href="{{ route('plans.create') }}" class="bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-700 transition duration-200 shadow-lg">
+            <a href="{{ route('plans.create') }}" class="bg-indigo-700 text-white rounded-full px-4 py-1 font-bold uppercase tracking-wide hover:bg-white hover:text-indigo-500 border-2 border-indigo-700 transition-all duration-300 flex items-center justify-center">
                 新しい旅行計画を作成
             </a>
         </div>
         
         <!-- 旅行計画の新規投稿ボタン -->
         <div class="text-right mb-4">
-            <a href="{{ route('plans.post') }}" class="bg-sky-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-sky-700 transition duration-200 shadow-lg">
+            <a href="{{ route('plans.post') }}" class="bg-sky-500 text-white rounded-full px-4 py-1 font-bold uppercase tracking-wide hover:bg-white hover:text-sky-500 border-2 border-sky-500 transition-all duration-300 flex items-center justify-center">
                 旅行計画の投稿
             </a>
         </div>
@@ -55,7 +55,7 @@
                             <form action="{{ route('plans.destroy', $plan->id) }}" method="POST" onsubmit="return confirm('本当に削除しますか？');">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="bg-red-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-700 transition duration-200 shadow-lg">
+                                <button type="submit" class="bg-rose-500 text-white rounded-full px-4 py-1 font-bold uppercase tracking-wide hover:bg-white hover:text-rose-500 border-2 border-rose-500 transition-all duration-300">
                                     削除
                                 </button>
                             </form>

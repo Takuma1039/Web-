@@ -2,17 +2,17 @@
     <div class="container mx-auto">
         <h1 class="text-4xl font-extrabold text-gray-800 text-center mb-8">いいねした旅行計画一覧</h1>
         
-        <div class="flex flex-row-reverse items-center gap-2">
+        <div class="flex flex-col md:flex-row-reverse items-center md:gap-2">
             <!-- みんなの旅行計画 -->
             <div class="text-right mb-4">
-                <a href="{{ route('planposts.index') }}" class="bg-green-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-600 transition duration-200 shadow-lg">
+                <a href="{{ route('planposts.index') }}" class="bg-teal-600 text-white border-2 border-teal-600 rounded-full px-4 py-1 font-bold uppercase tracking-wide hover:bg-white hover:text-teal-800 transition-all duration-300 flex items-center justify-center">
                     みんなの旅行計画から探す
                 </a>
             </div>
         
             <!-- 旅行計画の新規投稿ボタン -->
             <div class="text-right mb-4">
-                <a href="{{ route('plans.post') }}" class="bg-sky-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-sky-600 transition duration-200 shadow-lg">
+                <a href="{{ route('plans.post') }}" class="bg-fuchsia-500 text-white border-2 border-fuchsia-500 rounded-full px-4 py-1 font-bold uppercase tracking-wide hover:bg-white hover:text-fuchsia-600 transition-all duration-300 flex items-center justify-center">
                     旅行計画の投稿
                 </a>
             </div>
