@@ -114,7 +114,8 @@ class SpotController extends Controller
         }
 
         $input = $request['spot'];
-        $input['local_ids'] = $request->input('spot.local_ids', []);
+        $localIds = $request->input('spot.local_id', []);
+        $input['local_id'] = !empty($localIds) ? $localIds[0] : null;
 
         // JSONとして保存
         $input['category_ids'] = json_encode($request->input('spot.category_ids', []));
