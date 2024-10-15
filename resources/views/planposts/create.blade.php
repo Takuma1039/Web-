@@ -76,13 +76,13 @@
         
             <div class="mb-4">
                 <label class="block text-sm font-medium text-gray-700">タイトル</label>
-                <input type="text" name="planpost[title]" placeholder="名前" value="{{ old('planpost.title') }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-indigo-200"/>
+                <input type="text" name="planpost[title]" placeholder="タイトル" value="{{ old('planpost.title') }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-indigo-200"/>
                 <p class="text-red-500 text-sm">{{ $errors->first('planpost.title') }}</p>
             </div>
 
             <div class="mb-4">
                 <label class="block text-sm font-medium text-gray-700">コメント</label>
-                <textarea name="planpost[comment]" placeholder="紹介文" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-indigo-200">{{ old('planpost.comment') }}</textarea>
+                <textarea name="planpost[comment]" placeholder="コメント" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-indigo-200">{{ old('planpost.comment') }}</textarea>
                 <p class="text-red-500 text-sm">{{ $errors->first('planpost.comment') }}</p>
             </div>
             

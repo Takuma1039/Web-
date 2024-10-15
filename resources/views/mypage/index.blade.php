@@ -39,23 +39,13 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach ($plans as $plan)
                 <div class="p-6 max-w-sm bg-white rounded-lg border border-gray-200 shadow-md hover:shadow-lg transition duration-300">
-                    <h2 class="text-xl font-bold mb-4">{{ $plan->title }}</h2>
+                    <a href="{{ route('plans.show', $plan->id) }}"><h2 class="text-xl font-bold mr-2 transition duration-300 ease-in-out transform hover:text-indigo-600">{{ $plan->title }}</h2></a>
                     <p class="text-gray-700 mb-2">旅行日: {{ $plan->start_date->format('Y年m月d日') }} {{ $plan->start_time->format('H時i分') }}</p>
                     <ul class="list-disc pl-5">
                         @foreach ($plan->destinations as $destination)
                             <li>{{ $destination->name }}</li>
                         @endforeach
                     </ul>
-                    <div class="mt-4 flex justify-between items-center">
-                        <a href="{{ route('plans.show', $plan->id) }}" class="text-blue-600 hover:underline">
-                            詳細を見る
-                        </a>
-                        <form action="{{ route('plans.destroy', $plan->id) }}" method="POST" onsubmit="return confirm('本当に削除しますか？');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="text-red-600 hover:underline">削除</button>
-                        </form>
-                    </div>
                 </div>
             @endforeach
         </div>

@@ -8,7 +8,8 @@
                 <span class="block sm:inline">{{ session('success') }}</span>
             </div>
         @endif
-
+        
+        <div class="flex flex-row-reverse items-center gap-2">
         <!-- 旅行計画の新規作成ボタン -->
         <div class="text-right mb-4">
             <a href="{{ route('plans.create') }}" class="bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-700 transition duration-200 shadow-lg">
@@ -17,43 +18,46 @@
         </div>
         
         <!-- 旅行計画の新規投稿ボタン -->
-          <div class="text-right mb-4">
-            <a href="{{ route('plans.post') }}" class="bg-sky-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-emerald-700 transition duration-200 shadow-lg">
+        <div class="text-right mb-4">
+            <a href="{{ route('plans.post') }}" class="bg-sky-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-sky-700 transition duration-200 shadow-lg">
                 旅行計画の投稿
             </a>
         </div>
+        </div>
 
-              <!-- エラーメッセージの表示 -->
-              @if ($errors->any())
-                <div class="mb-4 text-red-600">
-                  <ul>
+        <!-- エラーメッセージの表示 -->
+        @if ($errors->any())
+            <div class="mb-4 text-red-600">
+                <ul>
                     @foreach ($errors->all() as $error)
-                      <li>{{ $error }}</li>
+                        <li>{{ $error }}</li>
                     @endforeach
-                  </ul>
-                </div>
-              @endif
+                </ul>
+            </div>
+        @endif
 
         <!-- 旅行計画一覧 -->
         @if ($plans->count() > 0)
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach ($plans as $plan)
-                    <div class="p-6 max-w-sm bg-white rounded-lg border border-gray-200 shadow-md hover:shadow-lg transition duration-300">
-                        <h2 class="text-xl font-bold mb-4">{{ $plan->title }}</h2>
-                        <p class="text-gray-700 mb-2">旅行日: {{ $plan->start_date->format('Y年m月d日') }} {{ $plan->start_time->format('H時i分') }}</p>
-                        <ul class="list-disc pl-5">
-                            @foreach ($plan->destinations as $destination)
-                                <li>{{ $destination->name }}</li>
-                            @endforeach
-                        </ul>
-                        <div class="mt-4 flex justify-between">
-                            <a href="{{ route('plans.show', $plan->id) }}" class="text-blue-600 hover:underline">
-                                詳細を見る
-                            </a>
+                    <div class="flex flex-col justify-between p-6 max-w-sm bg-white rounded-lg border border-gray-200 shadow-md hover:shadow-lg transition duration-300">
+                        <div>
+                            <a href="{{ route('plans.show', $plan->id) }}"><h2 class="text-xl font-bold mr-2 transition duration-300 ease-in-out transform hover:text-indigo-600">{{ $plan->title }}</h2></a>
+                            <p class="text-gray-700 mb-2">旅行日: {{ $plan->start_date->format('Y年m月d日') }} {{ $plan->start_time->format('H時i分') }}</p>
+                            <ul class="list-disc pl-5">
+                                @foreach ($plan->destinations as $destination)
+                                    <li>{{ $destination->name }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                        <!-- 削除ボタン -->
+                        <div class="text-right mt-4">
                             <form action="{{ route('plans.destroy', $plan->id) }}" method="POST" onsubmit="return confirm('本当に削除しますか？');">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="text-red-600 hover:underline">削除</button>
+                                <button type="submit" class="bg-red-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-700 transition duration-200 shadow-lg">
+                                    削除
+                                </button>
                             </form>
                         </div>
                     </div>

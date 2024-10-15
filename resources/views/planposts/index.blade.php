@@ -20,11 +20,15 @@
                 @foreach ($planposts as $planpost)
                     <div class="flex justify-between border border-gray-300 rounded-lg p-6 shadow-sm">
                         <div class="w-3/5">
-                            <div class="flex items-center justify-between">
+                            <div class="flex items-center justify-between mb-4">
                                 <div class="flex items-center gap-2">
-                                    <a href="{{ route('plans.show', $planpost->plan->id) }}"><h2 class="text-xl font-bold mr-2 transition duration-300 ease-in-out transform hover:text-indigo-600">{{ $planpost->title }}</h2></a>
+                                    <a href="{{ route('plans.show', $planpost->plan->id) }}">
+                                        <h2 class="text-xl font-bold transition duration-300 ease-in-out transform hover:text-indigo-600">{{ $planpost->title }}</h2>
+                                    </a>
                                     @auth
-                                        <x-planpost-like :planpost="$planpost" />
+                                        @if(Auth::id() !== $planpost->user_id)
+                                            <x-planpost-like :planpost="$planpost" />
+                                        @endif
                                     @endauth
                                 </div>
                                 @if(Auth::id() === $planpost->user_id)
@@ -35,8 +39,14 @@
                                     </form>
                                 @endif
                             </div>
-                            <div class="flex ites-center justify-between">
-                                <span class="text-gray-700 font-semibold text-md">投稿者: {{ $planpost->is_anonymous ? '匿名' : $planpost->user->name }}</span>
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="text-gray-700 font-semibold text-md">投稿者: 
+                                    @if(Auth::id() === $planpost->user_id)
+                                        {{ $planpost->user->name }}
+                                    @else
+                                        {{ $planpost->is_anonymous ? '匿名' : $planpost->user->name }}
+                                    @endif
+                                </span>
                                 <span class="inline-block bg-teal-100 text-teal-800 text-sm font-medium mr-1 px-2.5 py-0.5 rounded">カテゴリー: 
                                     {{ $planpost->local->name }} 
                                     {{ $planpost->season->name }}
@@ -49,15 +59,15 @@
                             </div>
                         </div>
 
-                        <div class="w-2/5 ml-6">
+                        <div class="w-2/5 ml-6 flex flex-col gap-4">
                             @foreach($planpost->planimages as $plan_img)
-                                <a class="group relative flex h-48 items-end overflow-hidden rounded-lg shadow-lg transition-transform duration-300 transform hover:scale-105" onclick="openModal('{{ $plan_img->image_path }}')">
-                                    <img src="{{ $plan_img->image_path }}" loading="lazy" alt="Image" class="absolute inset-0 h-full w-full object-cover object-center transition duration-200 group-hover:opacity-90" />
+                                <a class="group relative flex-grow overflow-hidden rounded-lg shadow-lg transition-transform duration-300 transform hover:scale-105" onclick="openModal('{{ $plan_img->image_path }}')">
+                                    <img src="{{ asset($plan_img->image_path) }}" loading="lazy" alt="Image" class="absolute inset-0 h-full w-full object-cover object-center transition duration-200 group-hover:opacity-90" />
                                     <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-gray-800 via-transparent to-transparent opacity-40"></div>
                                 </a>
                             @endforeach
-                            <x-modal-window />
                         </div>
+                        <x-modal-window />
                     </div>
                 @endforeach
             </div>
@@ -66,6 +76,6 @@
         <!-- ページネーション -->
         <div class='mt-8'>
             <x-pagination :paginator="$planposts" />
-      </div>
+        </div>
     </div>
 </x-app-layout>
