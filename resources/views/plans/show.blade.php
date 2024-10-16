@@ -156,8 +156,6 @@
                                 },
                             });
                         }
-
-                        map.setCenter(currentLocation); // マップを現在地にセンタリング
                     },
                     (error) => {
                         console.error("位置情報の取得に失敗しました。", error);
