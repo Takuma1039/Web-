@@ -37,18 +37,29 @@
         <p>まだ作成した旅行計画はありません。</p>
     @else
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            @foreach ($plans as $plan)
-                <div class="p-6 max-w-sm bg-white rounded-lg border border-gray-200 shadow-md hover:shadow-lg transition duration-300">
-                    <a href="{{ route('plans.show', $plan->id) }}"><h2 class="text-xl font-bold mr-2 transition duration-300 ease-in-out transform hover:text-indigo-600">{{ $plan->title }}</h2></a>
-                    <p class="text-gray-700 mb-2">旅行日: {{ $plan->start_date->format('Y年m月d日') }} {{ $plan->start_time->format('H時i分') }}</p>
-                    <ul class="list-disc pl-5">
-                        @foreach ($plan->destinations as $destination)
-                            <li>{{ $destination->name }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endforeach
+    @foreach ($plans as $plan)
+        <div class="p-6 bg-white rounded-2xl border border-gray-200 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105">
+            <!-- タイトル -->
+            <a href="{{ route('plans.show', $plan->id) }}">
+                <h2 class="text-xl font-extrabold mb-3 transition duration-300 ease-in-out transform hover:text-indigo-500">{{ $plan->title }}</h2>
+            </a>
+            
+            <!-- 旅行日 -->
+            <p class="text-sm text-gray-500 mb-3">
+                <span class="font-semibold">旅行日:</span> 
+                <span>{{ $plan->start_date->format('Y年m月d日') }} {{ $plan->start_time->format('H時i分') }}</span>
+            </p>
+
+            <!-- 目的地リスト -->
+            <ul class="list-disc pl-5 space-y-1 text-gray-600 text-sm">
+                @foreach ($plan->destinations as $destination)
+                    <li class="font-medium">{{ $destination->name }}</li>
+                @endforeach
+            </ul>
         </div>
+    @endforeach
+</div>
+
     @endif
 </div>
 
@@ -63,20 +74,25 @@
     @else
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach ($planposts as $planpost)
-                <div class="p-6 max-w-sm bg-white rounded-lg border border-gray-200 shadow-md hover:shadow-lg transition duration-300">
-                    <a href="{{ route('plans.show', $planpost->planpost->plan->id) }}"><h2 class="text-xl font-bold mr-2 transition duration-300 ease-in-out transform hover:text-indigo-600">{{ $planpost->title }}</h2></a>
-                    <p class="text-gray-700 mb-2">旅行日: {{ $planpost->start_date->format('Y年m月d日') }} {{ $planpost->start_time->format('H時i分') }}</p>
-                    @foreach($planpost->planpost->planimages as $plan_img)
-                        <a class="group relative flex h-48 items-end overflow-hidden rounded-lg shadow-lg transition-transform duration-300 transform hover:scale-105" onclick="openModal('{{ $plan_img->image_path }}')">
-                            <img src="{{ $plan_img->image_path }}" loading="lazy" alt="Image" class="absolute inset-0 h-full w-full object-cover object-center transition duration-200 group-hover:opacity-90" />
-                            <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-gray-800 via-transparent to-transparent opacity-40"></div>
-                        </a>
-                    @endforeach
+                <div class="p-6 max-w-sm bg-white rounded-2xl border border-gray-200 shadow-md hover:shadow-lg transition duration-300 transform hover:-translate-y-1">
+                    <a href="{{ route('plans.show', $planpost->planpost->plan->id) }}">
+                        <h2 class="text-xl font-extrabold mr-2 transition duration-300 ease-in-out transform hover:text-indigo-500">{{ $planpost->title }}</h2>
+                    </a>
+                    <p class="text-gray-500 text-sm mb-2">旅行日: 
+                        <span class="font-semibold">{{ $planpost->start_date->format('Y年m月d日') }}</span> 
+                        <span>{{ $planpost->start_time->format('H時i分') }}</span>
+                    </p>
+                    <a class="group relative flex h-48 items-end overflow-hidden rounded-xl shadow-lg transition-transform duration-300 transform hover:scale-105" onclick="openModal('{{ $planpost->planpost->planimages->first()->image_path }}')">
+                        <img src="{{ $planpost->planpost->planimages->first()->image_path }}" loading="lazy" alt="Image" class="absolute inset-0 h-full w-full object-cover object-center transition duration-200 group-hover:opacity-90" />
+                        <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent opacity-50"></div>
+                    </a>
+
                     <x-modal-window />
-                    <p class="text-gray-700 mb-2">目的地:
-                        <ul class="list-disc pl-5">
+
+                    <p class="text-gray-700 mt-4 mb-2">目的地:
+                        <ul class="list-disc pl-5 text-gray-600 text-sm">
                             @foreach ($planpost->planpost->plan->destinations as $destination)
-                                <li>{{ $destination->name }}</li>
+                                <li class="font-medium">{{ $destination->name }}</li>
                             @endforeach
                         </ul>
                     </p>

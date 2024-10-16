@@ -6,8 +6,13 @@
             @else
                 {{ $planpost->title }}
             @endif
-            </h1>
+        </h1>
         
+        <div class="text-right text-sm">
+            <a href="{{ route('plans.post') }}" class="bg-teal-500 text-white border-2 border-teal-500 rounded-full px-2 py-1 font-bold uppercase tracking-wide hover:bg-white hover:text-teal-700 transition-all duration-300">
+                自分用に編集
+            </a>
+        </div>
         
         <div class="mt-6">
             <h2 class="text-2xl font-bold">旅行日程</h2>
@@ -38,25 +43,39 @@
             </ul>
         </div>
 
+        <div class="flex flex-col items-center mt-6">
+            <label for="travelModeSelect" class="text-lg font-medium mb-2">移動手段を選択:</label>
+            <select id="travelModeSelect" class="w-full max-w-xs bg-white border border-gray-300 rounded-lg shadow-md p-2 focus:outline-none focus:ring-2 md:focus:ring-blue-400 focus:border-transparent">
+                <option value="DRIVING">車</option>
+                <option value="WALKING">徒歩</option>
+                <option value="BICYCLING">自転車</option>
+                <option value="TRANSIT">公共交通機関</option>
+            </select>
+
+            <button onclick="updateRoute()" class="mt-4 w-full max-w-xs bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50">
+                経路を検索
+            </button>
+        </div>
+
         <div class="mt-6">
             <h2 class="text-2xl font-bold">経路</h2>
             <div id="map" class="w-full h-80 mb-4 rounded-lg border shadow-md"></div>
             <div id="result" class="p-4">
-              <h2 class="text-xl font-bold mb-4">経路候補</h2>
-              <div id="routes" class="space-y-4"></div>
+                <h2 class="text-xl font-bold mb-4">経路候補</h2>
+                <div id="routes" class="space-y-4"></div>
             </div>
         </div>
         
         <div class="mt-6">
-        　　@if(Auth::id() === $plan->user_id)
+            @if(Auth::id() === $plan->user_id)
                 <a href="{{ route('plans.index') }}" class="bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-indigo-700 transition-all duration-300 shadow-lg">
                     旅行計画一覧に戻る
                 </a>
-        　　@else
-            　　<a href="{{ route('planposts.index') }}" class="bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-indigo-700 transition-all duration-300 shadow-lg">
-                　　みんなの旅行計画へ
-            　　</a>
-        　　@endif
+            @else
+                <a href="{{ route('planposts.index') }}" class="bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-indigo-700 transition-all duration-300 shadow-lg">
+                    みんなの旅行計画へ
+                </a>
+            @endif
         </div>
     </div>
 
@@ -64,246 +83,196 @@
         let map;
         let userMarker;
         let goalMarker;
-        let waypoints;
+        let directionsService;
+        let directionsRenderer;
+        let waypoints = [];
         const startTime = "{{ $plan->start_date->format('Y-m-d') }}T{{ $plan->start_time->format('H:i:s') }}";
 
         function initMap() {
-            getCurrentLocation();
+            directionsService = new google.maps.DirectionsService();
+            directionsRenderer = new google.maps.DirectionsRenderer();
+            getCurrentLocation();  //旅行計画作成時に設定した現在地の取得
+            startTrackingLocation(); // 位置情報のトラッキングを開始
         }
 
         function getCurrentLocation() {
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition((position) => {
-                    const currentLocation = {
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude,
-                    };
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const currentLocation = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude,
+                        };
 
-                    map = new google.maps.Map(document.getElementById("map"), {
-                        zoom: 10,
-                        center: currentLocation,
-                    });
+                        // マップの初期化
+                        map = new google.maps.Map(document.getElementById("map"), {
+                            zoom: 10,
+                            center: currentLocation,
+                        });
 
-                    userMarker = new google.maps.Marker({
-                        position: currentLocation,
-                        map: map,
-                        title: "現在地",
-                        icon: {
-                            url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
-                        },
-                    });
+                        // 現在地マーカーの設定
+                        userMarker = new google.maps.Marker({
+                            position: currentLocation,
+                            map: map,
+                            title: "現在地",
+                        });
 
-                    map.setCenter(currentLocation);
-                    drawRoute();
-                }, () => {
-                    alert('現在地の取得に失敗しました。位置情報サービスが有効になっていることを確認してください。');
-                });
+                        // 経路描画
+                        directionsRenderer.setMap(map);
+                        map.setCenter(currentLocation);
+                        drawRoute();
+                    },
+                    (error) => {
+                        console.error("位置情報の取得に失敗しました。", error);
+                        alert('現在地の取得に失敗しました。位置情報サービスが有効になっていることを確認してください。');
+                    },
+                    { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
+                );
             } else {
-                alert('このブラウザはGeolocation APIをサポートしていません。');
+                alert('位置情報サービスがサポートされていません。');
+            }
+        }
+
+        
+        function startTrackingLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.watchPosition(
+                    (position) => {
+                        const currentLocation = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+
+                        // 現在地マーカーの更新
+                        if (userMarker) {
+                            userMarker.setPosition(currentLocation);
+                        } else {
+                            userMarker = new google.maps.Marker({
+                                position: currentLocation,
+                                map: map,
+                                title: "現在地",
+                                icon: {
+                                    url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+                                },
+                            });
+                        }
+
+                        map.setCenter(currentLocation); // マップを現在地にセンタリング
+                    },
+                    (error) => {
+                        console.error("位置情報の取得に失敗しました。", error);
+                    },
+                    { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
+                );
+            } else {
+                alert('位置情報サービスがサポートされていません。');
             }
         }
 
         function drawRoute() {
             waypoints = [];
-            const currentLocation = `${userMarker.getPosition().lat()},${userMarker.getPosition().lng()}`;
-            
+            const currentLocation = { lat: userMarker.getPosition().lat(), lng: userMarker.getPosition().lng() };
+
             @foreach ($plan->destinations as $destination)
-                waypoints.push({ lat: {{ $destination->lat }}, lon: {{ $destination->long }} });
+                waypoints.push({
+                    location: { lat: {{ $destination->lat }}, lng: {{ $destination->long }} },
+                    stopover: true
+                });
             @endforeach
-            
-            // 目的地が1つだけの場合の処理
-            if (waypoints.length === 1) {
-                const goal = waypoints[0];
-                const goalLocation = { lat: goal.lat, lng: goal.lon};
-                //console.log("Goal Location:", goalLocation);
-                if (currentLocation === `${goalLocation.lat},${goalLocation.lng}`) {
-                    document.getElementById('result').innerHTML = '<p>現在地と目的地が同じです。移動する必要はありません。</p>';
-                    return;
-                } else {
-                    searchRoute(currentLocation, goalLocation, []);
-                    goalMarker = new google.maps.Marker({
-                        position: goalLocation,
-                        map: map,
-                        title: "目的地",
-                        icon: {
-                            url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
-                        },
-                    });
-                }
+
+            const goal = waypoints[waypoints.length - 1].location;
+            const goalLocation = { lat: goal.lat, lng: goal.lng };
+
+            if (currentLocation.lat === goalLocation.lat && currentLocation.lng === goalLocation.lng) {
+                document.getElementById('result').innerHTML = '<p>現在地と目的地が同じです。移動する必要はありません。</p>';
             } else {
-                const goal = waypoints[waypoints.length - 1];
-                const goalLocation = { lat: goal.lat, lng: goal.lon};
-                //console.log("Goal Location:", goalLocation);
-                searchRoute(currentLocation, goalLocation, waypoints);
-                goalMarker = new google.maps.Marker({
-                        position: goalLocation,
-                        map: map,
-                        title: "目的地",
-                        icon: {
-                            url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
-                        },
-                    });
+                searchRoute(currentLocation, goalLocation, waypoints.slice(0, -1));
             }
-            
         }
 
-        function searchRoute(startLocation, goalLocation, waypoints) {
-            const filteredWaypoints = waypoints.slice(0, -1); // 最後の値を取り除いた配列
-            const waypointParam = encodeURIComponent(JSON.stringify(filteredWaypoints)); //JSON表現の文字列
-            //console.log("Waypoint Parameter:", filteredWaypoints);
-    
-            const options = {
-                method: 'GET',
-                headers: {
-                    'x-rapidapi-key': '{{ $apikey }}',
-                    'x-rapidapi-host': 'navitime-route-totalnavi.p.rapidapi.com'
-                }
+        function updateRoute() {
+            const travelMode = document.getElementById("travelModeSelect").value;
+            const currentLocation = { lat: userMarker.getPosition().lat(), lng: userMarker.getPosition().lng() };
+            const goal = waypoints[waypoints.length - 1].location;
+
+            searchRoute(currentLocation, goal, waypoints.slice(0, -1), travelMode);
+        }
+
+        function searchRoute(startLocation, goalLocation, waypoints, travelMode) {
+            const now = new Date();
+            const startTimeDate = new Date(startTime);
+
+            if (startTimeDate < now) {
+                alert('出発時刻が過去です。現在時刻以降を指定してください。');
+                return;
+            }
+
+            const request = {
+                origin: startLocation,
+                destination: goalLocation,
+                waypoints: waypoints.length ? waypoints : undefined,
+                travelMode: google.maps.TravelMode[travelMode],
+                optimizeWaypoints: true // 経由地を最適化
             };
 
-            // waypointsが空のときの処理
-            if (waypoints.length === 0) {
-                //console.log("Waypointsがありません。直接の経路検索を行います。");
-                const goals = `${goalLocation.lat},${goalLocation.lng}`; // 目的地の座標を取得
-                const requestUrl = `https://navitime-route-totalnavi.p.rapidapi.com/route_transit?start=${startLocation}&goal=${goals}&datum=wgs84&term=1440&limit=5&start_time=${startTime}&coord_unit=degree&shape=true&options=railway_calling_at`;
-
-                fetch(requestUrl, options)
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log(data); // レスポンス全体を表示
-                        if (data.items && data.items.length > 0) {
-                            map.data.addGeoJson(data.items[0].shapes); //１つ目の経路を地図上に描画
-                            displayRouteInfo(data.items); //経路候補を表示
-                        } else {
-                            document.getElementById('result').innerHTML = '<p>経路情報が見つかりませんでした。</p>';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('エラーが発生しました:', error);
-                        document.getElementById('result').innerHTML = `<p>エラー: ${error.message}</p>`;
-                    });
-                    return; // 処理を終了
+            if (travelMode === 'DRIVING') {
+                request.drivingOptions = {
+                    departureTime: startTimeDate,
+                    trafficModel: 'bestguess' // 交通状況を考慮
+                };
+            } else if (travelMode === 'TRANSIT') {
+                request.transitOptions = {
+                    departureTime: startTimeDate,
+                    modes: ['BUS', 'RAIL'],
+                };
             }
-            
-            const goals = `${goalLocation.lat},${goalLocation.lng}`; // 目的地の座標を取得
-                
-            // waypointsが1つ以上ある場合の処理
-            const requestUrl = `https://navitime-route-totalnavi.p.rapidapi.com/route_transit?start=${startLocation}&goal=${goals}&via=${waypointParam}&via_type=specified&datum=wgs84&term=1440&limit=5&start_time=${startTime}&coord_unit=degree&shape=true&options=railway_calling_at`;
 
-            fetch(requestUrl, options)
-                .then(response => response.json())
-                .then(data => {
-                console.log(data); // レスポンス全体を表示
-                if (data.items && data.items.length > 0) {
-                    map.data.addGeoJson(data.items[0].shapes);
-                    displayRouteInfo(data.items);
+            directionsService.route(request, (result, status) => {
+            console.log(result); // 結果をログ出力して詳細を確認
+                if (status === google.maps.DirectionsStatus.OK) {
+                    directionsRenderer.setDirections(result);
+                    displayRouteInfo(result.routes[0].legs);
                 } else {
-                    document.getElementById('result').innerHTML = '<p>経路情報が見つかりませんでした。</p>';
+                    document.getElementById('result').innerHTML = `<p>経路情報が見つかりませんでした</p>`;
                 }
-            })
-            .catch(error => {
-                console.error('エラーが発生しました:', error);
-                document.getElementById('result').innerHTML = `<p>エラー: ${error.message}</p>`;
             });
         }
 
-        function displayRouteInfo(routes) {
-            const routesContainer = document.getElementById("routes");  //経路候補の配列を取得
-            routesContainer.innerHTML = ""; // 既存の内容をクリア
+        function displayRouteInfo(legs) {
+            const routesContainer = document.getElementById("routes");
+            routesContainer.innerHTML = "";
 
-            routes.forEach((route, index) => {
-                // 日付をわかりやすいように
-                const fromTime = formatDate(route.summary.move.from_time);
-                const toTime = formatDate(route.summary.move.to_time);
-        
+            legs.forEach((leg, index) => {
+                const fromTime = new Date(startTime);
+                const addTime = leg.duration.value;
+                const toTime = new Date(fromTime.getTime() + Math.round(addTime / 60) * 60 * 1000);
+                
+                const departureTime = formatDate(fromTime);
+                const arrivalTime = formatDate(toTime);
+
                 let resultHTML = `
                     <div class="bg-gray-200 shadow rounded-lg p-4">
-                    <h3 class="text-lg font-semibold">候補 ${index + 1}: ${fromTime} ➡ ${toTime}</h3> 
-                    <h4 class="text-md font-medium">合計時間: ${formatDuration(route.summary.move.time)}</h4>
+                        <h3 class="text-lg font-semibold">経路 ${index + 1}: ${departureTime} ➡ ${arrivalTime}</h3>
+                        <h4 class="text-md font-medium">合計時間: ${leg.duration.text}</h4>
+                        <h4 class="text-md font-medium">距離: ${leg.distance.text}</h4>
+                        <hr class="my-2 border-black">
                 `;
 
-                if (route.summary.move.fare && route.summary.move.fare.unit_0) {
-                    resultHTML += `<h4 class="text-md font-medium">合計運賃: ¥${route.summary.move.fare.unit_0}</h4>`;
-                }
-
-                resultHTML += '<hr class="my-2 border-black">';
-
-                if (route.sections && route.sections.length > 0) {
-                    route.sections.forEach(function(section) {
-                        const type = section.type;
-                        const locationName = section.name || '';
-
-                        if (type === "move") {
-                            // セクションの時間をフォーマット
-                            const sectionFromTime = formatDate(section.from_time);
-                            resultHTML += `<h4 class="text-md">${sectionFromTime}発 ${section.line_name} (${section.time}分)</h4>`;
-                            
-                            if (section.transport && section.transport.fare) {
-                                let unitIndex = 0;
-                                let fareFound = false; // fareが見つかったかどうかを示すフラグ
-                                let fareValues = []; // 有効な運賃を格納する配列
-
-                                // 有効な運賃を配列に格納していく
-                                while (section.transport.fare_break[`unit_${unitIndex}`] !== undefined) {
-                                    if (section.transport.fare_break[`unit_${unitIndex}`] === true) {
-                                        if (section.transport.fare[`unit_${unitIndex}`] !== undefined) {
-                                            fareValues.push(section.transport.fare[`unit_${unitIndex}`]);
-                                            fareFound = true;
-                                        }
-                                    }
-                                    unitIndex++;
-                                }
-                                //console.log(fareValues);
-                                // 取得した運賃の中から最小の運賃を求めて表示
-                                if (fareFound && fareValues.length > 0) {
-                                    const minFare = Math.min(...fareValues);
-                                    resultHTML += `<h4 class="text-sm text-gray-600">運賃: ¥${minFare}</h4>`;
-                                } else {
-                                    resultHTML += `<h4 class="text-sm text-gray-600">運賃: 現在情報がございませんので別途でご確認ください。</h4>`;
-                                }
-                            }
-                        
-                        } else if (type === "point") {
-                            if (locationName === "start") {
-                                resultHTML += `<h3 class="text-lg font-bold">現在地</h3>`;
-                            } else if (locationName === "goal") {
-                                resultHTML += `<h3 class="text-lg font-bold">目的地</h3>`;
-                            } else {
-                                resultHTML += `<h3 class="text-lg font-bold">${locationName}</h3>`;
-                }
-                        }
-                    });    
-                } else {
-                    resultHTML += '<h4 class="text-md text-red-500">セクション情報が見つかりませんでした。</h4>';
-                }
-
-                resultHTML += '</div>'; // ルートのカードを閉じる
-                routesContainer.innerHTML += resultHTML; // 新しい内容を追加
-                    
+                leg.steps.forEach(step => {
+                    resultHTML += `
+                        <div>${step.instructions} (${step.distance.text})</div>
+                    `;
+                });
+                resultHTML += `</div>`;
+                routesContainer.innerHTML += resultHTML;
             });
         }
 
-        function formatDuration(totalMinutes) {
-            const hours = Math.floor(totalMinutes / 60);
-            const minutes = totalMinutes % 60;
-
-            if (hours > 0) {
-                return `${hours}時間${minutes}分`;
-            } else {
-                return `${minutes}分`;
-            }
-        }
-
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleString('ja-JP', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false, // 24時間形式にする
-            }).replace(',', ''); // カンマを削除
+        function formatDate(date) {
+            const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false };
+            return date.toLocaleString('ja-JP', options);
         }
     </script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ $api_key }}&callback=initMap&v=weekly&libraries=marker"></script>
+
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ $api_key }}&callback=initMap&v=weekly&libraries=routes"></script>
 </x-app-layout>

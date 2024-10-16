@@ -27,7 +27,7 @@ class PlanRequest extends FormRequest
             'title' => 'required|string|max:255',
             'start_date' => 'required|date',
             'start_time' => 'required|date_format:H:i',
-            'initial_position' => 'required|string',
+            //'initial_position' => 'string',
             'destinations' => 'required|array|min:1',
             'destinations.*' => 'exists:spots,id', // 目的地のIDがspotsテーブルに存在するか確認
         ];

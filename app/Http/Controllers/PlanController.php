@@ -82,7 +82,6 @@ class PlanController extends Controller
             'title' => $request->title,
             'start_date' => $request->start_date,
             'start_time' => $request->start_time,
-            'initial_position' => $request->initial_position,
         ]);
 
         // 目的地を plan_destinations テーブルに挿入
