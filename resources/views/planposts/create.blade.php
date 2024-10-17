@@ -166,9 +166,6 @@
 
                 reader.readAsDataURL(file);
             });
-
-            // 同じファイルを選択できるようにファイル入力をリセット
-            fileInput.value = '';
         }
         
         // 画像を選択リストから削除

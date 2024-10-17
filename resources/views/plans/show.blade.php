@@ -197,13 +197,23 @@
             const travelMode = document.getElementById("travelModeSelect").value;
             const currentLocation = { lat: userMarker.getPosition().lat(), lng: userMarker.getPosition().lng() };
             if(travelMode === "TRANSIT") {
-                const goal = { lat: navitimeWaypoints[navitimeWaypoints.length - 1].lat, lng: navitimeWaypoints[navitimeWaypoints.length - 1].lon };
+                if(navitimeWaypoints.length === 1) {
+                    const goal = { lat: navitimeWaypoints[0].lat, lng: navitimeWaypoints[0].lon };
+                    searchRoute(currentLocation, goal, [], travelMode);
+                    goalMarker = new google.maps.Marker({
+                                position: goal,
+                                map: map,
+                                title: "目的地",
+                            });
+                } else {
+                    const goal = { lat: navitimeWaypoints[navitimeWaypoints.length - 1].lat, lng: navitimeWaypoints[navitimeWaypoints.length - 1].lon };
                 searchRoute(currentLocation, goal, navitimeWaypoints.slice(0, -1), travelMode);
                 goalMarker = new google.maps.Marker({
                                 position: goal,
                                 map: map,
                                 title: "目的地",
                             });
+                }
             } else {
                 const goal = googleWaypoints[googleWaypoints.length - 1].location;
                 searchRoute(currentLocation, goal, googleWaypoints.slice(0, -1), travelMode);
@@ -219,38 +229,66 @@
                 return;
             }
             
-            // 旅行モードがTRANSITの場合
             if (travelMode === 'TRANSIT') {
-                const filteredWaypoints = waypoints;
-                addWaypointMarkers(filteredWaypoints);
-                const waypointParam = encodeURIComponent(JSON.stringify(filteredWaypoints));
-                const goals = `${goalLocation.lat},${goalLocation.lng}`;
-                const requestUrl = `https://navitime-route-totalnavi.p.rapidapi.com/route_transit?start=${startLocation.lat},${startLocation.lng}&goal=${goals}&via=${waypointParam}&datum=wgs84&term=1440&limit=5&start_time=${startTime}&coord_unit=degree&shape=true&options=railway_calling_at`;
-
-                const options = {
-                    method: 'GET',
-                    headers: {
-                        'x-rapidapi-key': '{{ $apikey }}',
-                        'x-rapidapi-host': 'navitime-route-totalnavi.p.rapidapi.com'
-                    }
-                };
-        
-                fetch(requestUrl, options)
+                // 旅行モードがTRANSITかつ経由地がない場合
+                if (waypoints.length === 0) {
+                    const goals = `${goalLocation.lat},${goalLocation.lng}`;
+                    const requestUrl = `https://navitime-route-totalnavi.p.rapidapi.com/route_transit?start=${startLocation.lat},${startLocation.lng}&goal=${goals}&datum=wgs84&term=1440&limit=5&start_time=${startTime}&coord_unit=degree&shape=true&options=railway_calling_at`;
+                    
+                    const options = {
+                        method: 'GET',
+                        headers: {
+                            'x-rapidapi-key': '{{ $apikey }}',
+                            'x-rapidapi-host': 'navitime-route-totalnavi.p.rapidapi.com'
+                        }
+                    };
+                    
+                    fetch(requestUrl, options)
                     .then(response => response.json())
                     .then(data => {
-                    console.log(data);
-                    if (data.items && data.items.length > 0) {
-                        displayNavitimeRouteInfo(data.items);
-                        map.data.addGeoJson(data.items[0].shapes);
-                        
-                    } else {
-                        document.getElementById('result').innerHTML = '<p>経路情報が見つかりませんでした。</p>';
-                    }
-                })
-                .catch(error => {
-                    console.error('エラーが発生しました:', error);
-                    document.getElementById('result').innerHTML = `<p>エラー: ${error.message}</p>`;
-                });
+                        console.log(data);
+                        if (data.items && data.items.length > 0) {
+                            displayNavitimeRouteInfo(data.items);
+                            map.data.addGeoJson(data.items[0].shapes);
+                        } else {
+                            document.getElementById('result').innerHTML = '<p>経路情報が見つかりませんでした。</p>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('エラーが発生しました:', error);
+                        document.getElementById('result').innerHTML = `<p>エラー: ${error.message}</p>`;
+                    });
+                } else {
+                    const filteredWaypoints = waypoints;
+                    addWaypointMarkers(filteredWaypoints);
+                    const waypointParam = encodeURIComponent(JSON.stringify(filteredWaypoints));
+                    const goals = `${goalLocation.lat},${goalLocation.lng}`;
+                    const requestUrl = `https://navitime-route-totalnavi.p.rapidapi.com/route_transit?start=${startLocation.lat},${startLocation.lng}&goal=${goals}&via=${waypointParam}&datum=wgs84&term=1440&limit=5&start_time=${startTime}&coord_unit=degree&shape=true&options=railway_calling_at`;
+                    const options = {
+                        method: 'GET',
+                        headers: {
+                            'x-rapidapi-key': '{{ $apikey }}',
+                            'x-rapidapi-host': 'navitime-route-totalnavi.p.rapidapi.com'
+                        }
+                    };
+                    
+                    fetch(requestUrl, options)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+                        if (data.items && data.items.length > 0) {
+                            displayNavitimeRouteInfo(data.items);
+                            map.data.addGeoJson(data.items[0].shapes);
+                        } else {
+                            document.getElementById('result').innerHTML = '<p>経路情報が見つかりませんでした。</p>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('エラーが発生しました:', error);
+                        document.getElementById('result').innerHTML = `<p>エラー: ${error.message}</p>`;
+                    });
+                }
+
             } else {
                 const request = {
                     origin: startLocation,

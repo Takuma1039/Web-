@@ -102,7 +102,7 @@ class PlanpostController extends Controller {
     }
     
     public function store(PlanpostRequest $request, Planpost $planpost) {
-    
+        
         $images = $request->file('images');
         if (is_null($images) || !is_array($images)) {
             return redirect()->back()->withErrors('画像が選択されていません。');
