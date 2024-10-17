@@ -8,7 +8,7 @@
             <!-- スポット一覧 -->
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 @forelse($spots as $spot)
-                    <div class="bg-white p-6 rounded-lg shadow-lg transition-transform transform z-0 hover:shadow-xl hover:scale-105 duration-300 overflow-visible">
+                    <div class="bg-white p-6 rounded-lg shadow-lg transition-transform transform z-0 sm:hover:shadow-xl sm:hover:scale-105 duration-300 overflow-visible">
                         <div class="">
                             <a href="{{ route('spots.show', $spot->id) }}" class="hover:opacity-80 transition-opacity duration-150">
                                 <!-- 画像表示 -->
