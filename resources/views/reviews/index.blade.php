@@ -1,28 +1,27 @@
 <x-app-layout>
-<div class="container mx-auto p-1">
-    <h1 class="text-4xl font-extrabold text-gray-800 text-center mb-8">口コミ投稿一覧</h1>
+    <div class="container mx-auto p-1">
+        <h1 class="text-4xl font-extrabold text-gray-800 text-center mb-8">口コミ投稿一覧</h1>
     
-    <!-- おしゃれなメッセージボックス -->
-    <div class="mb-6 p-4 bg-white border-l-4 border-indigo-600 rounded-lg shadow-md">
-        <p class="text-lg font-semibold text-gray-800">
-            各スポット詳細画面に行って口コミを投稿しよう！
-        </p>
-        <a href="{{ route('spots.index') }}" class="inline-block mt-2 px-4 py-2 bg-indigo-600 text-white rounded-full shadow transition duration-300 ease-in-out hover:bg-indigo-700">
-            スポットを探したい場合はこちら
-        </a>
-    </div>
+        <div class="mb-6 p-4 bg-white border-l-4 border-pink-500 rounded-lg shadow-md">
+            <p class="text-lg font-semibold text-gray-800">
+                各スポット詳細画面に行って口コミを投稿しよう！
+            </p>
+            <a href="{{ route('spots.index') }}" class="inline-block mt-2 px-4 py-2 bg-pink-500 text-white rounded-full shadow transition duration-300 ease-in-out hover:bg-pink-600 hover:scale-105">
+                スポットを探したい場合はこちら
+            </a>
+        </div>
 
-    @foreach($spots as $spot)
-        <div class="mb-6 p-4 border rounded-lg shadow">
-            <div class="flex items-center">
-    <a href="{{ route('spots.show', $spot->id) }}" class="transition duration-300 ease-in-out transform hover:text-indigo-600">
-        <h2 class="text-xl font-semibold leading-tight">{{ $spot->name }}</h2>
-    </a>
-    <div class="flex items-center ml-4">
-        <x-rating :average-rating="$spot->average_rating" class="h-6" />
-        <span class="text-gray-600 ml-2 font-semibold leading-tight">総合評価: {{ number_format($spot->average_rating, 2) }}</span>
+        @foreach($spots as $spot)
+            <div class="mb-6 p-4 border rounded-lg shadow">
+                <div class="flex items-center">
+        <a href="{{ route('spots.show', $spot->id) }}" class="transition duration-300 ease-in-out transform hover:text-indigo-600">
+            <h2 class="text-xl font-semibold leading-tight">{{ $spot->name }}</h2>
+        </a>
+        <div class="flex items-center ml-4">
+            <x-rating :average-rating="$spot->average_rating" class="h-6" />
+            <span class="text-gray-600 ml-2 font-semibold leading-tight">総合評価: {{ number_format($spot->average_rating, 2) }}</span>
+        </div>
     </div>
-</div>
             
             <!-- 画像の表示 -->
             @if($spot->spotimages->isNotEmpty())

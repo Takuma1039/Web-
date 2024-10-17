@@ -15,7 +15,6 @@ class Plan extends Model
         'memo',
         'start_date',
         'start_time',
-        'initial_position',
     ];
     
     public function destinations()

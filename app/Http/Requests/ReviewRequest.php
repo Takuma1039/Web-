@@ -27,8 +27,8 @@ class ReviewRequest extends FormRequest
             'title' => 'required|max:50',
             'comment' => 'required|string|max:500',
             'review' => 'required|numeric|between:1,5',
-            'images.*' => 'image|mimes:jpg,png,jpeg,gif,webp,AVIF|max:2048',
-            'image_names.*' => 'nullable|string|max:255', // 画像名のバリデーション
+            'images.*' => 'image|mimes:jpg,png,jpeg,gif,webp,avif,AVIF|max:2048',
+            'new_image_names.*' => 'nullable|string|max:255', // 画像名のバリデーション
             'is_anonymous' => 'nullable|boolean',
             'image_ids.*' => 'nullable|integer|exists:review_images,id', // 画像IDのバリデーション
         ];

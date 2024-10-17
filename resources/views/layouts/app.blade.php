@@ -36,7 +36,7 @@
             
             <!-- Page Content -->
             <main>
-              <div>   
+              <div class="container mx-auto max-w-screen-xl">   
                 {{ $slot }}
               </div>
             </main>

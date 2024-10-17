@@ -23,7 +23,7 @@
 
                 <!-- 新規登録 & ログインボタン -->
                 @guest
-                    <div class="flex flex-col sm:flex-row gap-2 justify-center"> <!-- スマートフォンでは縦、デスクトップでは横に並ぶ -->
+                    <div class="flex flex-col sm:flex-row gap-2 justify-center">
                         <a href="/register" class="bg-white text-gray-800 border-2 border-gray-800 rounded-full px-4 py-1 font-bold uppercase tracking-wide hover:bg-gray-800 hover:text-white transition-all duration-300 flex items-center justify-center">
                             新規登録
                         </a>

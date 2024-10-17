@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div class="container mx-auto">
+    <div class="container mx-auto max-w-screen-xl">
         <h1 class="text-4xl font-extrabold text-gray-800 text-center mb-8">旅行計画一覧</h1>
 
         <!-- 成功メッセージ -->

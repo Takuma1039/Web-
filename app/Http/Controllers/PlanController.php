@@ -58,14 +58,8 @@ class PlanController extends Controller
 
         // お気に入りスポットを取得
         $likedSpots = $user->spotlikes()->with('spot:id,name,lat,long')->get()->pluck('spot');
-        
-        // Google Map APIキー
-        $api_key = config('app.google_maps_api_key');
-        
-        // Navitime APIキー
-        $apikey = config('app.navitime_api_key');
     
-        return view('plans.create', compact('likedSpots', 'api_key', 'apikey'));
+        return view('plans.create', compact('likedSpots'));
     }
 
     // 計画の保存処理
@@ -133,7 +127,6 @@ public function show(Request $request, Planpost $planpost, $id)
     return view('plans.show', compact('plan', 'api_key', 'apikey', 'planpost'));
 }
 
-    
     public function destroy($id)
 {
     \DB::beginTransaction();
@@ -141,7 +134,8 @@ public function show(Request $request, Planpost $planpost, $id)
     try {
         // IDに対応する旅行計画を取得
         $plan = Plan::findOrFail($id);
-        
+        // 関連する目的地を削除
+        $plan->destinations()->delete();
         // リレーションを解除 (目的地)
         $plan->destinations()->detach();
         

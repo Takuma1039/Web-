@@ -22,7 +22,7 @@
             <div class="mt-1 flex flex-wrap">
                 @foreach($locals as $local)
                     <div class="flex items-center mr-4">
-                        <input type="checkbox" name="spot[local_id][]" value="{{ $local->id }}" id="local-{{ $local->id }}" {{ in_array($local->id, old('spot.local_id', [])) ? 'checked' : '' }} class="mr-2">
+                        <input type="radio" name="spot[local_id][]" value="{{ $local->id }}" id="local-{{ $local->id }}" {{ in_array($local->id, old('spot.local_id', [])) ? 'checked' : '' }} class="mr-2">
                         <label for="local-{{ $local->id }}" class="text-sm text-gray-600">{{ $local->name }}</label>
                     </div>
                 @endforeach

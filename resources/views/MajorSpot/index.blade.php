@@ -9,7 +9,7 @@
       <!-- 検索バーコンポーネント -->
       <x-search-bar :spotcategories="$spotcategories" :locals="$locals" :seasons="$seasons" :months="$months" />
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div>
         <div class="col-span-2">
           @forelse($majorranking as $index => $spot)
             <div class="p-4 bg-white rounded-lg shadow-lg mb-4 border border-gray-300 hover:shadow-xl transition-shadow duration-300">

@@ -1,5 +1,5 @@
 <x-app-layout>
-  <div class="bg-gray-100 min-h-screen">
+  <div class="bg-white min-h-screen">
     <div class="container mx-auto px-4 py-8">
       <h1 class="text-2xl font-bold mb-6">地域:
         @if($local) <!-- $localが存在するかどうかを確認 -->
@@ -9,7 +9,7 @@
         @endif
       </h1>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div>
         <div class="col-span-2">
           @forelse($spots as $spot)
             <div class="p-4 bg-white rounded-lg shadow-md mb-4">

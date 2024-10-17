@@ -62,7 +62,8 @@ Route::middleware('auth', 'activity')->group(function () {
     //旅行計画関係
     Route::get('/planposts/likesplan', [PlanpostController::class, 'likesplan'])->name('planposts.likesplan');
     Route::get('/planposts/create', [PlanpostController::class, 'create'])->name('plans.post');
-    
+    Route::get('/planpost/{planpost}/add', [PlanpostController::class, 'addPlan'])->name('planposts.add'); //いいねした旅行計画の追加
+    Route::post('/planposts/planstore', [PlanpostController::class, 'planstore'])->name('planposts.planstore'); //いいねした旅行計画の保存
     Route::post('/planposts/store', [PlanpostController::class, 'store'])->name('planposts.store'); //旅行計画投稿の保存
     Route::post('/planpost/like', [PlanLikeController::class, 'likeplan']);
     Route::delete('/planposts/{planpost}', [PlanpostController::class, 'destroy'])->name('planposts.destroy'); //投稿した旅行計画の削除

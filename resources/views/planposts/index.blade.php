@@ -51,7 +51,7 @@
                             </div>
                         </div>
 
-                        <div class="w-full md:w-2/5 flex flex-col gap-4 relative md:ml-6">
+                        <div class="w-full md:w-2/5 grid grid-cols-1 gap-4 md:grid-cols-2 relative md:ml-6">
                             @foreach($planpost->planimages as $plan_img)
                                 <a class="group relative flex-grow overflow-hidden rounded-lg shadow-lg transition-transform duration-300 transform hover:scale-105" onclick="openModal('{{ $plan_img->image_path }}')">
                                     <img src="{{ asset($plan_img->image_path) }}" loading="lazy" alt="Image" class="absolute inset-0 h-full w-full object-cover object-center transition duration-200 group-hover:opacity-90" />

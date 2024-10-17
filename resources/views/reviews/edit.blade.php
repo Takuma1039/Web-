@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div class="bg-gray-50 dark:bg-gray-900 min-h-screen py-8">
+    <div class="bg-white dark:bg-gray-900 min-h-screen py-8">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
                 <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white mb-4">口コミを編集</h2>
