@@ -122,24 +122,24 @@
         </div>
         
         <!--画像のプレビュー画面用-->
-                <script>
-                  function previewImages() {
-                    const preview = document.getElementById('image-preview');
-                    preview.innerHTML = ''; // プレビューをリセット
+        <script>
+            function previewImages() {
+                const preview = document.getElementById('image-preview');
+                preview.innerHTML = ''; // プレビューをリセット
 
-                    const files = document.getElementById('image-input').files;
+                const files = document.getElementById('image-input').files;
 
-                    if (files.length === 0) {
-                      preview.innerHTML = '<p class="text-gray-500">画像が選択されていません。</p>';
-                      return;
-                    }
+                if (files.length === 0) {
+                    preview.innerHTML = '<p class="text-gray-500">画像が選択されていません。</p>';
+                    return;
+                }
 
-                    for (let i = 0; i < files.length; i++) {
-                      const file = files[i];
-                      const reader = new FileReader();
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    const reader = new FileReader();
 
-                      // 画像のプレビューと名前入力欄を作成
-                      reader.onload = function(e) {
+                    // 画像のプレビューと名前入力欄を作成
+                    reader.onload = function(e) {
                         const imgContainer = document.createElement('div');
                         imgContainer.classList.add('flex', 'flex-col', 'items-center', 'mb-4');
 
@@ -149,24 +149,24 @@
 
                         imgContainer.appendChild(img);
                         preview.appendChild(imgContainer);
-                      }
-
-                      reader.readAsDataURL(file);
                     }
-                  }
-                </script>
+
+                    reader.readAsDataURL(file);
+                }
+            }
+        </script>
                 
         <button type="submit" class="mt-4 bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700">アップロード</button>
     </form>
     @if ($errors->any())
-    <div class="alert alert-danger">
-        <ul>
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 </x-app-layout>
 
 

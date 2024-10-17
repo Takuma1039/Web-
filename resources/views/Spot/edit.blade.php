@@ -9,11 +9,11 @@
             <label class="block text-sm font-medium text-gray-700">カテゴリー</label>
             <div class="mt-1 flex flex-wrap">
                 @foreach($spotcategories as $spotcategory)
-    <div class="flex items-center mr-4">
-        <input type="checkbox" name="spot[category_ids][]" value="{{ $spotcategory->id }}" id="category-{{ $spotcategory->id }}" {{ in_array($spotcategory->id, $categoryIds) ? 'checked' : '' }} class="mr-2">
-        <label for="category-{{ $spotcategory->id }}" class="text-sm text-gray-600">{{ $spotcategory->name }}</label>
-    </div>
-@endforeach
+                    <div class="flex items-center mr-4">
+                        <input type="checkbox" name="spot[category_ids][]" value="{{ $spotcategory->id }}" id="category-{{ $spotcategory->id }}" {{ in_array($spotcategory->id, $categoryIds) ? 'checked' : '' }} class="mr-2">
+                        <label for="category-{{ $spotcategory->id }}" class="text-sm text-gray-600">{{ $spotcategory->name }}</label>
+                    </div>
+                @endforeach
             </div>
         </div>
 
@@ -117,36 +117,33 @@
         </div>
 
         <div class="mb-4">
-    <label class="block text-sm font-medium text-gray-700">現在の画像</label>
-    <div class="mt-1 flex flex-wrap">
-        @foreach($spotImages as $spotImage)
-            <div class="mr-4">
-                <img src="{{ $spotImage->image_path }}" alt="Spot Image" class="w-32 h-32 object-cover mb-2">
-                <div>
-                    <input type="checkbox" name="remove_images[]" value="{{ $spotImage->id }}">
-                    <label>削除</label>
-                </div>
+            <label class="block text-sm font-medium text-gray-700">現在の画像</label>
+            <div class="mt-1 flex flex-wrap">
+                @foreach($spotImages as $spotImage)
+                    <div class="mr-4">
+                        <img src="{{ $spotImage->image_path }}" alt="Spot Image" class="w-32 h-32 object-cover mb-2">
+                        <div>
+                            <input type="checkbox" name="remove_images[]" value="{{ $spotImage->id }}">
+                            <label>削除</label>
+                        </div>
+                    </div>
+                @endforeach
             </div>
-        @endforeach
-    </div>
-</div>
+        </div>
 
-<div class="mb-4">
-    <label class="block text-sm font-medium text-gray-700">新しい画像ファイル（複数可）:</label>
-    <input type="file" name="image[]" multiple class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-indigo-200">
-</div>
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700">新しい画像ファイル（複数可）:</label>
+            <input type="file" name="image[]" multiple class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-indigo-200">
+        </div>
         <button type="submit" class="mt-4 bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700">更新</button>
     </form>
     @if ($errors->any())
-    <div>
-        <ul>
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
-    <div class="footer mt-6 text-center">
-        <a href="javascript:history.back();" class="text-blue-600 hover:underline">戻る</a>
-    </div>
+        <div>
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 </x-app-layout>

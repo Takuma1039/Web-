@@ -122,5 +122,5 @@
             event.target.closest('.destination-item').remove();
         }
     });
-</script>
+    </script>
 </x-app-layout>

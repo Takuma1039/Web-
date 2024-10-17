@@ -65,5 +65,4 @@
         selectFiles.splice(index, 1); // 選択されたファイルリストから削除
         previewImages(); // プレビューを再描画
     }
-    
 </script>

@@ -100,7 +100,7 @@
                 noSpotsMessage.classList.add('hidden'); // スポットがある場合は非表示
             }
         }
-  </script>
+    </script>
 </x-app-layout>
 
 

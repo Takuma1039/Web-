@@ -1,15 +1,15 @@
 @props(['planpost'])
 
 <div class="relative flex items-center">
-  <!-- いいねメッセージ表示 -->
-  <div id="likeMessage-{{ $planpost->id }}" 
-       class="hidden absolute left-1/2 transform -translate-x-1/2 -translate-y-full mb-2 text-sm font-semibold text-fuchsia-600 bg-fuchsia-100 px-2 py-1 rounded-full transition duration-300 opacity-0 z-50" 
-       style="pointer-events: none; white-space: nowrap; z-index: 200;">
-  </div>
+    <!-- いいねメッセージ表示 -->
+    <div id="likeMessage-{{ $planpost->id }}" 
+        class="hidden absolute left-1/2 transform -translate-x-1/2 -translate-y-full mb-2 text-sm font-semibold text-fuchsia-600 bg-fuchsia-100 px-2 py-1 rounded-full transition duration-300 opacity-0 z-50" 
+        style="pointer-events: none; white-space: nowrap; z-index: 200;">
+    </div>
 
-  <!-- いいねボタン -->
-  <i class="fa-solid fa-heart like-btn {{ $planpost->isLikedByAuthUser() ? 'liked' : '' }}" 
-     id="like-btn-{{ $planpost->id }}" style="font-size: 1.25rem; z-index: 10;"></i>
+    <!-- いいねボタン -->
+    <i class="fa-solid fa-heart like-btn {{ $planpost->isLikedByAuthUser() ? 'liked' : '' }}" 
+        id="like-btn-{{ $planpost->id }}" style="font-size: 1.25rem; z-index: 10;"></i>
   
     <!-- いいねボタンの処理 -->
     <script>
