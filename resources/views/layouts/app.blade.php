@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Few Days-trip') }}</title>
+        <title>{{ config('app.name', 'DayTrip Planner') }}</title>
         
         <!-- Css -->
         <link rel="preconnect" href="https://fonts.bunny.net">

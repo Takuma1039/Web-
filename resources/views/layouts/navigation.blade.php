@@ -4,7 +4,7 @@
         <div class="flex justify-between items-center py-4 px-4"> <!-- 全体を横並びに -->
             <!-- Few Days-Trip タイトル -->
             <a href="/" aria-label="Dashboard">
-                <h1 class="text-xl font-semibold">Few Days-Trip</h1>
+                <h1 class="text-xl font-mono font-bold">DayTrip Planner</h1>
             </a>
             @include('components.breadcrumb') {{-- パンくずリスト --}}
             

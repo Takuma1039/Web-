@@ -44,7 +44,8 @@
                                         id="{{ $planpost->planpost->id }}" style="font-size: 1.25rem;"></i>
                                 </div>
                                 <div class="text-right text-xs ml-2 md:text-sm">
-                                    <a href="{{ route('planposts.add', $planpost->planpost->plan->id) }}" class="bg-blue-600 text-white border-2 border-blue-600 rounded-full px-2 py-1 font-bold uppercase tracking-wide hover:bg-white hover:text-blue-700 transition-all duration-300">
+                                    <a href="{{ route('planposts.add', $planpost->planpost->plan->id) }}" class="bg-blue-600 text-white border-2 border-blue-600 rounded-full px-2 py-1 font-bold uppercase tracking-wide hover:bg-white hover:text-blue-700 transition-all duration-300"
+                                        style="white-space: nowrap;">
                                         自分の旅行計画に追加
                                     </a>
                                 </div>

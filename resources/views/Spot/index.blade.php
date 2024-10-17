@@ -8,8 +8,8 @@
             <!-- スポット一覧 -->
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 @forelse($spots as $spot)
-                    <div class="bg-white p-6 rounded-lg shadow-lg transition-transform transform relative z-0 hover:shadow-xl hover:scale-105 duration-300 overflow-visible">
-                        <div class="relative">
+                    <div class="bg-white p-6 rounded-lg shadow-lg transition-transform transform z-0 hover:shadow-xl hover:scale-105 duration-300 overflow-visible">
+                        <div class="">
                             <a href="{{ route('spots.show', $spot->id) }}" class="hover:opacity-80 transition-opacity duration-150">
                                 <!-- 画像表示 -->
                                 @if ($spot->spotimages->isNotEmpty())
@@ -24,7 +24,7 @@
                             <h2 class="text-2xl font-semibold text-gray-800 mt-2 flex items-center">
                                 {{ $spot->name }}
                                 @auth
-                                    <div class="ml-4 relative">
+                                    <div class="ml-4">
                                         <x-like-button :spot="$spot" />
                                     </div>
                                 @endauth
@@ -38,7 +38,7 @@
                                 @endforeach
                             </p>
                             <!-- おすすめシーズン -->
-                            <p class="text-gray-500 font-bold mt-1">おすすめな季節:
+                            <p class="text-gray-500 font-bold mt-1">おすすめシーズン:
                                 @foreach($spot->seasons as $season)
                                     <span class="inline-block bg-pink-500 text-white text-sm font-medium mr-1 px-2.5 py-0.5 rounded">{{ $season->name }}</span>
                                 @endforeach
