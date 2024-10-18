@@ -6,15 +6,15 @@ DayTrip Planner
 
 ## 概要
 
-今のシーズンに人気なスポットなどの情報を紹介し, 行きたいスポットを決定したときに, それらのスポットを経由する旅行プランを簡単に作成できるアプリです。他にも口コミ投稿や自分で作成した旅行プランの投稿ができます。
+今のシーズンに人気なスポットなどの情報を紹介し, 行きたいスポットを決定したときに, そのスポットを経由地、または目的地とする旅行プランを簡単に作成できるアプリです。他にも口コミ投稿や自分で作成した旅行プランの投稿ができます。
 
 ## 使用技術
 
-PHP:8.2.x
+PHP: 8.2.21
 
-Laravel:10.x.x
+Laravel: 10.48.20
 
-Tailwind:5.x.x
+Tailwindcss: 3.4.13
 
 デプロイ：Heroku
 
@@ -24,7 +24,7 @@ Tailwind:5.x.x
 
 URL:[localhost:3000](https://oneday-trip-8e0ed0b84bcb.herokuapp.com/)
 
-以下のEmailとPasswardを用いてアクセスしてください。
+以下のEmailとPasswardを用いてアクセスしてください。Nameは自由に設定できますが、demoとしてください。
 <markdown-accessiblity-table data-catalyst=""><table>
 <thead>
 <tr>
@@ -41,10 +41,17 @@ URL:[localhost:3000](https://oneday-trip-8e0ed0b84bcb.herokuapp.com/)
 </table></markdown-accessiblity-table>
 
 ## 機能
-- 口コミ投稿周りのCRUD
-- いいね機能
-- コメント機能
-- 画像投稿
+1. スポット周りの機能
+   - お気に入り機能
+     スポット名の横にある星ボタンを押すとお気に入り登録ができる
+   - 口コミ投稿機能
+   - Map表示機能
+   - 画像プレビュー画面
+3. 口コミ投稿周りの機能
+    - いいね機能
+    - レビュー機能
+    - コメント機能
+    - 画像投稿
 
 ## 工夫点・苦労した点
 
