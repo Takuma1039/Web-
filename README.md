@@ -42,7 +42,7 @@ URL:[localhost:3000](https://oneday-trip-8e0ed0b84bcb.herokuapp.com/)
 
 ## 機能
 1. スポット周りの機能
-   - お気に入り機能
+   - お気に入り機能  
      スポット名の横にある星ボタンを押すとお気に入り登録ができる
    - 口コミ投稿機能
    - Map表示機能
