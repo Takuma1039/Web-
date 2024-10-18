@@ -22,7 +22,7 @@ Tailwindcss: 3.4.13
 
 URL:[localhost:3000](https://oneday-trip-8e0ed0b84bcb.herokuapp.com/)
 
-以下のEmailとPasswardを用いてアクセスしてください。Nameは自由に設定できますが、demoとしてください。
+以下のEmailとPasswardを用いてアクセスしてください。Nameは自由に設定できます。Nameを決められない場合はdemoで設定しましょう。
 <markdown-accessiblity-table data-catalyst=""><table>
 <thead>
 <tr>
