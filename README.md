@@ -1,17 +1,22 @@
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-# Name（アプリ名と概要）
+# Name アプリ名
 
-Few Days-Trip (アプリ名[仮])
+DayTrip Planner
 
-今のシーズンに人気なスポットを紹介し, 行きたいスポットを決定したときに, それらのスポットを経由する旅行プランをいくつか出してくれるアプリです。
+## 概要
 
-# Disclaimer (免責事項)
+今のシーズンに人気なスポットなどの情報を紹介し, 行きたいスポットを決定したときに, それらのスポットを経由する旅行プランを簡単に作成できるアプリです。他にも口コミ投稿や自分で作成した旅行プランの投稿ができます。
 
-このプロジェクトは現在開発中のため、バグや大幅な変更が発生する可能性があります。
+## 使用技術
+PHP:8.2.x
+Laravel:10.x.x
+Tailwind:5.x.x
+デプロイ：Heroku
 
-リファクタリングできていないため、ソースコードがきれいに整理されておりません。(完成次第取り掛かる予定)
-# DEMO
+[![使用技術アイコン](https://skillicons.dev/icons?i=php,laravel,tailwind,heroku)](https://skillicons.dev)
+
+## DEMO
 
 以下のEmailとPasswardを用いてアクセスしてください。
 <markdown-accessiblity-table data-catalyst=""><table>
@@ -29,24 +34,22 @@ Few Days-Trip (アプリ名[仮])
 </tbody>
 </table></markdown-accessiblity-table>
 
-# Features
+## 機能
+- 口コミ投稿周りのCRUD
+- いいね機能
+- コメント機能
+- 画像投稿
 
-完成した際に記述
+## 工夫点・苦労した点
 
-# Usage
 
-完成した際に記述
+## 今後の展望
 
-# Note
+## ER図・ワイヤーフレームなど
+URL or スクショ（こっちの方がよい）
 
-注意点などがあれば記述
-
-# Author
+## Author
 
 * 作成者: Yagyu Takuma
 * 所属 : Gunma University
 * E-mail : j241a031@gunma-u.ac.jp
-
-# License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
