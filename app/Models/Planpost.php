@@ -17,7 +17,7 @@ class Planpost extends Model
         'season_id',
         'month_id',
         'local_id',
-        'plantype_id',
+        'plan_category_ids',
         'is_anonymous',
     ];
     
@@ -31,9 +31,9 @@ class Planpost extends Model
         return $this->belongsTo(User::class);
     }
     
-    public function plantype()
+    public function plantypes()
     {
-        return $this->belongsTo(Plantype::class);
+        return $this->belongsToMany(Plantype::class, 'planpost_plantype');
     }
 
     public function local()

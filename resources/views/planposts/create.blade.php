@@ -2,10 +2,10 @@
     <div class="container mx-auto">
         <h1 class="text-4xl font-extrabold text-gray-800 text-center mb-8">旅行計画の投稿</h1>
 
-        <!-- 成功メッセージ -->
-        @if (session('success'))
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-6" role="alert">
-                <span class="block sm:inline">{{ session('success') }}</span>
+        <!-- 失敗メッセージ -->
+        @if (session('error'))
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6" role="alert">
+                <span class="block sm:inline">{{ session('error') }}</span>
             </div>
         @endif
 
@@ -67,7 +67,7 @@
                 <div class="mt-1 flex flex-wrap">
                     @foreach($plantypes as $plantype)
                         <div class="flex items-center mr-4">
-                            <input type="radio" name="planpost[plantype_id]" value="{{ $plantype->id }}" id="plantype-{{ $plantype->id }}" {{ in_array($plantype->id, old('planpost.plantype_id', [])) ? 'checked' : '' }} class="mr-2">
+                            <input type="checkbox" name="planpost[plantype_ids][]" value="{{ $plantype->id }}" id="plantype-{{ $plantype->id }}" {{ in_array($plantype->id, old('planpost.plantype_id', [])) ? 'checked' : '' }} class="mr-2">
                             <label for="plantype-{{ $plantype->id }}" class="text-sm text-gray-600">{{ $plantype->name }}</label>
                         </div>
                     @endforeach

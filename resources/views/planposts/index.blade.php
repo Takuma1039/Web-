@@ -1,6 +1,14 @@
 <x-app-layout>
     <div class="container mx-auto py-4 md:py-8">
         <h1 class="text-3xl md:text-4xl font-bold text-gray-800 text-center mb-6 md:mb-8">みんなの旅行計画</h1>
+        
+        <!-- 成功メッセージ -->
+        @if (session('success'))
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-6" role="alert">
+                <span class="block sm:inline">{{ session('success') }}</span>
+            </div>
+        @endif
+        
         <!-- 検索バーコンポーネント -->
         <x-plan-search-bar :plantypes="$plantypes" :locals="$locals" :seasons="$seasons" :months="$months" />
 
@@ -43,7 +51,9 @@
                                     {{ $planpost->local->name }} 
                                     {{ $planpost->season->name }}
                                     {{ $planpost->month->name }}
-                                    {{ $planpost->plantype->name }}
+                                    @foreach($planpost->plantypes as $plantype)
+                                        {{ $plantype->name }}
+                                    @endforeach
                                 </span>
                             </div>
                             <div class="border border-gray-300 bg-gray-50 rounded-md p-4 mt-2 md:mt-4">

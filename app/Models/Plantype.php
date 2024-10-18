@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Plantype extends Model
 {
     use HasFactory;
+    
+    public function planposts()
+    {
+        return $this->belongsToMany(Planpost::class, 'planpost_plantype');
+    }
 }

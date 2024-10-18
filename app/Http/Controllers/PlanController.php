@@ -125,16 +125,13 @@ class PlanController extends Controller
         \DB::beginTransaction();
     
         try {
-            // IDに対応する旅行計画を取得
-            $plan = Plan::findOrFail($id);
+            
+            $plan = Plan::with('destinations')->find($id);
+            
             // 関連する目的地を削除
-            $plan->destinations()->delete();
-            // リレーションを解除 (目的地)
             $plan->destinations()->detach();
-        
-            // 旅行計画自体を削除
+            
             $plan->delete();
-        
             // トランザクションをコミット
             \DB::commit();
         

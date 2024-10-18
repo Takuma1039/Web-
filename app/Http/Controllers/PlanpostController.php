@@ -109,10 +109,7 @@ class PlanpostController extends Controller {
         }
     
         $input = $request['planpost'];
-        $input['local_id'] = $request->input('planpost.local_id');
-        $input['season_id'] = $request->input('planpost.season_id');
-        $input['month_id'] = $request->input('planpost.month_id');
-        $input['plantype_id'] = $request->input('planpost.plantype_id');
+        $input['plantype_ids'] = json_encode($request->input('planpost.plantype_ids', []));
         $input['user_id'] = auth()->id();
         $input['plan_id'] = $request->input('planpost.plan_id');
         $input['is_anonymous'] = $request->input('planpost.is_anonymous');
@@ -125,6 +122,8 @@ class PlanpostController extends Controller {
             if (!$planpost->fill($input)->save()) {
                 throw new \Exception('旅行計画の投稿に失敗しました。');
             }
+            
+            $planpost->plantypes()->attach($request->input('planpost.plantype_ids', []));
         
             foreach ($images as $image) {
                 try {

@@ -8,4 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class PlanCategory extends Model
 {
     use HasFactory;
+    
+    protected $table = 'planpost_plantype';
 }
