@@ -14,15 +14,15 @@
         @if($likedSpots->count() > 0)
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach($likedSpots as $spot)
-                    <div class="spot-card bg-white rounded-lg shadow-lg overflow-hidden transition-transform duration-200 transform hover:scale-105">
-                        <a href="/spots/{{ $spot->id }}">
-                            <img src="{{ $spot->spotimages->first()->image_path ?? asset('images/default-image.jpg') }}" 
-                                alt="{{ $spot->name ?? 'デフォルトのスポット画像' }}" class="w-full h-48 object-cover">
+                    <div class="spot-card bg-white rounded-lg shadow-lg overflow-hidden transition-transform duration-200 transform sm:hover:scale-105">
+                        <a href="/spots/{{ $spot->spot->id }}">
+                            <img src="{{ $spot->spot->spotimages->first()->image_path ?? asset('images/default-image.jpg') }}" 
+                                alt="{{ $spot->spot->name ?? 'デフォルトのスポット画像' }}" class="w-full h-48 object-cover">
                         </a>
                         <div class="flex items-center justify-between p-2">
-                            <h2 class="text-lg font-bold text-gray-800">{{ $spot->name }}</h2>
-                            <i class="fa-solid fa-star like-btn {{ $spot->isLikedByAuthUser() ? 'liked' : '' }}" 
-                                id="{{ $spot->id }}" style="font-size: 1.25rem;"></i>
+                            <h2 class="text-lg font-bold text-gray-800">{{ $spot->spot->name }}</h2>
+                            <i class="fa-solid fa-star like-btn {{ $spot->spot->isLikedByAuthUser() ? 'liked' : '' }}" 
+                                id="{{ $spot->spot->id }}" style="font-size: 1.25rem;"></i>
                         </div>
                     </div>
                 @endforeach
@@ -30,7 +30,9 @@
         @endif
         <p class="no-spots-message hidden">まだお気に入り登録したスポットはありません。</p>
     </div>
-
+    <div class='mt-8'>
+            <x-pagination :paginator="$likedSpots" />
+    </div>
     <script type="module">
         document.addEventListener('DOMContentLoaded', () => {
             setupLikeButtons();

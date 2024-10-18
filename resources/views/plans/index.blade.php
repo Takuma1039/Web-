@@ -40,7 +40,7 @@
         @if ($plans->count() > 0)
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach ($plans as $plan)
-                    <div class="flex flex-col justify-between p-6 max-w-sm bg-white rounded-lg border border-gray-200 shadow-md hover:shadow-lg transition duration-300">
+                    <div class="flex flex-col justify-between p-6 max-w-sm bg-white rounded-lg border border-gray-200 shadow-md sm:hover:shadow-lg transition duration-300 sm:hover:scale-105">
                         <div>
                             <a href="{{ route('plans.show', $plan->id) }}"><h2 class="text-xl font-bold mr-2 transition duration-300 ease-in-out transform hover:text-indigo-600">{{ $plan->title }}</h2></a>
                             <p class="text-gray-700 mb-2">旅行日: {{ $plan->start_date->format('Y年m月d日') }} {{ $plan->start_time->format('H時i分') }}</p>

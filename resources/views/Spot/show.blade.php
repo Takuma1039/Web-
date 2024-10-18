@@ -152,7 +152,7 @@
 
                     <!-- 口コミ投稿のポップアップ -->
                     <div id="reviewModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black bg-opacity-50">
-                        <div class="bg-white rounded-lg shadow-lg p-6 max-w-md w-full transition-transform transform scale-95 hover:scale-100">
+                        <div class="bg-white rounded-lg shadow-lg p-6 max-w-md w-full transition-transform transform scale-95 sm:hover:scale-100">
                             <h3 class="text-xl font-bold mb-4 text-center text-blue-600">口コミを投稿</h3>
                             <!-- 口コミ投稿フォーム -->
                             <x-review-form :spotId="$spot->id" />

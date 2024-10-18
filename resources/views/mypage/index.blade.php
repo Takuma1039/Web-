@@ -37,7 +37,7 @@
             @else
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-2">
                     @foreach ($plans as $plan)
-                        <a href="{{ route('plans.show', $plan->id) }}" class="p-6 bg-white rounded-2xl border border-gray-200 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105">
+                        <a href="{{ route('plans.show', $plan->id) }}" class="p-6 bg-white rounded-2xl border border-gray-200 shadow-md sm:hover:shadow-xl transition-all duration-300 transform sm:hover:-translate-y-1 sm:hover:scale-105">
                             <!-- タイトル -->
                             <h2 class="text-xl font-extrabold mb-3">{{ $plan->title }}</h2>
                             <!-- 旅行日 -->
@@ -69,7 +69,7 @@
             @else
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-2">
                     @foreach ($planposts as $planpost)
-                        <a href="{{ route('plans.show', $planpost->planpost->plan->id) }}" class="p-6 max-w-sm bg-white rounded-2xl border border-gray-200 shadow-md hover:shadow-lg transition duration-300 transform hover:-translate-y-1 hover:scale-105">
+                        <a href="{{ route('plans.show', $planpost->planpost->plan->id) }}" class="p-6 max-w-sm bg-white rounded-2xl border border-gray-200 shadow-md sm:hover:shadow-lg transition duration-300 transform sm:hover:-translate-y-1 sm:hover:scale-105">
                             <h2 class="text-xl font-extrabold mr-2">{{ $planpost->title }}</h2>
                             <p class="text-gray-500 text-sm mb-2">旅行日: 
                                 <span class="font-semibold">{{ $planpost->start_date->format('Y年m月d日') }}</span> 

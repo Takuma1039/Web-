@@ -241,7 +241,7 @@ class SpotController extends Controller
         $user = $request->user();
 
         // お気に入りスポットを取得
-        $likedSpots = $user->spotlikes()->with('spot')->get()->pluck('spot');
+        $likedSpots = $user->spotlikes()->with('spot')->paginate(10);
 
         return view('Spot.favorite', compact('likedSpots'));
     }
