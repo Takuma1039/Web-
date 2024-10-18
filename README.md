@@ -1,6 +1,6 @@
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-# Name アプリ名
+# アプリ名
 
 DayTrip Planner
 
@@ -9,9 +9,13 @@ DayTrip Planner
 今のシーズンに人気なスポットなどの情報を紹介し, 行きたいスポットを決定したときに, それらのスポットを経由する旅行プランを簡単に作成できるアプリです。他にも口コミ投稿や自分で作成した旅行プランの投稿ができます。
 
 ## 使用技術
+
 PHP:8.2.x
+
 Laravel:10.x.x
+
 Tailwind:5.x.x
+
 デプロイ：Heroku
 
 [![使用技術アイコン](https://skillicons.dev/icons?i=php,laravel,tailwind,heroku)](https://skillicons.dev)
