@@ -20,7 +20,9 @@ Tailwind:5.x.x
 
 [![使用技術アイコン](https://skillicons.dev/icons?i=php,laravel,tailwind,heroku)](https://skillicons.dev)
 
-## DEMO
+## URL・テストユーザー
+
+URL:[localhost:3000](https://oneday-trip-8e0ed0b84bcb.herokuapp.com/)
 
 以下のEmailとPasswardを用いてアクセスしてください。
 <markdown-accessiblity-table data-catalyst=""><table>
