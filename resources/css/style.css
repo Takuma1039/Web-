@@ -3,6 +3,7 @@
     color: orangered;
     transition: all 0.3s ease;
 }
+
 #dialog {
     display: none; /* デフォルトで非表示 */
 }

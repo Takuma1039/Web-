@@ -44,8 +44,12 @@
                     <!-- 新しい画像を追加 -->
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700">新しい画像ファイル（複数可）:</label>
-                        <input type="file" name="images[]" id="image-input" multiple class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-indigo-200" accept="image/*" onchange="previewImages()">
-                        <div id="image-preview" class="grid grid-cols-2 gap-4 mt-2"></div>
+                        <label for="image-input" class="bg-blue-600 text-white py-2 px-4 rounded-lg cursor-pointer hover:bg-blue-700 transition-all duration-200 shadow-lg inline-block">
+                            画像を選択
+                        </label>
+                        <input type="file" id="image-input" class="hidden" name="images[]" multiple accept="image/*" onchange="previewImages()">
+                        <span id="file-count" class="text-sm text-gray-600 ml-4">0ファイル選択</span>
+                        <div id="image-preview" class="flex flex-wrap mt-1"></div>
                     </div>
 
                     <!-- 既存の画像名の編集 -->
@@ -85,44 +89,69 @@
     </div>
     
     <script>
+        let selectFiles = []; // 選択されたファイルを保持
+
         function previewImages() {
-            const preview = document.getElementById('image-preview'); //IDがimage-previewの要素を取得
-            preview.innerHTML = ''; // プレビューをリセット
+            const fileInput = document.getElementById('image-input');
+            const preview = document.getElementById('image-preview');
+            const fileCount = document.getElementById('file-count'); 
+    
+            // 新しく選択されたファイルを追加
+            const newFiles = Array.from(fileInput.files);
+            selectFiles = selectFiles.concat(newFiles);
+            
+            fileCount.textContent = selectFiles.length + 'ファイル選択'; // ファイル数更新
+            
+            // プレビューをリセットしてから、選択されたすべてのファイルを表示
+            updatePreview();
+        }
 
-            const files = document.getElementById('image-input').files; // IDがimage-inputの要素から選択されたファイルを取得
-            //もしファイルが選択されていなければ、プレビュー領域に「画像が選択されていません。」というメッセージを表示
-            if (files.length === 0) {
-                preview.innerHTML = '<p class="text-gray-500">画像が選択されていません。</p>';
-                return;
-            }
-            //選択されたすべてのファイルに対してループを実行
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                const reader = new FileReader(); //FileReaderオブジェクトを作成
+        function updatePreview() {
+            const preview = document.getElementById('image-preview');
+            preview.innerHTML = '';
 
-                // 画像のプレビューと名前入力欄を作成
-                reader.onload = function(e) { //FileReaderオブジェクトがファイルを読み込んだときに呼び出されるイベントハンドラー
-                    const imgContainer = document.createElement('div'); //新しいdiv要素の作成
-                    imgContainer.classList.add('flex', 'flex-col', 'items-center', 'mb-4'); //imgContainerにTailwind CSSのスタイルクラスを追加
+            // すでに選択されたファイルをプレビューに追加
+            selectFiles.forEach((file, index) => {
+                const reader = new FileReader();
+        
+                reader.onload = function(e) {
+                    const imgContainer = document.createElement('div');
+                    imgContainer.classList.add('flex', 'flex-col', 'items-center', 'mb-4');
 
-                    const img = document.createElement('img'); //新しいimg要素を作成
-                    img.src = e.target.result; //FileReaderが読み込んだ画像データをimg要素のsrc属性に設定
-                    img.classList.add('h-32', 'w-full', 'object-cover', 'rounded-lg', 'shadow-lg'); //imgに対して、Tailwind CSSのスタイルクラスを追加
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.classList.add('h-32', 'w-full', 'object-cover', 'rounded-lg', 'shadow-lg');
 
-                    // 新しく追加された画像に対する名前入力欄を生成
-                    const nameInput = document.createElement('input'); //新しいinput要素を作成
-                    nameInput.type = 'text'; //入力フィールドのタイプをテキストに設定
-                    nameInput.name = `new_image_names[]`; // 入力フィールドの名前を設定
-                    nameInput.placeholder = '画像の名前を入力'; //入力フィールドが空のときに表示されるプレースホルダーテキストを設定
-                    nameInput.classList.add('mt-1', 'block', 'w-full', 'border', 'border-gray-300', 'rounded-md', 'shadow-sm', 'focus:ring', 'focus:ring-indigo-200'); //入力フィールドにTailwind CSSのスタイルクラスを追加
-
-                    imgContainer.appendChild(img); //生成した画像をコンテナimgContainerに追加
-                    imgContainer.appendChild(nameInput); //生成した名前入力欄をコンテナに追加
-                    preview.appendChild(imgContainer); //previewという親要素にimgContainerを追加
+                    const nameInput = document.createElement('input');
+                    nameInput.type = 'text';
+                    nameInput.name = `new_image_names[]`;
+                    nameInput.placeholder = '画像の名前を入力';
+                    nameInput.classList.add('mt-1', 'block', 'w-full', 'border', 'border-gray-300', 'rounded-md', 'shadow-sm', 'focus:ring', 'focus:ring-indigo-200');
+                    
+                    const removeButton = document.createElement('button');
+                    removeButton.textContent = '削除';
+                    removeButton.classList.add('mt-2', 'bg-red-600', 'text-white', 'rounded', 'px-4', 'py-2');
+                    removeButton.onclick = () => removeImage(index);
+                    
+                    imgContainer.appendChild(img);
+                    imgContainer.appendChild(nameInput);
+                    imgContainer.appendChild(removeButton);
+                    preview.appendChild(imgContainer);
                 }
 
-                reader.readAsDataURL(file); //選択されたファイルを読み込み、onloadイベントがトリガーされるのを待つ
-            }
+                reader.readAsDataURL(file);
+            });
+        }
+        
+        function removeImage(index) {
+            selectFiles.splice(index, 1);
+            updatePreview();
+            updateFileCount();
+        }
+        
+        function updateFileCount() {
+            const fileCount = document.getElementById('file-count');
+            fileCount.textContent = selectFiles.length + 'ファイル選択';
         }
     </script>
 </x-app-layout>

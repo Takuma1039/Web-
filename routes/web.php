@@ -25,6 +25,7 @@ use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\PlanController;
 use App\Http\Controllers\PlanpostController;
 use App\Http\Controllers\PlanLikeController;
+use App\Http\Controllers\UseController;
 
 /*
 |--------------------------------------------------------------------------
@@ -64,11 +65,22 @@ Route::middleware('auth', 'activity')->group(function () {
     Route::post('/planposts/store', [PlanpostController::class, 'store'])->name('planposts.store'); //旅行計画投稿の保存
     Route::post('/planpost/like', [PlanLikeController::class, 'likeplan']);  //旅行計画いいね機能
     Route::delete('/planposts/{planpost}', [PlanpostController::class, 'destroy'])->name('planposts.destroy'); //投稿した旅行計画の削除
-
-
+    Route::get('/planposts/{planpost}/edit', [PlanpostController::class, 'edit'])->name('planposts.edit'); //投稿した旅行計画の編集
+    Route::patch('/planposts/{planpost}', [PlanpostController::class, 'update'])->name('planposts.update'); //投稿した旅行計画の更新
 });
+
+Route::controller(PlanController::class)->middleware(['auth', 'activity'])->group(function(){
+    Route::get('/plans', 'index')->name('plans.index'); //旅行計画一覧
+    Route::get('/plans/create', 'create')->name('plans.create'); //旅行計画の作成
+    Route::get('/plans/{plan}/edit', 'edit')->name('plans.edit'); //旅行計画の編集
+    Route::put('/plans/{plan}', 'update')->name('plans.update'); //旅行計画の更新
+    Route::delete('/plans/{plan}', 'destroy')->name('plans.destroy'); //旅行計画の削除
+    Route::post('/plans/store', 'store')->name('plans.store'); //旅行計画の保存
+});
+
 //guestでも閲覧・操作できるページ
 Route::middleware('activity')->group(function () {
+    Route::get('/use', [UseController::class, 'index'])->name('use'); //使い方画面
     Route::get('/spots', [SpotController::class, 'index'])->name('spots.index'); //スポット一覧
     Route::get('/', [DashboardController::class, 'index'])->name('Toppage');  //トップページ
     Route::get('/spotcategories/{category}', [SpotcategoryController::class,'index']); //スポットカテゴリーごとの一覧
@@ -83,6 +95,7 @@ Route::middleware('activity')->group(function () {
     Route::get('/search', [SpotController::class, 'search'])->name('spot.search'); //検索
     Route::get('/planposts/index', [PlanpostController::class, 'index'])->name('planposts.index');
     Route::get('/plansearch', [PlanpostController::class, 'search'])->name('planposts.search'); //検索
+    Route::get('/plans/{plan}', [PlanController::class, 'show'])->name('plans.show'); //旅行計画の詳細
 });
 //プロフィール
 Route::middleware('auth', 'activity')->group(function () {
@@ -90,16 +103,6 @@ Route::middleware('auth', 'activity')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/profile/update-icon', [ProfileController::class, 'updateIcon'])->name('profile.updateIcon');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
-
-Route::controller(PlanController::class)->middleware(['auth', 'activity'])->group(function(){
-    Route::get('/plans', 'index')->name('plans.index'); //旅行計画一覧
-    Route::get('/plans/create', 'create')->name('plans.create'); //旅行計画の作成
-    Route::get('/plans/{plan}', 'show')->name('plans.show'); //旅行計画の詳細
-    Route::get('/plans/{plan}/edit', 'edit')->name('plans.edit'); //旅行計画の編集
-    Route::put('/plans/{plan}', 'update')->name('plans.update'); //旅行計画の更新
-    Route::delete('/plans/{plan}', 'destroy')->name('plans.destroy'); //旅行計画の削除
-    Route::post('/plans/store', 'store')->name('plans.store'); //旅行計画の保存
 });
 
 require __DIR__.'/auth.php';

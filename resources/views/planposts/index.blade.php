@@ -19,9 +19,9 @@
             <div class="p-1 space-y-6 md:space-y-8">
                 @foreach ($planposts as $planpost)
                     <div class="flex flex-col md:flex-row justify-between border border-gray-300 rounded-lg p-4 md:p-6 shadow-sm">
-                        <div class="w-full md:w-3/5 mb-4 md:mb-0">
+                        <div class="w-full flex flex-col md:w-3/5 mb-4 md:mb-0">
                             <div class="flex items-center justify-between mb-3 md:mb-4">
-                                <div class="flex items-center gap-2">
+                                <div class="gap-2">
                                     <a href="{{ route('plans.show', $planpost->plan->id) }}">
                                         <h2 class="text-lg md:text-xl font-bold transition duration-300 ease-in-out transform hover:text-indigo-600">{{ $planpost->title }}</h2>
                                     </a>
@@ -32,11 +32,14 @@
                                     @endauth
                                 </div>
                                 @if(Auth::id() === $planpost->user_id)
-                                    <form action="{{ route('planposts.destroy', $planpost->id) }}" method="POST" onsubmit="return confirm('本当に削除しますか？');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-red-600 hover:underline font-semibold transition duration-200 text-base md:text-lg">削除</button>
-                                    </form>
+                                    <div class="flex">
+                                        <a href="/planposts/{{ $planpost->id }}/edit" class="text-indigo-600 hover:underline font-semibold transition duration-200 text-base md:text-lg">編集</a>
+                                        <form action="{{ route('planposts.destroy', $planpost->id) }}" method="POST" onsubmit="return confirm('本当に削除しますか？');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="text-red-600 hover:underline font-semibold transition duration-200 text-base md:text-lg">削除</button>
+                                        </form>
+                                    </div>
                                 @endif
                             </div>
                             <div class="flex items-center justify-between mb-3 md:mb-4">
@@ -56,15 +59,15 @@
                                     @endforeach
                                 </span>
                             </div>
-                            <div class="border border-gray-300 bg-gray-50 rounded-md p-4 mt-2 md:mt-4">
+                            <div class="border border-gray-300 bg-gray-50 rounded-md p-4 mt-2 md:mt-4 flex-grow">
                                 <p class="text-base md:text-md text-gray-600">{{ $planpost->comment }}</p>
                             </div>
                         </div>
 
-                        <div class="w-full md:w-2/5 grid grid-cols-1 gap-4 md:grid-cols-2 relative md:ml-6">
+                        <div class="w-full md:w-2/5 grid grid-cols-3 gap-4 sm:grid-cols-3 md:grid-cols-2 relative md:ml-6 flex-grow">
                             @foreach($planpost->planimages as $plan_img)
-                                <a class="group relative flex-grow overflow-hidden rounded-lg shadow-lg transition-transform duration-300 transform hover:scale-105" onclick="openModal('{{ $plan_img->image_path }}')">
-                                    <img src="{{ asset($plan_img->image_path) }}" loading="lazy" alt="Image" class="absolute inset-0 h-full w-full object-cover object-center transition duration-200 group-hover:opacity-90" />
+                                <a class="group relative overflow-hidden rounded-lg shadow-lg transition-transform duration-300 transform hover:scale-105" onclick="openModal('{{ $plan_img->image_path }}')">
+                                    <img src="{{ asset($plan_img->image_path) }}" loading="lazy" alt="Image" class="h-full w-full object-contain object-cover object-center transition duration-200 group-hover:opacity-90" />
                                     <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-gray-800 via-transparent to-transparent opacity-40"></div>
                                 </a>
                             @endforeach

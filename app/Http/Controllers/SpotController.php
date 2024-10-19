@@ -274,7 +274,6 @@ class SpotController extends Controller
 
         $request->session()->put('history', $history); // 更新後にセッションに保存
     }
-
     
     public function truncateAtPunctuation($string, $maxLength) {
         

@@ -30,7 +30,7 @@
                                 @endauth
                             </h2>
                             <!-- 住所表示 -->
-                            <p class="text-gray-600 mt-1">{{ $spot->address }}</p>
+                            <p class="text-gray-600 text-sm p-2">{{ $spot->address }}</p>
                             <!-- カテゴリー表示 -->
                             <p class="text-gray-500 font-bold mt-1">カテゴリー:
                                 @foreach($spot->spotcategories as $category)

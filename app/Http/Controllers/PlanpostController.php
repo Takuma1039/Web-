@@ -15,6 +15,7 @@ use App\Models\PlanImage;
 use Cloudinary;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class PlanpostController extends Controller {
     
@@ -146,6 +147,96 @@ class PlanpostController extends Controller {
             \Log::error('Plan creation failed', ['error' => $e->getMessage()]);
             return redirect()->back()->withErrors(['error' => '旅行計画の投稿に失敗しました: ' . $e->getMessage()]);
         }
+    }
+    
+    public function edit(Request $request, Planpost $planpost) {
+        
+        $currentUrl = url()->current();
+        $currentPageName = '投稿した旅行計画の編集';
+        
+        // 履歴の管理
+        $this->updateHistory($request, $currentUrl, $currentPageName);
+    
+        $plantypeIds = json_decode($planpost->plan_category_ids, true) ?? [];
+        $seasonIds = (array) $planpost->season_id; 
+        $monthIds = (array) $planpost->month_id; 
+        $localIds = (array) $planpost->local_id; 
+        $planImages = PlanImage::where('planpost_id', $planpost->id)->get();
+        $plantypes = Plantype::all();
+        $locals = Local::all();
+        $seasons = Season::all();
+        $months = Month::all();
+        
+        $selectedLocalIds = $planpost->local->pluck('id')->toArray();
+        $selectedSeasonIds = $planpost->season->pluck('id')->toArray();
+        $selectedMonthIds = $planpost->month->pluck('id')->toArray();
+        $selectedPlantypeIds = $planpost->plantypes->pluck('id')->toArray();
+
+        return view('planposts.edit', compact(
+            'planpost', 'plantypes', 'locals', 
+            'seasons', 'months', 'plantypeIds', 
+            'seasonIds', 'monthIds', 'localIds', 
+            'planImages', 'selectedLocalIds', 'selectedSeasonIds',
+            'selectedMonthIds', 'selectedPlantypeIds'));
+    }
+    
+    public function update(PlanpostRequest $request, Planpost $planpost) {
+        
+        $images = $request->file('images');
+        $input = $request['planpost'];
+        $input['local_id'] = $request->input('planpost.local_id');
+        $input['season_id'] = $request->input('planpost.season_id');
+        $input['month_id'] = $request->input('planpost.month_id');
+
+        $input['plantype_ids'] = json_encode($request->input('planpost.plantype_ids', [])); 
+
+        try {
+            $planpost->update($input);
+
+            // 中間テーブルのカテゴリーの更新(更新だからデータを同期させるsync)
+            $planpost->plantypes()->sync($request->input('planpost.plantype_ids', []));
+            
+            // 画像削除処理
+            if ($request->has('remove_images')) {
+                foreach ($request->remove_images as $removeImageId) {
+                    $planImage = PlanImage::find($removeImageId);
+                    if ($planImage) {
+                        // Cloudinaryから画像を削除
+                        if (!empty($planImage->public_id)) {
+                            try {
+                                Cloudinary::destroy($splanImage->public_id);
+                            } catch (\Exception $e) {
+                                \Log::error('Error deleting image from Cloudinary: ' . $e->getMessage());
+                            }
+                        } else {
+                            \Log::warning('Public ID is missing for image ID: ' . $planImage->id);
+                        }
+                        $planImage->delete();
+                    }
+                }
+            }
+
+            // 新しい画像の処理
+            if ($images) {
+                foreach ($images as $image) {
+                    try {
+                        $uploadResult = Cloudinary::upload($image->getRealPath());
+                        $planImage = new PlanImage();
+                        $planImage->planpost_id = $planpost->id;
+                        $planImage->image_path = $uploadResult->getSecurePath();
+                        $planImage->public_id = $uploadResult->getPublicId();
+                        $planImage->save();
+                    } catch (\Exception $e) {
+                        \Log::error('エラー: ' . $e->getMessage());
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            \Log::error('Error updating planpost: ' . $e->getMessage());
+            return redirect()->back()->withErrors('エラーが発生しました: ' . $e->getMessage());
+        }
+
+        return redirect()->route('planposts.index', $planpost->id)->with('success', '投稿した旅行計画が更新されました！');
     }
     
     public function destroy($id) {

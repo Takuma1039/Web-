@@ -7,7 +7,7 @@
                         <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white flex items-center">
                             {{ $spot->name }}
                             @auth
-                                <div class="ml-4">
+                                <div class="px-4">
                                     <!--お気に入りボタンコンポーネント追加-->
                                     <x-like-button :spot="$spot" />
                                 </div>

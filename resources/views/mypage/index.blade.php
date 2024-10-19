@@ -33,7 +33,7 @@
                 <x-view-more-button route="plans.index" />
             </div>
             @if($plans->isEmpty())
-                <p>まだ作成した旅行計画はありません。</p>
+                <p class="ml-4">まだ作成した旅行計画はありません。</p>
             @else
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-2">
                     @foreach ($plans as $plan)
@@ -64,8 +64,8 @@
                 <h1 class="text-xl md:text-2xl font-semibold ml-2 px-2">いいねした旅行計画</h1>
                 <x-view-more-button route="planposts.likesplan" />
             </div>
-            @if($likedSpots->isEmpty())
-                <p>まだいいねした旅行計画はありません。</p>
+            @if($planposts->isEmpty())
+                <p class="ml-4">まだいいねした旅行計画はありません。</p>
             @else
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-2">
                     @foreach ($planposts as $planpost)

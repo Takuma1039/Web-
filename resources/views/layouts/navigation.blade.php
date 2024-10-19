@@ -99,9 +99,9 @@
                         <i class="fas fa-comment-dots" style="margin-right: 8px;"></i>
                             口コミ投稿一覧
                     </a>
-                    <a href="#" class="flex items-center px-4 py-2 mt-2 text-gray-100 hover:bg-gray-400 hover:bg-opacity-25 rounded-2xl" aria-label="Settings">
+                    <a href="/use" class="flex items-center px-4 py-2 mt-2 text-gray-100 hover:bg-gray-400 hover:bg-opacity-25 rounded-2xl" aria-label="Settings">
                         <i class="fas fa-cog" style="margin-right: 8px;"></i>
-                            設定
+                            使い方
                     </a>
                     @if (Auth::check())
                         <a href="{{ route('logout') }}" 
