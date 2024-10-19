@@ -2,7 +2,7 @@
     <form action="/planposts/{{ $planpost->id }}" method="POST" enctype="multipart/form-data" class="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
         @csrf
         @method('PATCH')
-        <h1 class="text-2xl font-bold mb-4">旅行計画投稿を編集</h1>
+        <h1 class="text-2xl font-bold mb-4">投稿した旅行計画の編集</h1>
             
         <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700">地域</label>

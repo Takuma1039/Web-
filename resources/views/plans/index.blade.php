@@ -38,7 +38,7 @@
 
         <!-- 旅行計画一覧 -->
         @if ($plans->count() > 0)
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
                 @foreach ($plans as $plan)
                     <div class="flex flex-col justify-between p-6 max-w-sm bg-white rounded-lg border border-gray-200 shadow-md sm:hover:shadow-lg transition duration-300 sm:hover:scale-105">
                         <div>

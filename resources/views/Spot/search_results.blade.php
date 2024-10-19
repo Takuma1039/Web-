@@ -74,9 +74,9 @@
             <!-- スポット一覧 -->
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 @forelse($results as $spot)
-                    <div class="bg-white p-6 rounded-lg shadow-lg transition-transform transform relative z-0 hover:shadow-xl hover:scale-105 duration-300 overflow-visible">
+                    <a href="{{ route('spots.show', $spot->id) }}" class="bg-white p-6 rounded-lg shadow-lg transition-transform transform relative z-0 hover:shadow-xl hover:scale-105 duration-300 overflow-visible">
                         <div class="relative">
-                            <a href="{{ route('spots.show', $spot->id) }}" class="hover:opacity-80 transition-opacity duration-150">
+                            <div class="hover:opacity-80 transition-opacity duration-150">
                                 <!-- 画像表示 -->
                                 @if ($spot->spotimages->isNotEmpty())
                                     <img src="{{ $spot->spotimages->first()->image_path }}" 
@@ -85,7 +85,7 @@
                                     <img src="/images/no_image_available.png" alt="画像がありません" 
                                         class="w-full h-48 object-cover rounded-lg mb-4">
                                 @endif
-                            </a>
+                            </div>
                             <!-- スポット名とお気に入りボタン -->
                             <h2 class="text-2xl font-semibold text-gray-800 mt-2 flex items-center">
                                 {{ $spot->name }}
@@ -124,7 +124,7 @@
                                 @endif
                             </p>
                         </div>
-                    </div>
+                    </a>
                     @empty
                         <p class="text-center text-gray-500 mt-8">現在、該当するスポットはありません。</p>
                 @endforelse

@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div class="container mx-auto py-4 md:py-8">
+    <div class="container mx-auto max-w-screen-xl py-4 md:py-8">
         <h1 class="text-3xl md:text-4xl font-bold text-gray-800 text-center mb-6 md:mb-8">みんなの旅行計画</h1>
         
         <!-- 成功メッセージ -->
@@ -21,7 +21,7 @@
                     <div class="flex flex-col md:flex-row justify-between border border-gray-300 rounded-lg p-4 md:p-6 shadow-sm">
                         <div class="w-full flex flex-col md:w-3/5 mb-4 md:mb-0">
                             <div class="flex items-center justify-between mb-3 md:mb-4">
-                                <div class="gap-2">
+                                <div class="flex flex-row items-center gap-2">
                                     <a href="{{ route('plans.show', $planpost->plan->id) }}">
                                         <h2 class="text-lg md:text-xl font-bold transition duration-300 ease-in-out transform hover:text-indigo-600">{{ $planpost->title }}</h2>
                                     </a>
