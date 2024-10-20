@@ -9,8 +9,8 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 @forelse($spots as $spot)
                     <div class="bg-white p-6 rounded-lg shadow-lg transition-transform transform z-0 sm:hover:shadow-xl sm:hover:scale-105 duration-300 overflow-visible">
-                        <a href="{{ route('spots.show', $spot->id) }}">
-                            <div class="hover:opacity-80 transition-opacity duration-150">
+                        <a href="{{ route('spots.show', $spot->id) }}"></a>
+                            <a href="{{ route('spots.show', $spot->id) }}" class="hover:opacity-80 transition-opacity duration-150">
                                 <!-- 画像表示 -->
                                 @if ($spot->spotimages->isNotEmpty())
                                     <img src="{{ $spot->spotimages->first()->image_path }}" 
@@ -19,7 +19,7 @@
                                     <img src="/images/no_image_available.png" alt="画像がありません" 
                                         class="w-full h-48 object-cover rounded-lg mb-4">
                                 @endif
-                            </div>
+                            </a>
                             <!-- スポット名とお気に入りボタン -->
                             <h2 class="text-2xl font-semibold text-gray-800 mt-2 flex items-center">
                                 {{ $spot->name }}

@@ -13,12 +13,8 @@
                 $yourDeveloperId = 1; // 開発者のIDを指定
             @endphp
             
-            <div class="ml-auto flex flex-col sm:flex-row items-center space-x-0 sm:space-x-4 space-y-2 sm:space-y-0">
+            <div class="ml-auto text-sm flex flex-col sm:flex-row items-center space-x-0 sm:space-x-4 space-y-2 sm:space-y-0">
                 @if (auth()->check() && auth()->user()->id === $yourDeveloperId)
-                    <form action="{{ route('history.clear') }}" method="POST" class="inline">
-                        @csrf
-                        <button type="submit" class="bg-white text-red-500 border-2 border-red-500 rounded-full px-4 py-1 font-bold uppercase tracking-wide hover:bg-red-500 hover:text-white transition-all duration-300 flex items-center justify-center">履歴を削除</button>
-                    </form>
                     <a href="/spots/create" class="bg-white text-gray-800 border-2 border-gray-800 rounded-full px-4 py-1 font-bold uppercase tracking-wide hover:bg-gray-800 hover:text-white transition-all duration-300 flex items-center justify-center">スポット作成</a>
                 @endif
                 

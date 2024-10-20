@@ -119,7 +119,55 @@ class PlanController extends Controller
         
         return view('plans.show', compact('plan', 'api_key', 'apikey', 'planpost'));
     }
+    
+    public function edit(Request $request, Plan $plan) {
+        
+        $currentUrl = url()->current();
+        $currentPageName = '旅行計画の編集';
+        
+        // 履歴の管理
+        $this->updateHistory($request, $currentUrl, $currentPageName);
+        
+        $user = $request->user();
 
+        // お気に入りスポットを取得
+        $likedSpots = $user->spotlikes()->with('spot:id,name,lat,long')->get()->pluck('spot');
+    
+        if (is_string($plan->start_date)) {
+            $plan->start_date = Carbon::createFromFormat('Y-m-d', $plan->start_date);
+        }
+            
+        if (is_string($plan->start_time)) {
+            $plan->start_time = Carbon::createFromFormat('H:i:s', $plan->start_time);
+        }
+
+        return view('plans.edit', compact('plan', 'likedSpots'));
+    }
+    
+    public function update(Request $request, Plan $plan) {
+        
+        $input = $request['plan'];
+
+        try {
+            $plan->update($input);
+            \DB::beginTransaction();
+            
+            foreach ($request->destinations as $index => $destinationId) {
+                $syncData[$destinationId] = ['order' => $index + 1];
+            }
+            $plan->destinations()->sync($syncData);
+            
+            \DB::commit();
+            
+        } catch (\Exception $e) {
+            \Log::error('Error updating plan: ' . $e->getMessage());
+            \DB::rollBack();
+            return redirect()->back()->withErrors('エラーが発生しました: ' . $e->getMessage());
+        }
+
+        return redirect()->route('plans.index', $plan->id)->with('success', '旅行計画が更新されました！');
+    }
+    
     public function destroy($id) {
         
         \DB::beginTransaction();

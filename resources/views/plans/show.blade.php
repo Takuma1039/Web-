@@ -12,9 +12,9 @@
             <h2 class="text-2xl font-bold">旅行日程</h2>
             <p class="text-lg text-gray-600">{{ $plan->start_date->format('Y年m月d日') }} {{ $plan->start_time->format('H時i分') }}</p>
         </div>
-        <label for="startTimeInput" class="mt-4 block text-lg font-bold">出発時刻を変更:</label>
+        <label for="startTimeInput" class="mt-4 block text-lg font-bold">現在時刻を変更:</label>
         <input type="datetime-local" id="startTimeInput" value="{{ $plan->start_date->format('Y-m-d\TH:i') }}" class="mt-2 p-2 border rounded" />
-        <button id="updateStartTimeButton" class="mt-2 p-2 bg-blue-500 text-white rounded hover:bg-blue-600">出発時刻を更新</button>
+        <button id="updateStartTimeButton" class="mt-2 p-2 bg-blue-500 text-white rounded hover:bg-blue-600">現在時刻を更新</button>
         <div id="message" class="text-green-600 mt-2 hidden"></div>
 
         <div class="mt-6">
@@ -84,6 +84,7 @@
         let directionsRenderer;
         let googleWaypoints = [];
         let navitimeWaypoints = [];
+        let visitedWaypoints = [];
         let startTime = "{{ $plan->start_date->format('Y-m-d') }}T{{ $plan->start_time->format('H:i:s') }}";
 
         document.getElementById("updateStartTimeButton").addEventListener("click", function() {
@@ -93,14 +94,14 @@
                 startTime = startTimeInput; 
                 
                 const messageDiv = document.getElementById("message");
-                messageDiv.textContent = "出発時刻が変更されました。";
+                messageDiv.textContent = "現在時刻が変更されました。";
                 messageDiv.classList.remove("hidden");
         
                 setTimeout(() => {
                     messageDiv.classList.add("hidden");
                 }, 3000);
             } else {
-                alert('出発時刻を入力してください。');
+                alert('現在時刻を入力してください。');
             }
         });
 
@@ -112,7 +113,7 @@
             directionsService = new google.maps.DirectionsService();
             directionsRenderer = new google.maps.DirectionsRenderer();
             getCurrentLocation();  //現在地の取得
-            startTrackingLocation(); // 位置情報のトラッキング
+            trackingCurrentLocation(); // 位置情報のトラッキング
         }
 
         function getCurrentLocation() {
@@ -128,6 +129,7 @@
                         map = new google.maps.Map(document.getElementById("map"), {
                             zoom: 10,
                             center: currentLocation,
+                            gestureHandling: 'greedy' //指一本での操作を有効
                         });
 
                         // 現在地マーカーの設定
@@ -153,7 +155,7 @@
         }
 
         
-        function startTrackingLocation() {
+        function trackingCurrentLocation() {
             if (navigator.geolocation) {
                 navigator.geolocation.watchPosition(
                     (position) => {
@@ -172,6 +174,7 @@
                                 title: "現在地",
                             });
                         }
+                        checkWaypointVisited(currentLocation);
                     },
                     (error) => {
                         console.error("位置情報の取得に失敗しました。", error);
@@ -181,6 +184,25 @@
             } else {
                 alert('位置情報サービスがサポートされていません。');
             }
+        }
+        
+        function checkWaypointVisited(currentLocation) {
+            googleWaypoints.forEach((waypoint, index) => {
+                const distance = google.maps.geometry.spherical.computeDistanceBetween(
+                    new google.maps.LatLng(currentLocation.lat, currentLocation.lng),
+                    new google.maps.LatLng(waypoint.location.lat, waypoint.location.lng)
+                );
+        
+                if (distance < 5000 && !visitedWaypoints.includes(index)) {
+                    visitedWaypoints.push(index);
+                    removeWaypointFromRoute(index);
+                }
+            });
+        }
+        
+        function removeWaypointFromRoute(index) {
+            googleWaypoints.splice(index, 1);
+            updateRoute();
         }
 
         function updateRoute() {
@@ -263,7 +285,7 @@
                     addWaypointMarkers(filteredWaypoints);
                     const waypointParam = encodeURIComponent(JSON.stringify(filteredWaypoints));
                     const goals = `${goalLocation.lat},${goalLocation.lng}`;
-                    const requestUrl = `https://navitime-route-totalnavi.p.rapidapi.com/route_transit?start=${startLocation.lat},${startLocation.lng}&goal=${goals}&via=${waypointParam}&datum=wgs84&term=1440&limit=5&start_time=${startTime}&coord_unit=degree&shape=true&options=railway_calling_at`;
+                    const requestUrl = `https://navitime-route-totalnavi.p.rapidapi.com/route_transit?start=${startLocation.lat},${startLocation.lng}&goal=${goals}&via=${waypointParam}&datum=wgs84&term=1440&limit=5&start_time=${startTime}&coord_unit=degree&shape=true&options=railway_calling_at&stay-time=${stayTime}`;
                     const options = {
                         method: 'GET',
                         headers: {
@@ -414,6 +436,18 @@
                 resultHTML += `</div>`;
                 routesContainer.innerHTML += resultHTML;
             });
+        }
+        
+        // 滞在時間を計算する関数
+        function calculateStayDuration(departureTime, arrivalTime) {
+            const depDate = new Date(departureTime);
+            const arrDate = new Date(arrivalTime);
+
+            const stayDurationMinutes = Math.floor((arrDate - depDate) / 60000); // 分単位で計算
+            const hours = Math.floor(stayDurationMinutes / 60);
+            const minutes = stayDurationMinutes % 60;
+
+            return { hours, minutes };
         }
         
         function formatDuration(totalMinutes) {

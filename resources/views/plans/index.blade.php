@@ -51,11 +51,14 @@
                             </ul>
                         </div>
                         <!-- 削除ボタン -->
-                        <div class="text-right mt-4">
+                        <div class="flex flex-row ml-auto mt-4 gap-2">
+                            <a href="{{ route('plans.edit', $plan->id) }}" class="bg-white text-green-500 rounded-full px-4 py-1 font-bold uppercase tracking-wide hover:bg-green-500 hover:text-white border-2 border-green-500 transition-all duration-300">
+                                編集
+                            </a>
                             <form action="{{ route('plans.destroy', $plan->id) }}" method="POST" onsubmit="return confirm('本当に削除しますか？');">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="bg-rose-500 text-white rounded-full px-4 py-1 font-bold uppercase tracking-wide hover:bg-white hover:text-rose-500 border-2 border-rose-500 transition-all duration-300">
+                                <button type="submit" class="bg-white text-rose-500 rounded-full px-4 py-1 font-bold uppercase tracking-wide hover:bg-rose-500 hover:text-white border-2 border-rose-500 transition-all duration-300">
                                     削除
                                 </button>
                             </form>
