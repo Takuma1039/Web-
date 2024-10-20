@@ -1,45 +1,51 @@
 <nav x-data="{ open: false }" class="bg-white border-b border-gray-100 fixed top-0 w-full h-auto z-50" aria-label="Main Navigation">
     <!-- Primary Navigation Menu -->
     <div class="bg-white shadow">
-        <div class="flex justify-between items-center py-4 px-4"> <!-- 全体を横並びに -->
-            <!-- Few Days-Trip タイトル -->
+        <div class="flex flex-col md:flex-row items-center py-4 px-4">
             <a href="/" aria-label="Dashboard">
                 <h1 class="text-xl font-mono font-bold">DayTrip Planner</h1>
             </a>
-            @include('components.breadcrumb') {{-- パンくずリスト --}}
+            <div class="px-4">
+                @include('components.breadcrumb') {{-- パンくずリスト --}}
+            </div>
             
             @php
                 $yourDeveloperId = 1; // 開発者のIDを指定
             @endphp
-
-            <div class="flex items-center space-x-4"> <!-- ボタンを横並びにする -->
+            
+            <div class="ml-auto flex flex-col sm:flex-row items-center space-x-0 sm:space-x-4 space-y-2 sm:space-y-0">
                 @if (auth()->check() && auth()->user()->id === $yourDeveloperId)
                     <form action="{{ route('history.clear') }}" method="POST" class="inline">
                         @csrf
-                        <button type="submit" class="text-red-600 hover:text-red-800">履歴を削除</button>
+                        <button type="submit" class="bg-white text-red-500 border-2 border-red-500 rounded-full px-4 py-1 font-bold uppercase tracking-wide hover:bg-red-500 hover:text-white transition-all duration-300 flex items-center justify-center">履歴を削除</button>
                     </form>
-                    <a href="/spots/create" class="text-blue-600 hover:text-blue-800">スポット作成</a>
+                    <a href="/spots/create" class="bg-white text-gray-800 border-2 border-gray-800 rounded-full px-4 py-1 font-bold uppercase tracking-wide hover:bg-gray-800 hover:text-white transition-all duration-300 flex items-center justify-center">スポット作成</a>
                 @endif
-
-                <!-- 新規登録 & ログインボタン -->
-                @guest
-                    <div class="flex flex-col sm:flex-row gap-2 justify-center">
-                        <a href="/register" class="bg-white text-gray-800 border-2 border-gray-800 rounded-full px-4 py-1 font-bold uppercase tracking-wide hover:bg-gray-800 hover:text-white transition-all duration-300 flex items-center justify-center">
-                            新規登録
-                        </a>
-                        <a href="/login" class="bg-white text-gray-800 border-2 border-gray-800 rounded-full px-4 py-1 font-bold uppercase tracking-wide hover:bg-gray-800 hover:text-white transition-all duration-300 flex items-center justify-center">
-                            ログイン
-                        </a>
+                
+                <div class="flex flex-row items-center gap-2">
+                    <!-- 新規登録 & ログインボタン -->
+                    <div class="text-sm flex flex-row gap-2 items-center">
+                        <form action="{{ route('history.clear') }}" method="POST" class="inline-block" id="history-btn">
+                            @csrf
+                            <button type="submit" id="clear-history" class="bg-white text-red-500 border-2 border-red-500 rounded-full px-4 py-1 font-bold uppercase tracking-wide hover:bg-red-500 hover:text-white transition-all duration-300 flex items-center justify-center">履歴クリア</button>
+                        </form>
+                        @guest
+                            <a href="/register" class="bg-white text-gray-800 border-2 border-gray-800 rounded-full px-4 py-1 font-bold uppercase tracking-wide hover:bg-gray-800 hover:text-white transition-all duration-300 flex items-center justify-center">
+                                新規登録
+                            </a>
+                            <a href="/login" class="bg-white text-gray-800 border-2 border-gray-800 rounded-full px-4 py-1 font-bold uppercase tracking-wide hover:bg-gray-800 hover:text-white transition-all duration-300 flex items-center justify-center">
+                                ログイン
+                            </a>
+                        @endguest
                     </div>
-                @endguest
-
-
-                <!-- Windowbar ボタン -->
-                <button class="text-gray-500 hover:text-gray-600 touch-manipulation" id="open-sidebar" aria-expanded="false" aria-controls="sidebar" @click="open = !open">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                    </svg>
-                </button>
+                
+                    <!-- Windowbar ボタン -->
+                    <button class="text-gray-500 hover:text-gray-600 touch-manipulation" id="open-sidebar" aria-expanded="false" aria-controls="sidebar" @click="open = !open">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -153,6 +159,10 @@
 
         //再調整用
         window.addEventListener('resize', adjustMarginTop);
+    });
+    
+    document.getElementById('clear-history').addEventListener('click', function() {
+        alert('本当に履歴をクリアしますか？');
     });
 </script>
 

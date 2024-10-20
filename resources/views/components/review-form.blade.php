@@ -60,11 +60,6 @@
     @endif
 </form>
 <script>
-    //口コミ投稿メッセージ表示用
-    document.querySelector('form').onsubmit = function() {
-      alert('口コミが投稿されました！');
-    };
-
     // 口コミ投稿モーダルの表示/非表示切替
     document.getElementById('reviewBtn').addEventListener('click', function() {
       document.getElementById('reviewModal').classList.remove('hidden');

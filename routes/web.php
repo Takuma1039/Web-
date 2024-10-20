@@ -44,8 +44,6 @@ Route::middleware('auth', 'activity', 'developer')->group(function () {
     Route::get('/spots/{spot}/edit', [SpotController::class, 'edit'])->name('spots.edit');  // 編集画面へのルート
     Route::patch('/spots/{spot}', [SpotController::class, 'update'])->name('spots.update');  // 更新処理へのルート
     Route::post('/spots/store', [SpotController::class, 'store'])->name('store'); //画像を含めたスポット投稿の保存機能
-    Route::post('/history/clear', [HistoryController::class, 'clearHistory'])->name('history.clear'); //履歴の削除
-
 });
 
 //login後使用可能
@@ -96,6 +94,7 @@ Route::middleware('activity')->group(function () {
     Route::get('/planposts/index', [PlanpostController::class, 'index'])->name('planposts.index');
     Route::get('/plansearch', [PlanpostController::class, 'search'])->name('planposts.search'); //検索
     Route::get('/plans/{plan}', [PlanController::class, 'show'])->name('plans.show'); //旅行計画の詳細
+    Route::post('/history/clear', [HistoryController::class, 'clearHistory'])->name('history.clear'); //履歴の削除
 });
 //プロフィール
 Route::middleware('auth', 'activity')->group(function () {

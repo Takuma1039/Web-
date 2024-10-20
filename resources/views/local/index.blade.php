@@ -22,19 +22,19 @@
                             @endauth
                         </div>
 
-                        <div class="flex mb-2">
-                            <div class="w-1/2 pr-2">
+                        <div class="flex flex-col lg:flex-row mb-2">
+                            <div class="w-full lg:w-1/2 pr-2">
                                 <p class="text-gray-600 mb-2">
                                     {{ $spot->truncated_body }}
                                 </p>
                                 <span class="text-sm font-medium text-gray-600" id="likeCount-{{ $spot->id }}">{{ $spot->likes->count() }} いいね</span>
                             </div>
                 
-                            <div class="w-1/2 pl-2">
+                            <div class="w-full lg:w-1/2 pl-2">
                                 @if ($spot->spotimages->isNotEmpty())
-                                    <img src="{{ $spot->spotimages->first()->image_path }}" alt="{{ $spot->name }}" class="w-full h-48 object-cover rounded-lg">
+                                    <img src="{{ $spot->spotimages->first()->image_path }}" alt="{{ $spot->name }}" class="w-full h-auto sm:h-48 object-cover rounded-lg">
                                 @else
-                                    <img src="/images/no_image_available.png" alt="No image" class="w-full h-48 object-cover rounded-lg">
+                                    <img src="/images/no_image_available.png" alt="No image" class="w-full h-auto sm:h-48 object-cover rounded-lg">
                                 @endif
                             </div>
                         </div>
