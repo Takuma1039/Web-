@@ -246,7 +246,14 @@
                 <div class="mt-4 text-right">
                     <p>ログインユーザー: {{ Auth::user()->name }}</p>
                     @if (auth()->user()->id === $yourDeveloperId)
-                        <a href="/spots/{{ $spot->id }}/edit" class="text-indigo-600 hover:underline">編集</a>
+                        <a href="/spots/{{ $spot->id }}/edit" class="bg-white text-indigo-500 rounded-full px-4 py-1 font-bold uppercase tracking-wide hover:bg-indigo-500 hover:text-white border-2 border-indigo-500 transition-all duration-300">編集</a>
+                        <form action="{{ route('spots.destroy', $spot->id) }}" method="POST" onsubmit="return confirm('本当に削除しますか？');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="bg-white text-rose-500 rounded-full px-4 py-1 font-bold uppercase tracking-wide hover:bg-rose-500 hover:text-white border-2 border-rose-500 transition-all duration-300">
+                                削除
+                            </button>
+                        </form>
                     @endif
                 </div>
             @endauth

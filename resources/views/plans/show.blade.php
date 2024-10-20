@@ -105,10 +105,6 @@
             }
         });
 
-        document.addEventListener("DOMContentLoaded", function() {
-            initMap();
-        });
-
         function initMap() {
             directionsService = new google.maps.DirectionsService();
             directionsRenderer = new google.maps.DirectionsRenderer();
@@ -174,7 +170,7 @@
                                 title: "現在地",
                             });
                         }
-                        checkWaypointVisited(currentLocation);
+                        //checkWaypointVisited(currentLocation);
                     },
                     (error) => {
                         console.error("位置情報の取得に失敗しました。", error);
@@ -285,7 +281,7 @@
                     addWaypointMarkers(filteredWaypoints);
                     const waypointParam = encodeURIComponent(JSON.stringify(filteredWaypoints));
                     const goals = `${goalLocation.lat},${goalLocation.lng}`;
-                    const requestUrl = `https://navitime-route-totalnavi.p.rapidapi.com/route_transit?start=${startLocation.lat},${startLocation.lng}&goal=${goals}&via=${waypointParam}&datum=wgs84&term=1440&limit=5&start_time=${startTime}&coord_unit=degree&shape=true&options=railway_calling_at&stay-time=${stayTime}`;
+                    const requestUrl = `https://navitime-route-totalnavi.p.rapidapi.com/route_transit?start=${startLocation.lat},${startLocation.lng}&goal=${goals}&via=${waypointParam}&datum=wgs84&term=1440&limit=5&start_time=${startTime}&coord_unit=degree&shape=true&options=railway_calling_at`;
                     const options = {
                         method: 'GET',
                         headers: {
@@ -438,18 +434,6 @@
             });
         }
         
-        // 滞在時間を計算する関数
-        function calculateStayDuration(departureTime, arrivalTime) {
-            const depDate = new Date(departureTime);
-            const arrDate = new Date(arrivalTime);
-
-            const stayDurationMinutes = Math.floor((arrDate - depDate) / 60000); // 分単位で計算
-            const hours = Math.floor(stayDurationMinutes / 60);
-            const minutes = stayDurationMinutes % 60;
-
-            return { hours, minutes };
-        }
-        
         function formatDuration(totalMinutes) {
             const hours = Math.floor(totalMinutes / 60);  // 分から時間を計算
             const minutes = totalMinutes % 60;           // 残りの分を計算
@@ -473,5 +457,5 @@
             }).replace(',', '');
         }
     </script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ $api_key }}&callback=initMap&v=weekly&libraries=places,geometry"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ $api_key }}&callback=initMap&v=weekly&libraries=places,geometry&callback=initMap"></script>
 </x-app-layout>

@@ -158,7 +158,11 @@
     });
     
     document.getElementById('clear-history').addEventListener('click', function() {
-        alert('本当に履歴をクリアしますか？');
+        if (confirm('本当に履歴をクリアしますか？')) {
+            alert('履歴がクリアされました。');
+        } else {
+            alert('履歴はクリアされませんでした。');
+        }
     });
 </script>
 

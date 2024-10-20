@@ -229,6 +229,28 @@ class SpotController extends Controller
         return redirect()->route('spots.show', $spot->id)->with('success', 'スポットが更新されました！');
     }
     
+    public function destroy($id) {
+        
+        \DB::beginTransaction();
+    
+        try {
+            
+            $spot = Spot::findOrFail($id);
+            $spot->spotimages()->delete();
+            $spot->delete();
+            // トランザクションをコミット
+            \DB::commit();
+        
+            // 成功メッセージと共にリダイレクト
+            return redirect()->route('spots.index')->with('success', 'スポットが削除されました。');
+        } catch (\Exception $e) {
+            // トランザクションをロールバック
+            \DB::rollBack();
+            // エラーメッセージを表示
+            return redirect()->route('spots.index')->with('error', 'スポットの削除中にエラーが発生しました。' . $e->getMessage());
+        }
+    }
+    
     // お気に入りスポット一覧
     public function favorite(Request $request) {
         

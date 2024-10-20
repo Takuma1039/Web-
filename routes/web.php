@@ -39,11 +39,12 @@ use App\Http\Controllers\UseController;
 */
 
 //開発者のみ
-Route::middleware('auth', 'activity', 'developer')->group(function () {
-    Route::get('/spots/create', [SpotController::class, 'create'])->name('spots.create');  //スポット作成フォーム
-    Route::get('/spots/{spot}/edit', [SpotController::class, 'edit'])->name('spots.edit');  // 編集画面へのルート
-    Route::patch('/spots/{spot}', [SpotController::class, 'update'])->name('spots.update');  // 更新処理へのルート
-    Route::post('/spots/store', [SpotController::class, 'store'])->name('store'); //画像を含めたスポット投稿の保存機能
+Route::controller(SpotController::class)->middleware(['auth', 'activity', 'developer'])->group(function () {
+    Route::get('/spots/create', 'create')->name('spots.create');  //スポット作成フォーム
+    Route::get('/spots/{spot}/edit', 'edit')->name('spots.edit');  // 編集画面へのルート
+    Route::patch('/spots/{spot}', 'update')->name('spots.update');  // 更新処理へのルート
+    Route::post('/spots/store', 'store')->name('store'); //画像を含めたスポット投稿の保存機能
+    Route::delete('/spots/{spot}', 'destroy')->name('spots.destroy');
 });
 
 //login後使用可能
