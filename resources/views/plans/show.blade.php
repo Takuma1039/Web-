@@ -3,8 +3,10 @@
         <h1 class="text-4xl font-extrabold text-gray-800 text-center">
             @if(Auth::id() === $plan->user_id)
                 {{ $plan->title }}
-            @else
+            @elseif(isset($planpost))
                 {{ $planpost->title }}
+            @else
+                タイトルが存在しません
             @endif
         </h1>
         
@@ -12,16 +14,17 @@
             <h2 class="text-2xl font-bold">旅行日程</h2>
             <p class="text-lg text-gray-600">{{ $plan->start_date->format('Y年m月d日') }} {{ $plan->start_time->format('H時i分') }}</p>
         </div>
-        <label for="startTimeInput" class="mt-4 block text-lg font-bold">現在時刻を変更:</label>
-        <input type="datetime-local" id="startTimeInput" value="{{ $plan->start_date->format('Y-m-d\TH:i') }}" class="mt-2 p-2 border rounded" />
-        <button id="updateStartTimeButton" class="mt-2 p-2 bg-blue-500 text-white rounded hover:bg-blue-600">現在時刻を更新</button>
+        
+        <label for="startTimeInput" class="mt-4 block text-lg font-bold">出発時刻を変更:</label>
+        <input type="datetime-local" id="startTimeInput" value="" class="mt-2 p-2 border rounded" />
+        <button id="updateStartTimeButton" class="bg-green-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-600 transition-all duration-300 shadow-lg">出発時刻を更新</button>
         <div id="message" class="text-green-600 mt-2 hidden"></div>
 
         <div class="mt-6">
             <h2 class="text-2xl font-bold">スポット</h2>
             <ul class="space-y-2">
                 @foreach ($plan->destinations as $index => $destination)
-                    <li class="p-4 border rounded-lg shadow-md bg-gray-50">
+                    <li class="p-4 border rounded-lg shadow-md bg-gray-50 hover:text-indigo-500">
                         @if ($destination->id)
                             <a href="/spots/{{ $destination->id }}" class="flex items-center space-x-4">
                                 <div>
@@ -40,6 +43,14 @@
                 @endforeach
             </ul>
         </div>
+        @if(Auth::id() === $plan->user_id)
+            <div class="mt-6">
+                <label for="memoInput" class="block text-2xl font-bold">旅行メモ</label>
+                <textarea id="memoInput" rows="4" class="w-full mt-2 p-2 border rounded" placeholder="ここにメモを入力してください">{{ $plan->memo }}</textarea>
+                <button id="saveMemoButton" class="bg-lime-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-lime-600 transition-all duration-300 shadow-lg">メモを保存</button>
+                <div id="memo-message" class="text-green-600 mt-2 hidden"></div>
+            </div>
+        @endif
 
         <div class="flex flex-col items-center mt-6">
             <label for="travelModeSelect" class="text-lg font-medium mb-2">移動手段を選択:</label>
@@ -49,7 +60,7 @@
                 <option value="TRANSIT">公共交通機関</option>
             </select>
 
-            <button onclick="updateRoute()" class="mt-4 w-full max-w-xs bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50">
+            <button onclick="updateRoute()" class="mt-2 w-full max-w-xs bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition-all duration-300 shadow-lg">
                 経路を検索
             </button>
         </div>
@@ -94,15 +105,43 @@
                 startTime = startTimeInput; 
                 
                 const messageDiv = document.getElementById("message");
-                messageDiv.textContent = "現在時刻が変更されました。";
+                messageDiv.textContent = "出発時刻が変更されました。";
                 messageDiv.classList.remove("hidden");
         
                 setTimeout(() => {
                     messageDiv.classList.add("hidden");
-                }, 3000);
+                }, 2000);
             } else {
                 alert('現在時刻を入力してください。');
             }
+        });
+        
+        document.getElementById('saveMemoButton').addEventListener('click', function() {
+            const planId = {{ $plan->id }};
+            const memoContent = document.getElementById('memoInput').value;
+            
+            fetch(`/plans/${planId}/memo`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                },
+                body: JSON.stringify({ memo: memoContent }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                const messageDiv = document.getElementById('memo-message');
+                messageDiv.textContent = data.message;
+                messageDiv.classList.remove('hidden');
+                messageDiv.classList.add('block');
+                
+                setTimeout(() => {
+                    messageDiv.classList.add("hidden");
+                }, 2000);
+            })
+            .catch(error => {
+                console.error('メモの更新中にエラーが発生しました:', error);
+            });
         });
 
         function initMap() {
@@ -241,6 +280,11 @@
         function searchRoute(startLocation, goalLocation, waypoints, travelMode) {
             const now = new Date();
             const startTimeDate = new Date(startTime);
+            //秒とミリ秒を無視
+            startTimeDate.setSeconds(0);
+            startTimeDate.setMilliseconds(0);
+            now.setSeconds(0);
+            now.setMilliseconds(0);
 
             if (startTimeDate < now) {
                 alert('出発時刻が過去です。現在時刻以降を指定してください。');

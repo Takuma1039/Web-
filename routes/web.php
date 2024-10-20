@@ -75,6 +75,7 @@ Route::controller(PlanController::class)->middleware(['auth', 'activity'])->grou
     Route::put('/plans/{plan}', 'update')->name('plans.update'); //旅行計画の更新
     Route::delete('/plans/{plan}', 'destroy')->name('plans.destroy'); //旅行計画の削除
     Route::post('/plans/store', 'store')->name('plans.store'); //旅行計画の保存
+    Route::post('/plans/{plan}/memo', 'updateMemo')->name('plans.memo');
 });
 
 //guestでも閲覧・操作できるページ

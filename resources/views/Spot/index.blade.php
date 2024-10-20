@@ -5,6 +5,14 @@
             <h1 class="text-4xl font-extrabold text-gray-800 text-center mb-8">スポット一覧</h1>
             <!--検索バーコンポーネント-->
             <x-search-bar :spotcategories="$spotcategories" :locals="$locals" :seasons="$seasons" :months="$months" />
+            
+            <!-- 成功メッセージ -->
+            @if (session('success'))
+                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-6" role="alert">
+                    <span class="block sm:inline">{{ session('success') }}</span>
+                </div>
+            @endif
+        
             <!-- スポット一覧 -->
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 @forelse($spots as $spot)

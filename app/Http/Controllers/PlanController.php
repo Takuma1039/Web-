@@ -168,6 +168,19 @@ class PlanController extends Controller
         return redirect()->route('plans.index', $plan->id)->with('success', '旅行計画が更新されました！');
     }
     
+    public function updateMemo(Request $request, $id) {
+        
+        $request->validate([
+            'memo' => 'nullable|string|max:1000',
+        ]);
+
+        $plan = Plan::findOrFail($id);
+        $plan->memo = $request->input('memo');
+        $plan->save();
+
+        return response()->json(['message' => 'メモが更新されました']);
+    }
+    
     public function destroy($id) {
         
         \DB::beginTransaction();
