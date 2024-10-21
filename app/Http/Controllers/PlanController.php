@@ -95,6 +95,10 @@ class PlanController extends Controller
         $plan = Plan::with('destinations')->find($id);
     
         $planpost = Planpost::where('plan_id', $id)->first();
+        
+        if (!$planpost) {
+            return redirect()->route('Toppage');
+        }
     
         $currentUrl = url()->current();
         $currentPageName = $plan->title; // 計画のタイトルをページ名に使用
