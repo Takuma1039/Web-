@@ -87,7 +87,8 @@ URL:[localhost:3000](https://oneday-trip-8e0ed0b84bcb.herokuapp.com/)
   - スポット内での楽しみ方なども紹介してくれる機能も欲しい
   - フレンド機能を作成し、フレンド内で旅行計画を一緒に作れるような機能も追加したい
 ## ER図・ワイヤーフレームなど
-![Uploading image.png…]()
+![ER図](https://github.com/user-attachments/assets/233e5e73-d78a-41aa-9858-1d26fae5ba73)
+
 
 
 
