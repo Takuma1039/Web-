@@ -27,7 +27,7 @@ class DashboardController extends Controller
     $majorspots = $this->getSpotsWithLikes();
     $reviewspots = $this->getSpotsWithReviews();
     $seasonspots = $this->getSeasonSpots();
-    $spotlists = Spot::withCount('likes')->orderBy('name', 'asc')->get();
+    $spotlists = Spot::withCount('likes')->orderBy('name', 'asc')->paginate(10);
     
     // 各スポットリストに対して共通処理を実行
     $this->processSpotData($majorspots);
@@ -61,7 +61,7 @@ class DashboardController extends Controller
                 ->whereColumn('spotlikes.spot_id', 'spots.id');
         }, '>', 0)  // likes_count をWHEREでフィルタ
         ->orderByRaw('(select count(*) from spotlikes where spotlikes.spot_id = spots.id) desc')
-        ->get();
+        ->paginate(10);
 }
 
 private function getSpotsWithReviews()
@@ -74,7 +74,7 @@ private function getSpotsWithReviews()
                 ->whereColumn('reviews.spot_id', 'spots.id');
         }, '>', 0) 
         ->orderByRaw('(select count(*) from reviews where reviews.spot_id = spots.id) desc') 
-        ->get();
+        ->paginate(10);
 }
 
 private function getSeasonSpots()
@@ -82,7 +82,7 @@ private function getSeasonSpots()
     return Spot::select('spots.*')
         ->join('season_spots', 'spots.id', '=', 'season_spots.spot_id')
         ->orderByRaw('(select count(*) from spotlikes where spotlikes.spot_id = spots.id) desc')
-        ->get();
+        ->paginate(10);
 }
 
 private function getSlideImages($majorspots)
