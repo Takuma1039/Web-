@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="container mx-auto px-4">
         <h1 class="text-4xl font-extrabold text-gray-800 text-center">
-            @if(Auth::id() === $plan->user_id)
+            @if(Auth::check() && Auth::id() === $plan->user_id)
                 {{ $plan->title }}
             @elseif(isset($planpost))
                 {{ $planpost->title }}
