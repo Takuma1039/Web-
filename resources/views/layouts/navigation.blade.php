@@ -21,9 +21,9 @@
                 <div class="flex flex-row items-center gap-2">
                     <!-- 新規登録 & ログインボタン -->
                     <div class="text-sm flex flex-row gap-2 items-center">
-                        <form action="{{ route('history.clear') }}" method="POST" class="inline-block" id="history-btn">
+                        <form action="{{ route('history.clear') }}" method="POST" class="inline-block" id="history-btn" onsubmit="return confirmDeletion()">
                             @csrf
-                            <button type="submit" id="clear-history" class="bg-white text-red-500 border-2 border-red-500 rounded-full px-4 py-1 font-bold uppercase tracking-wide hover:bg-red-500 hover:text-white transition-all duration-300 flex items-center justify-center">履歴クリア</button>
+                            <button type="submit" class="bg-white text-red-500 border-2 border-red-500 rounded-full px-4 py-1 font-bold uppercase tracking-wide hover:bg-red-500 hover:text-white transition-all duration-300 flex items-center justify-center">履歴クリア</button>
                         </form>
                         @guest
                             <a href="/register" class="bg-white text-gray-800 border-2 border-gray-800 rounded-full px-4 py-1 font-bold uppercase tracking-wide hover:bg-gray-800 hover:text-white transition-all duration-300 flex items-center justify-center">
@@ -157,12 +157,8 @@
         window.addEventListener('resize', adjustMarginTop);
     });
     
-    document.getElementById('clear-history').addEventListener('click', function() {
-        if (confirm('本当に履歴をクリアしますか？')) {
-            alert('履歴がクリアされました。');
-        } else {
-            alert('履歴はクリアされませんでした。');
-        }
-    });
+    function confirmDeletion() {
+        return confirm('本当に履歴をクリアしますか？');
+    }
 </script>
 

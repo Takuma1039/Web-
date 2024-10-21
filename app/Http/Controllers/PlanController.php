@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Plan;
 use App\Models\Spot;
 use App\Models\Planpost;
@@ -96,7 +97,7 @@ class PlanController extends Controller
     
         $planpost = Planpost::where('plan_id', $id)->first();
         
-        if (!$planpost) {
+        if (!Auth::check() && !$planpost) {
             return redirect()->route('Toppage');
         }
     
