@@ -14,7 +14,7 @@
         </div>
         
         <label for="startTimeInput" class="mt-4 block text-lg font-bold">出発時刻を変更:</label>
-        <input type="datetime-local" id="startTimeInput" value="" class="mt-2 p-2 border rounded" />
+        <input type="datetime-local" id="startTimeInput" class="mt-2 p-2 border rounded" />
         <button id="updateStartTimeButton" class="bg-green-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-600 transition-all duration-300 shadow-lg">出発時刻を更新</button>
         <div id="message" class="text-green-600 mt-2 hidden"></div>
 
@@ -31,7 +31,7 @@
                                     @else
                                         <span class="font-semibold">経由地: {{ $destination->name }}</span>
                                     @endif
-                                    <span class="text-gray-500">（{{ $destination->lat }}, {{ $destination->long }}）</span>
+                                    <span class="text-gray-500">（{{ $destination->address }}）</span>
                                 </div>
                             </a>
                         @else
@@ -110,7 +110,7 @@
                     messageDiv.classList.add("hidden");
                 }, 2000);
             } else {
-                alert('現在時刻を入力してください。');
+                alert('出発時刻が過去です。現在時刻以降を指定してください。');
             }
         });
         
@@ -145,7 +145,8 @@
         function initMap() {
             directionsService = new google.maps.DirectionsService();
             directionsRenderer = new google.maps.DirectionsRenderer();
-            getCurrentLocation();  //現在地の取得
+            initializeWaypoints(); // 目的地の初期設定
+            getCurrentLocation();  // 現在地の取得
             trackingCurrentLocation(); // 位置情報のトラッキング
         }
 
@@ -207,7 +208,7 @@
                                 title: "現在地",
                             });
                         }
-                        //checkWaypointVisited(currentLocation);
+                        checkWaypointVisited(currentLocation);
                     },
                     (error) => {
                         console.error("位置情報の取得に失敗しました。", error);
@@ -226,21 +227,20 @@
                     new google.maps.LatLng(waypoint.location.lat, waypoint.location.lng)
                 );
         
-                if (distance < 5000 && !visitedWaypoints.includes(index)) {
+                if (distance < 500 && !visitedWaypoints.includes(index)) {
                     visitedWaypoints.push(index);
                     removeWaypointFromRoute(index);
                 }
             });
         }
-        
+
         function removeWaypointFromRoute(index) {
             googleWaypoints.splice(index, 1);
+            navitimeWaypoints.splice(index, 1);
             updateRoute();
         }
-
-        function updateRoute() {
-            googleWaypoints = [];
-            navitimeWaypoints = [];
+        
+        function initializeWaypoints() {
             @foreach ($plan->destinations as $destination)
                 googleWaypoints.push({
                     location: { lat: {{ $destination->lat }}, lng: {{ $destination->long }} },
@@ -248,12 +248,27 @@
                 });
                 navitimeWaypoints.push({ lat: {{ $destination->lat }}, lon: {{ $destination->long }} });
             @endforeach
+        }
+
+        function updateRoute() {
+            const updatedGoogleWaypoints = [];
+            const updatedNavitimeWaypoints = [];
+            
+            googleWaypoints.forEach((waypoint) => {
+                updatedGoogleWaypoints.push(waypoint);
+            });
+
+            navitimeWaypoints.forEach((waypoint) => {
+                updatedNavitimeWaypoints.push(waypoint);
+            });
+            console.log(updatedGoogleWaypoints);
+            console.log(updatedNavitimeWaypoints);
             
             const travelMode = document.getElementById("travelModeSelect").value;
             const currentLocation = { lat: userMarker.getPosition().lat(), lng: userMarker.getPosition().lng() };
             if(travelMode === "TRANSIT") {
-                if(navitimeWaypoints.length === 1) {
-                    const goal = { lat: navitimeWaypoints[0].lat, lng: navitimeWaypoints[0].lon };
+                if(updatedNavitimeWaypoints.length === 1) {
+                    const goal = { lat: updatedNavitimeWaypoints[0].lat, lng: updatedNavitimeWaypoints[0].lon };
                     searchRoute(currentLocation, goal, [], travelMode);
                     goalMarker = new google.maps.Marker({
                                 position: goal,
@@ -261,8 +276,8 @@
                                 title: "目的地",
                             });
                 } else {
-                    const goal = { lat: navitimeWaypoints[navitimeWaypoints.length - 1].lat, lng: navitimeWaypoints[navitimeWaypoints.length - 1].lon };
-                searchRoute(currentLocation, goal, navitimeWaypoints.slice(0, -1), travelMode);
+                    const goal = { lat: updatedNavitimeWaypoints[updatedNavitimeWaypoints.length - 1].lat, lng: updatedNavitimeWaypoints[updatedNavitimeWaypoints.length - 1].lon };
+                searchRoute(currentLocation, goal, updatedNavitimeWaypoints.slice(0, -1), travelMode);
                 goalMarker = new google.maps.Marker({
                                 position: goal,
                                 map: map,
@@ -270,8 +285,8 @@
                             });
                 }
             } else {
-                const goal = googleWaypoints[googleWaypoints.length - 1].location;
-                searchRoute(currentLocation, goal, googleWaypoints.slice(0, -1), travelMode);
+                const goal = updatedGoogleWaypoints[updatedGoogleWaypoints.length - 1].location;
+                searchRoute(currentLocation, goal, updatedGoogleWaypoints.slice(0, -1), travelMode);
             }
         }
         
