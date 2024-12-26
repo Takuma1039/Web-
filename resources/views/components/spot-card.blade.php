@@ -27,7 +27,7 @@
                 </h3>
                 <p class="text-gray-600 mt-1 text-sm">{{ $spot->truncated_body }}</p> 
 
-                <div class="flex items-center"> 
+                <div class="flex items-center">
                     <!-- 総合評価コンポーネント追加 -->
                     <x-rating :average-rating="$spot->average_rating" />
                     <span class="ml-1 text-gray-600 text-sm"> 
