@@ -18,7 +18,7 @@
 
             <!-- 画像の表示 -->
             <a onclick="openModal('{{ $spot->spotimages->first()->image_path ?? asset('images/default-image.jpg') }}')" aria-label="スポットの詳細ページへ移動">
-                <img src="{{ $spot->spotimages->first()->image_path ?? asset('images/default-image.jpg') }}" alt="" class="w-full h-32 object-cover" loading="lazy"> <!-- 高さを小さく変更 -->
+                <img src="{{ $spot->spotimages->first()->image_path ?? asset('images/default-image.jpg') }}" alt="" class="w-full h-32 object-cover" loading="lazy">
             </a>
 
             <div class="flex-1 p-3 flex flex-col justify-between"> 
@@ -28,7 +28,6 @@
                 <p class="text-gray-600 mt-1 text-sm">{{ $spot->truncated_body }}</p> 
 
                 <div class="flex items-center">
-                    <!-- 総合評価コンポーネント追加 -->
                     <x-rating :average-rating="$spot->average_rating" />
                     <span class="ml-1 text-gray-600 text-sm"> 
                         <span class="text-gray-500 italic font-extrabold">{{ $spot->reviews->count() }} reviews</span>
